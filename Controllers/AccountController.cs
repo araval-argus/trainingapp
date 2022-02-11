@@ -29,6 +29,11 @@ namespace ChatApp.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
+            if ((loginModel.EmailAddress == "" && loginModel.Username == "") || (loginModel.EmailAddress == null && loginModel.EmailAddress == null))
+            {
+                return BadRequest();
+            }
+
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
             var user = _profileService.CheckPassword(loginModel);
 

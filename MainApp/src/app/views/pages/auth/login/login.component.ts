@@ -14,6 +14,13 @@ export class LoginComponent implements OnInit {
 
   returnUrl: any;
   loginModel: LoginModel
+
+  // utils
+  isFormValid: boolean = true;
+  isEmailValid: boolean = true;
+  isPasswordValid: boolean = true;
+  isPasswordValidLength: boolean = true;
+
   constructor(private router: Router,
     private route: ActivatedRoute,
     private accountService: AccountService,
@@ -32,6 +39,15 @@ export class LoginComponent implements OnInit {
   onLoggedin(e) {
     e.preventDefault();
     console.log(this.loginModel);
+
+    this.checkValidForm()
+
+    // validation of form
+    if (!this.isFormValid) {
+      console.log("Validation failed!")
+      return;
+    }
+
     // Implementation of API.
     this.accountService.login(this.loginModel).subscribe((result: any) => {
       this.authService.login(result.token, () => {
@@ -55,6 +71,36 @@ export class LoginComponent implements OnInit {
       });
     });
 
+  }
+
+  checkValidForm(): boolean {
+    if (this.loginModel.emailAddress.length == 0 || this.loginModel.password.length == 0) {
+      this.isFormValid = false;
+      return false;
+    }
+    return true;
+  }
+
+  checkEmail() {
+    this.isEmailValid = true;
+    if (this.loginModel.emailAddress.length == 0) {
+      this.isEmailValid = false;
+    }
+  }
+
+  checkPassword() {
+    this.isPasswordValid = true;
+    this.isPasswordValidLength = true;
+
+    if( this.loginModel.password.length == 0) {
+      this.isPasswordValid = false;
+      return;
+    }
+
+    if (this.loginModel.password.length < 8) {
+      this.isPasswordValidLength = false;
+      return;
+    }
   }
 
 }
