@@ -13,6 +13,7 @@ import { ErrorPageComponent } from './views/pages/error-page/error-page.componen
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
 import { HttpClientModule } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { AccountModule } from './views/pages/account/account.module';
 
 @NgModule({
   declarations: [
@@ -26,7 +27,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
     LayoutModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    AccountModule
   ],
   providers: [
     AuthGuard,
