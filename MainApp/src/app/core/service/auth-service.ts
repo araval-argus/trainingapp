@@ -30,4 +30,8 @@ export class AuthService {
         var user: LoggedInUser = this.jwtHelper.decodeToken(token);
         return user;
     }
+
+    getUserToken() {
+        return localStorage.getItem('USERTOKEN');
+    }
 }

@@ -11,9 +11,11 @@ import { AppComponent } from './app.component';
 import { ErrorPageComponent } from './views/pages/error-page/error-page.component';
 
 import { HIGHLIGHT_OPTIONS } from 'ngx-highlightjs';
-import { HttpClientModule } from '@angular/common/http';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccountModule } from './views/pages/account/account.module';
+import { TokenInterceptor } from './core/helper/token.interceptor';
+import { AuthService } from './core/service/auth-service';
 
 @NgModule({
   declarations: [
@@ -42,6 +44,12 @@ import { AccountModule } from './views/pages/account/account.module';
           scss: () => import('highlight.js/lib/languages/scss'),
         }
       }
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenInterceptor,
+      multi: true,
+      deps: [AuthService],
     }
   ],
   bootstrap: [AppComponent]
