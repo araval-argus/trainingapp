@@ -2,6 +2,7 @@
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using ChatApp.Models.Users;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -19,22 +20,71 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context = context;
         }
 
-        public Profile GetUserByUsername(string username)
+        public UserModel GetUserByUsername(string username)
         {
-            Profile user = null;
-            return user;
+            Profile user = this.context.Profiles.FirstOrDefault( (user) => String.Equals(user.UserName, username));
+
+            // if not found
+            if (user == null)
+            {
+                return null;
+            }
+
+            UserModel safeObj = ConvertToSafeUserObjects(user);
+
+            return safeObj;
         }
 
-        public async Task<IEnumerable<UserModel>> GetUsers()
+        public  IEnumerable<UserModel> GetUsers()
         {
-            IEnumerable<Profile> users =  (IEnumerable<Profile>)await context.Profiles.ToListAsync();
+            IEnumerable<Profile> users =  context.Profiles.ToList();
             IEnumerable<UserModel> safeObject = (IEnumerable<UserModel>)ConvertToSafeUserObjects(users);
 
             return safeObject;
         }
 
 
+        public async Task<UserModel> UpdateUser(UserUpdateModel user, string userName)
+        {
+            // check if the username provided is not an existing one
+            //Profile userCheck = this.context.Profiles.FirstOrDefault((u) => String.Equals(u.UserName, user.UserName));
+
+            //// another user exist of same name
+            //if (userCheck != null)
+            //{
+            //    return null;
+            //}
+
+            Profile updateObj = context.Profiles.FirstOrDefault((u) => String.Equals(u.UserName, userName));
+
+            // if user to update is not found
+            if (updateObj == null)
+            {
+                return null;
+            }
+
+            updateObj.UserName = user.UserName;
+            updateObj.FirstName = user.FirstName;
+            updateObj.LastName = user.LastName;
+            updateObj.Email = user.Email;
+            updateObj.LastUpdatedAt = DateTime.Now;
+
+            // temporary -- will be updated after profile type will be implemented
+            updateObj.LastUpdatedBy = updateObj.Id;
+
+            _ = await context.SaveChangesAsync();
+
+            UserModel safeObj = ConvertToSafeUserObjects(updateObj);
+
+            return safeObj;
+
+        }
+
+
         // helper functions 
+
+
+        // converts the profile object so that password and profile type were not sent to the client side
         private static UserModel ConvertToSafeUserObjects(Profile profile)
         {
             UserModel userModel = new();

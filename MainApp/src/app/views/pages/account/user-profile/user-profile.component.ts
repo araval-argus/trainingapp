@@ -11,7 +11,6 @@ import { UserService } from 'src/app/core/service/user.service';
 export class UserProfileComponent implements OnInit {
 
   user: LoggedInUser;
-  allUsers: LoggedInUser[];
 
   // flags
   dataLoadingFlag: boolean = true;
@@ -24,22 +23,18 @@ export class UserProfileComponent implements OnInit {
 
   ngOnInit(): void {
     this.fetchUserDetails();
-    console.table(this.user)
-    console.log("-----------------");
-    this.getAllUsers();
-    
   }
 
   private fetchUserDetails() {
-    this.user = this.authService.getLoggedInUserInfo();
-  }
-
-  private getAllUsers() {
-    this.userService.getUsers().subscribe(data => {
-      this.allUsers = data;
-      console.table(data);
-    })
-
+    this.userService.getCurrentUserDetails().subscribe((result) => {
+      this.user = result;
+      console.log(result);
+      this.dataLoadingFlag = false;
+    },
+    (err) => {
+      console.log(err);
+      this.dataLoadingFlag = false;
+    });
   }
 
 }

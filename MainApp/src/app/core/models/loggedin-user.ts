@@ -9,5 +9,6 @@ export interface LoggedInUser
     createdAt?: Date,
     createdBy?: number,
     lastUpdatedAt?: Date,
-    lastUpdatedBy?: number
+    lastUpdatedBy?: number,
+    sub?: string
 }

@@ -1,5 +1,6 @@
 ﻿using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using ChatApp.Models.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,10 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IUserService
     {
-        Profile GetUserByUsername(string username);
+        UserModel GetUserByUsername(string username);
         
-        Task<IEnumerable<UserModel>> GetUsers();
+        IEnumerable<UserModel> GetUsers();
+
+        Task<UserModel> UpdateUser(UserUpdateModel user, string userName);
     }
 }
