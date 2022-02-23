@@ -33,7 +33,7 @@
                 </tr>
                 <tr>
                     <td>Last Updated At:</td>
-                    <td>{{ user.lastUpdatedAt ? user.lastUpdatedAt : "-" }} </td>
+                    <td>{{ user.lastUpdatedAt ? (user.lastUpdatedAt|date:'medium') : "-" }} </td>
                 </tr>
                 <tr>
                     <td>Last Updated By:</td>
@@ -41,6 +41,19 @@
                 </tr>
                 
             </table>
+        </div>
+    </div>
+
+    <div class="col-md-6 ">
+
+
+        <div class="text-center">
+            <img [src]="getLinkPicture()" class="rounded-circle mb-3" height="200px" width="200px" alt="User Profile">
+            <h4 class="mb-3"> {{ user.userName }} 
+              
+            </h4>
+    
+            
         </div>
     </div>
 </div>

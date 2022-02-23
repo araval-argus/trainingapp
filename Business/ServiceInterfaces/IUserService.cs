@@ -1,6 +1,9 @@
 ﻿using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using ChatApp.Models.Assets;
 using ChatApp.Models.Users;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,5 +18,9 @@ namespace ChatApp.Business.ServiceInterfaces
         IEnumerable<UserModel> GetUsers();
 
         Task<UserModel> UpdateUser(UserUpdateModel user, string userName);
+
+        AssetModel UploadProfileImage(UserModel user, IFormFile profileImage);
+
+        string GetUserProfileUrlFromId(int Id);
     }
 }

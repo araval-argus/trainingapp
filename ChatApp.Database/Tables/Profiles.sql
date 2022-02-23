@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Profiles]
 (
-    [Id] INT IDENTITY (1, 1) NOT NULL, 
+    [Id] INT IDENTITY (1, 1) NOT NULL PRIMARY KEY,
     [FirstName] NVARCHAR(1000) NOT NULL, 
     [LastName] NVARCHAR(1000) NOT NULL, 
     [UserName] NVARCHAR(1000) NULL, 

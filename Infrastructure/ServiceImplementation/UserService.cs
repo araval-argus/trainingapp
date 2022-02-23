@@ -2,27 +2,34 @@
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using ChatApp.Models.Assets;
 using ChatApp.Models.Users;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using ChatApp.Business.Helpers;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
     public class UserService : IUserService
     {
         private readonly ChatAppContext context;
+        private readonly IAssetService assetService;
 
-        public UserService(ChatAppContext context)
+        public UserService(ChatAppContext context, IAssetService assetService)
         {
             this.context = context;
+            this.assetService = assetService;
         }
 
         public UserModel GetUserByUsername(string username)
         {
-            Profile user = this.context.Profiles.FirstOrDefault( (user) => String.Equals(user.UserName, username));
+            Profile user = this.context.Profiles.FirstOrDefault((user) => String.Equals(user.UserName, username));
 
             // if not found
             if (user == null)
@@ -30,15 +37,15 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 return null;
             }
 
-            UserModel safeObj = ConvertToSafeUserObjects(user);
+            UserModel safeObj = ConvertHelpers.ConvertToSafeUserObjects(user);
 
             return safeObj;
         }
 
-        public  IEnumerable<UserModel> GetUsers()
+        public IEnumerable<UserModel> GetUsers()
         {
-            IEnumerable<Profile> users =  context.Profiles.ToList();
-            IEnumerable<UserModel> safeObject = (IEnumerable<UserModel>)ConvertToSafeUserObjects(users);
+            IEnumerable<Profile> users = context.Profiles.ToList();
+            IEnumerable<UserModel> safeObject = (IEnumerable<UserModel>)ConvertHelpers.ConvertToSafeUserObjects(users);
 
             return safeObject;
         }
@@ -74,45 +81,29 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
             _ = await context.SaveChangesAsync();
 
-            UserModel safeObj = ConvertToSafeUserObjects(updateObj);
+            UserModel safeObj = ConvertHelpers.ConvertToSafeUserObjects(updateObj);
 
             return safeObj;
 
         }
 
 
-        // helper functions 
+        public AssetModel UploadProfileImage(UserModel user, IFormFile profileImage) {
 
 
-        // converts the profile object so that password and profile type were not sent to the client side
-        private static UserModel ConvertToSafeUserObjects(Profile profile)
-        {
-            UserModel userModel = new();
+            AssetModel returnAsset = assetService.SaveProfileImage(user, profileImage);
 
-            userModel.Id = profile.Id;
-            userModel.FirstName = profile.FirstName;
-            userModel.LastName = profile.LastName;
-            userModel.UserName = profile.UserName;
-            userModel.Email = profile.Email;
-            userModel.CreatedAt = profile.CreatedAt;
-            userModel.CreatedBy = profile.CreatedBy;
-            userModel.LastUpdatedAt = profile.LastUpdatedAt;
-            userModel.LastUpdatedBy = profile.LastUpdatedBy;
+            
+            return returnAsset;
+            
 
-            return userModel;
         }
 
-        private static IEnumerable<UserModel> ConvertToSafeUserObjects(IEnumerable<Profile> profiles)
+        public string GetUserProfileUrlFromId(int Id)
         {
-            IEnumerable<UserModel> userModels = Enumerable.Empty<UserModel>();
+            Asset asset = context.Assets.FirstOrDefault(x => x.ProfileId == Id);
 
-            for (int i = 0; i < profiles.Count(); i++)
-            {
-                UserModel user = ConvertToSafeUserObjects(profiles.ElementAt(i));
-                userModels = userModels.Append(user);
-            }
-
-            return userModels;
+            return asset.FilePath;
         }
 
     }

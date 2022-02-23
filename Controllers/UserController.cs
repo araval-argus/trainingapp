@@ -1,15 +1,21 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using ChatApp.Models.Assets;
 using ChatApp.Models.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace ChatApp.Controllers
 {
@@ -18,13 +24,17 @@ namespace ChatApp.Controllers
     [Authorize]
     public class UserController : ControllerBase
     {
-        private IConfiguration _config;
-        private readonly IUserService _userService;
+        private IConfiguration config;
+        private readonly IUserService userService;
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IAssetService assetService;
 
-        public UserController(IConfiguration config, IUserService userService)
+        public UserController(IConfiguration config, IUserService userService, IWebHostEnvironment webHostEnvironment, IAssetService assetService)
         {
-            _config = config;
-            _userService = userService;
+            this.config = config;
+            this.userService = userService;
+            this.webHostEnvironment = webHostEnvironment;
+            this.assetService = assetService;
         }
 
 
@@ -32,7 +42,7 @@ namespace ChatApp.Controllers
         [HttpGet]
         public IActionResult GetUsers()
         {
-            IEnumerable<UserModel> users =  _userService.GetUsers();
+            IEnumerable<UserModel> users =  userService.GetUsers();
             return Ok(users);
         }
 
@@ -40,7 +50,7 @@ namespace ChatApp.Controllers
         [HttpGet]
         public IActionResult GetUser(string username)
         {
-            UserModel user = _userService.GetUserByUsername(username);
+            UserModel user = userService.GetUserByUsername(username);
 
             if (user == null)
             {
@@ -54,7 +64,7 @@ namespace ChatApp.Controllers
         [HttpPut]
         public async Task<IActionResult> PutUser([FromBody] UserUpdateModel userDetails, string username)
         {
-            UserModel user = await _userService.UpdateUser(userDetails, username);
+            UserModel user = await userService.UpdateUser(userDetails, username);
 
             // update error
             if (user == null)
@@ -63,6 +73,56 @@ namespace ChatApp.Controllers
             }
 
             return Ok(user);
+        }
+
+        [Route("{username}/profileUpload")]
+        [HttpPost, DisableRequestSizeLimit]
+        public IActionResult UploadProfile(string username, IFormFile profileImage)
+        {
+            // check if the user present in the database
+            UserModel user = userService.GetUserByUsername(username);
+
+            if (user == null)
+            {
+                return BadRequest("No user found!");
+            }
+
+            if (profileImage.Length == 0)
+            {
+                return BadRequest("No image found");
+            }
+
+            if (profileImage.Length > int.MaxValue)
+            {
+                return BadRequest("Too large file");
+            }
+
+            AssetModel asset = assetService.SaveProfileImage(user, profileImage);
+
+            return Ok( new { asset.FilePath });
+        }
+
+        [AllowAnonymous]
+        [Route("{username}/getProfileUrl")]
+        [HttpGet]
+        public IActionResult GetProfileByUsername(string username)
+        {
+            // check if the user present in the database
+            UserModel user = userService.GetUserByUsername(username);
+
+            if (user == null)
+            {
+                return BadRequest(new { profileUrl = "" });
+            }
+
+            string profileUrl = userService.GetUserProfileUrlFromId(user.Id);
+
+            if (profileUrl == null || profileUrl == "")
+            {
+                return NotFound();
+            }
+
+            return Ok(new { profileUrl });
         }
 
     }
