@@ -7,6 +7,8 @@ import { AccountComponent } from './account.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FeahterIconModule } from 'src/app/core/feather-icon/feather-icon.module';
+import { EditProfileImageComponent } from './edit-profile/edit-profile-image/edit-profile-image.component';
+import { EditProfileDetailsComponent } from './edit-profile/edit-profile-details/edit-profile-details.component';
 
 const routes: Routes = [
   {
@@ -32,7 +34,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [UserProfileComponent, EditProfileComponent, AccountComponent],
+  declarations: [UserProfileComponent, EditProfileComponent, AccountComponent, EditProfileImageComponent, EditProfileDetailsComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

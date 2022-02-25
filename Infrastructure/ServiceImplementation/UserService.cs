@@ -88,20 +88,20 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
 
-        public AssetModel UploadProfileImage(UserModel user, IFormFile profileImage) {
-
-
+        public AssetModel UploadProfileImage(UserModel user, IFormFile profileImage)
+        {
             AssetModel returnAsset = assetService.SaveProfileImage(user, profileImage);
-
-            
             return returnAsset;
-            
-
         }
 
         public string GetUserProfileUrlFromId(int Id)
         {
             Asset asset = context.Assets.FirstOrDefault(x => x.ProfileId == Id);
+
+            if (asset == null)
+            {
+                return "";
+            }
 
             return asset.FilePath;
         }

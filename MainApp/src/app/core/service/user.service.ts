@@ -1,6 +1,6 @@
 import { HttpClient, HttpEvent } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { LoggedInUser } from '../models/loggedin-user';
 
@@ -11,10 +11,25 @@ import { AuthService } from './auth-service';
 })
 export class UserService {
 
-  constructor(private httpClient: HttpClient, private authService: AuthService) { }
   
-  profileUrl: string = "";
+  // currentUser: LoggedInUser;
+  
+  // behavior subjects
+  private _currentUserSubject: BehaviorSubject<LoggedInUser>;
 
+  currentUserObject: Observable<LoggedInUser>; 
+
+  
+ constructor(private httpClient: HttpClient, private authService: AuthService) {
+    this.getCurrentUserDetails().subscribe(
+      (response) => {
+        this._currentUserSubject = new BehaviorSubject<any>(response);
+        this.currentUserObject = this._currentUserSubject.asObservable(); 
+      }
+    )
+
+  }
+  
   getCurrentUserDetails(): Observable<LoggedInUser> {
     const user = this.authService.getLoggedInUserInfo();
     console.log("-------------");
@@ -45,6 +60,27 @@ export class UserService {
   getUserProfileUrl(): Observable<{profileUrl: string}> {
     const username = this.authService.getLoggedInUserInfo().sub;
     return this.httpClient.get<{profileUrl: string}>(environment.apiUrl + "/user/" + username + "/getProfileUrl")
+  }
+
+
+  // setting user behavior object
+
+  async setCurrentUserSubject() {
+    await this.getUserAsPromise().then(
+      (response) => {
+        response.profileUrl = environment.hostUrl + '/' + response.profileUrl;
+        this._currentUserSubject.next(response);
+      }
+    )
+  }
+
+  private getUserAsPromise(): Promise<LoggedInUser> {
+    const username = this.authService.getLoggedInUserInfo().sub;
+    return this.httpClient.get<LoggedInUser>(environment.apiUrl + "/user/" + username).toPromise();
+  }
+
+  updateUserObject(user: LoggedInUser) {
+    this._currentUserSubject.next(user);
   }
 
 }

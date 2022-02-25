@@ -10,5 +10,6 @@ export interface LoggedInUser
     createdBy?: number,
     lastUpdatedAt?: Date,
     lastUpdatedBy?: number,
-    sub?: string
+    sub?: string,
+    profileUrl?: string
 }

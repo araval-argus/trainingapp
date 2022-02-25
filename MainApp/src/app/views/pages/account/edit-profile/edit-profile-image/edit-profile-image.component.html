@@ -1,0 +1,26 @@
+<div class="text-center">
+    <img [src]="getLinkPicture()" class="rounded-circle mb-3" height="200px" width="200px" alt="User Profile">
+    <h4 class="mb-3"> {{ userObj.userName }} 
+      
+      <button class="btn" (click)="file.click()"><i data-feather="edit" appFeatherIcon></i></button>
+    </h4>
+
+    
+</div>
+
+<form class="mb-3" >
+  <div class="form-group" >
+    <input type="file" class="d-none" #file id="profileUploadInput" name="profile" accept="image/jpeg image/png" (change)="uploadFile(file.files)" >
+  </div>
+</form>
+
+<div class="px-2" *ngIf="uploadProgress != 0">
+    <p class="mb-1">
+      <ngb-progressbar type="primary" [value]=uploadProgress  [showValue]="true"></ngb-progressbar>
+    </p>
+
+    <div class="text-end">
+      <button class="btn" (click)="cancelUpload()">Cancel</button>
+    </div>
+
+</div>

@@ -57,6 +57,9 @@ namespace ChatApp.Controllers
                 return NotFound();
             }
 
+            // taking profile url from assets tables
+            user.ProfileUrl = userService.GetUserProfileUrlFromId(user.Id);
+
             return Ok(user);
         }
 
