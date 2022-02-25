@@ -43,7 +43,6 @@ export class EditProfileImageComponent implements OnInit {
         }
         if (res.type == 4) {
           this.userProfileImageLink = environment.hostUrl + "/" + res.body.filePath;
-
           this.updateProfileImage()
 
           this.userObj.profileUrl = this.userProfileImageLink + '?' + new Date();

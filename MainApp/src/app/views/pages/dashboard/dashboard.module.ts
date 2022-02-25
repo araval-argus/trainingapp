@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
-import { FeahterIconModule } from 'src/app/core/feather-icon/feather-icon.module';
+import { FeatherIconModule } from 'src/app/core/feather-icon/feather-icon.module';
 import { NgbDropdownModule, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 
 // Ng-ApexCharts
@@ -27,7 +27,7 @@ const routes: Routes = [
     CommonModule,
     RouterModule.forChild(routes),
     FormsModule,
-    FeahterIconModule,
+    FeatherIconModule,
     NgbDropdownModule,
     NgbDatepickerModule,
     NgApexchartsModule,

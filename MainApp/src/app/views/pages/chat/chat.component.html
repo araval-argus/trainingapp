@@ -1,0 +1,16 @@
+<div class="row chat-wrapper">
+    <div class="col-md-12">
+      <div class="card">
+        <div class="card-body">
+          <div class="row position-relative">
+            <div class="col-lg-4 chat-aside border-lg-right">
+              <app-chat-sidebar [userObj]="userObj" ></app-chat-sidebar>
+            </div>
+            <div class="col-lg-8 chat-content">
+              <app-chat-page [userObj]="userObj"></app-chat-page>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>

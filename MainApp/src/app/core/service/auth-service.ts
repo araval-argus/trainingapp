@@ -20,6 +20,7 @@ export class AuthService {
     logout(callback) {
         localStorage.removeItem('isLoggedin');
         localStorage.removeItem('USERTOKEN');
+        localStorage.removeItem('authToken');
         if (callback) {
             callback();
         }

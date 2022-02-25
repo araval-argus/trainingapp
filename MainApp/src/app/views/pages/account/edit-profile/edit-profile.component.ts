@@ -37,8 +37,6 @@ export class EditProfileComponent implements OnInit {
  
     this.userService.currentUserObject.subscribe(userObj => {  this.userObj = userObj; } )
 
-    console.log(this.userObj);
-    console.log("This is the user object");
     this.dataLoadingFlag = false;
     
   }

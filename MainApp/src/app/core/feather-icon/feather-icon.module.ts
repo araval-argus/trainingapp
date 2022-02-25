@@ -10,4 +10,4 @@ import { FeatherIconDirective } from './feather-icon.directive';
   ],
   exports: [FeatherIconDirective]
 })
-export class FeahterIconModule { }
+export class FeatherIconModule { }

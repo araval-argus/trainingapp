@@ -11,6 +11,15 @@ export const MENU: MenuItem[] = [
     link: '/dashboard'
   },
   {
+    label: 'Chat',
+    isTitle: true
+  },
+  {
+    label: 'Chat',
+    icon: 'message-circle',
+    link: '/chat'
+  },
+  {
     label: 'Account',
     isTitle: true
   },
@@ -23,5 +32,5 @@ export const MENU: MenuItem[] = [
     label: 'Edit Profile',
     icon: 'edit',
     link: '/account/edit'
-  }
+  },
 ];
