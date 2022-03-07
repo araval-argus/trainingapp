@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ChatApp.Context.EntityClasses
+namespace ChatApp.Models.Assets
 {
-    public class Asset
+    public class AvatarModel
     {
+
         public int Id { get; set; }
 
         public int ProfileId { get; set; }
@@ -17,7 +18,7 @@ namespace ChatApp.Context.EntityClasses
 
         public long FileSize { get; set; }
 
-        public string FileType { get; set; }
+        //public string FileType { get; set; }
 
         public string FilePath { get; set; }
 

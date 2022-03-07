@@ -3,6 +3,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { BaseComponent } from './views/layout/base/base.component';
 import { AuthGuard } from './core/guard/auth.guard';
 import { ErrorPageComponent } from './views/pages/error-page/error-page.component';
+import { SearchUserComponent } from './views/pages/search-user/search-user.component';
 
 
 const routes: Routes = [
@@ -27,6 +28,10 @@ const routes: Routes = [
       {
         path: 'chat',
         loadChildren: () => import('./views/pages/chat/chat.module').then(m => m.ChatModule)
+      },
+      {
+        path: 'search',
+        loadChildren: () => import('./views/pages/search-user/search-user.module').then(s => s.SearchUserModule)
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, 
     ]

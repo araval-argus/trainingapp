@@ -24,7 +24,6 @@ export class EditProfileImageComponent implements OnInit {
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
-    this.fetchProfileUrl() 
   }
   
   uploadFile(files){
@@ -41,7 +40,7 @@ export class EditProfileImageComponent implements OnInit {
         if (res.type == HttpEventType.UploadProgress) {
           this.uploadProgress = Math.round(100 * (res.loaded / res.total));
         }
-        if (res.type == 4) {
+        if (res.type == HttpEventType.Response) {
           this.userProfileImageLink = environment.hostUrl + "/" + res.body.filePath;
           this.updateProfileImage()
 
@@ -78,15 +77,6 @@ export class EditProfileImageComponent implements OnInit {
 
   getLinkPicture() { return this.userProfileImageLink + '?' + this.timeStamp; }
 
-  fetchProfileUrl() {
-    if (this.userObj.profileUrl != environment.hostUrl + '/') {
-      this.userProfileImageLink = this.userObj.profileUrl;
-    }
-    else {
-      this.userProfileImageLink = "/assets/images/placeholder.jpg";
-    }
-    
-  }
 
   public updateProfileImage() { this.timeStamp = new Date(); }
 

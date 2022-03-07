@@ -25,6 +25,11 @@ namespace ChatApp.Business.Helpers
             userModel.LastUpdatedAt = profile.LastUpdatedAt;
             userModel.LastUpdatedBy = profile.LastUpdatedBy;
 
+            if (profile.Avatar != null)
+            {
+                userModel.ProfileUrl = profile.Avatar.FilePath;
+            }
+
             return userModel;
         }
 
@@ -43,19 +48,19 @@ namespace ChatApp.Business.Helpers
         }
 
         // converts asset type object to asset model
-        public static AssetModel ConvetAssetToAssetModel(Asset asset)
+        public static AvatarModel ConvetAssetToAssetModel(Avatar avatar)
         {
-            return new AssetModel
+            return new AvatarModel
             {
-                Id = asset.Id,
-                ProfileId = asset.ProfileId,
-                FileName = asset.FileName,
-                FileExtension = asset.FileExtension,
-                FilePath = asset.FilePath,
-                FileSize = asset.FileSize,
-                FileType = asset.FileType,
-                CreatedAt = asset.CreatedAt,
-                UpdatedAt = asset.UpdatedAt
+                Id = avatar.Id,
+                ProfileId = avatar.ProfileId,
+                FileName = avatar.FileName,
+                FileExtension = avatar.FileExtension,
+                FilePath = avatar.FilePath,
+                FileSize = avatar.FileSize,
+                //FileType = asset.FileType,
+                CreatedAt = avatar.CreatedAt,
+                UpdatedAt = avatar.UpdatedAt
             };
         }
     }

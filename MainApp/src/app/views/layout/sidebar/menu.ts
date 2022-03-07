@@ -20,6 +20,11 @@ export const MENU: MenuItem[] = [
     link: '/chat'
   },
   {
+    label: 'Search',
+    icon: 'users',
+    link: '/search'
+  },
+  {
     label: 'Account',
     isTitle: true
   },

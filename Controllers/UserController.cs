@@ -1,4 +1,5 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
+using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using ChatApp.Models.Assets;
@@ -7,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
@@ -27,14 +29,20 @@ namespace ChatApp.Controllers
         private IConfiguration config;
         private readonly IUserService userService;
         private readonly IWebHostEnvironment webHostEnvironment;
-        private readonly IAssetService assetService;
+        private readonly IAvatarService assetService;
 
-        public UserController(IConfiguration config, IUserService userService, IWebHostEnvironment webHostEnvironment, IAssetService assetService)
+        // remove lately
+        private readonly ChatAppContext context;
+
+        public UserController(IConfiguration config, IUserService userService, IWebHostEnvironment webHostEnvironment, IAvatarService assetService, ChatAppContext context)
         {
             this.config = config;
             this.userService = userService;
             this.webHostEnvironment = webHostEnvironment;
             this.assetService = assetService;
+
+            // remove lately
+            this.context = context;
         }
 
 
@@ -56,9 +64,6 @@ namespace ChatApp.Controllers
             {
                 return NotFound();
             }
-
-            // taking profile url from assets tables
-            user.ProfileUrl = userService.GetUserProfileUrlFromId(user.Id);
 
             return Ok(user);
         }
@@ -100,32 +105,21 @@ namespace ChatApp.Controllers
                 return BadRequest("Too large file");
             }
 
-            AssetModel asset = assetService.SaveProfileImage(user, profileImage);
+            AvatarModel asset = assetService.SaveProfileImage(user, profileImage);
 
             return Ok( new { asset.FilePath });
         }
 
+        
+
         [AllowAnonymous]
-        [Route("{username}/getProfileUrl")]
+        [Route("search/{user}")]
         [HttpGet]
-        public IActionResult GetProfileByUsername(string username)
+        public IActionResult SearchUser(string user)
         {
-            // check if the user present in the database
-            UserModel user = userService.GetUserByUsername(username);
+            var searchResult = userService.SearchUser(user);
 
-            if (user == null)
-            {
-                return BadRequest(new { profileUrl = "" });
-            }
-
-            string profileUrl = userService.GetUserProfileUrlFromId(user.Id);
-
-            if (profileUrl == null || profileUrl == "")
-            {
-                return NotFound();
-            }
-
-            return Ok(new { profileUrl });
+            return Ok(searchResult);
         }
 
     }

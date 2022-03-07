@@ -19,8 +19,10 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Task<UserModel> UpdateUser(UserUpdateModel user, string userName);
 
-        AssetModel UploadProfileImage(UserModel user, IFormFile profileImage);
+        AvatarModel UploadProfileImage(UserModel user, IFormFile profileImage);
 
         string GetUserProfileUrlFromId(int Id);
+
+        IEnumerable<UserModel> SearchUser(string user);
     }
 }

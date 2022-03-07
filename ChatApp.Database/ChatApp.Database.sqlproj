@@ -62,7 +62,7 @@
   </ItemGroup>
   <ItemGroup>
     <Build Include="Tables\Profiles.sql" />
-    <Build Include="Tables\Assets.sql" />
+    <Build Include="Tables\Avatars.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatApp.local.publish.xml" />

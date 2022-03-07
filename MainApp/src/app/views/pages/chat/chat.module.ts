@@ -10,15 +10,12 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 
 const routes: Routes = [
   {
+    path: ':user',
+    component: ChatComponent,
+  },
+  {
     path: '',
     component: ChatComponent,
-
-    children: [
-      {
-        path: '',
-        component: ChatComponent
-      }
-    ]
   }
 ]
 

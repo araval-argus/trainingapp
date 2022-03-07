@@ -1,0 +1,60 @@
+
+<div class="mx-auto" style="width: 300px;">
+    <div class="text-center">
+
+        <input type="search" #search class="form-control rounded-pill" id="chatForm" placeholder="🔍 Type at least 2 letters to search.." (keyup)="searchUser(search.value)">
+        <p><small class="text-secondary"> Search for a user in whole app</small></p>
+    </div>
+</div>
+<div class="text-center" *ngIf="searchLoadingFlag">
+    <h5>
+        <div class="spinner-border text-primary spinner-border-sm" role="status">
+            <span class="sr-only">Loading...</span>
+        </div>
+        Searching 
+    </h5>
+</div>
+
+<div class="">
+    <h5 *ngIf="searchResult.length != 0" class="mb-3">
+        Result of the search for - {{ userToSearch}}
+    </h5>
+
+    <h5 *ngIf="searchResult.length == 0 && userToSearch.length >= 2" class="mb-3">
+        No user found for this search
+    </h5>
+
+    <h5 *ngIf="userToSearch.length < 2" class="mb-3">
+        Type at least 2 letters to search..
+    </h5>
+
+    <ul class="nav content-nav d-flex flex-column">
+        <li *ngFor="let u of searchResult" class="nav-item">
+            <!-- <div class="">
+                <div>
+                    <img class="" height="50px" [src]="getProfileUrl(u.profileUrl)" [alt]="u.userName + 'profile'">
+              
+                    <p>{{ u.userName }}</p>
+                    <p>{{ u.firstName }} {{ u.lastName }} </p>
+                </div>
+            </div> -->
+            <div class="card mb-3" style="max-width: 540px;">
+                <div class="row g-0">
+                  <div class="col-md-4">
+                      <div class="my-auto">
+                          <img [src]="getProfileUrl(u.profileUrl)" class="img-fluid rounded-start " alt="...">
+                        </div>
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title mb-0">{{ u.userName }} ( {{u.firstName}} {{u.lastName}} )</h5>
+                      <p class="card-text">{{ u.email }}</p>
+                      <p class="card-text"><small class="text-muted">Online - 3 mins ago</small></p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+        </li>
+      </ul>
+</div>
+  

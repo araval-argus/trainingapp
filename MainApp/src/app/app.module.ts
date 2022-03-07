@@ -16,6 +16,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AccountModule } from './views/pages/account/account.module';
 import { TokenInterceptor } from './core/helper/token.interceptor';
 import { AuthService } from './core/service/auth-service';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import { AuthService } from './core/service/auth-service';
     ErrorPageComponent,
   ],
   imports: [
+    CommonModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,

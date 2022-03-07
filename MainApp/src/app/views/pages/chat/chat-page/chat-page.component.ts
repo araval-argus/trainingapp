@@ -9,6 +9,7 @@ import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 export class ChatPageComponent implements OnInit {
 
   @Input() userObj: LoggedInUser;
+  @Input() userToChat: string;
 
   constructor() { }
 

@@ -32,7 +32,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
          * closing the sidebar
          */
         if (window.matchMedia('(max-width: 991px)').matches) {
-          this.document.body.classList.remove('sidebar-open');
+          document.body.classList.remove('sidebar-open');
         }
 
       }
@@ -65,10 +65,10 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     this.sidebarToggler.nativeElement.classList.toggle('not-active');
     if (window.matchMedia('(min-width: 992px)').matches) {
       e.preventDefault();
-      this.document.body.classList.toggle('sidebar-folded');
+      document.body.classList.toggle('sidebar-folded');
     } else if (window.matchMedia('(max-width: 991px)').matches) {
       e.preventDefault();
-      this.document.body.classList.toggle('sidebar-open');
+      document.body.classList.toggle('sidebar-open');
     }
   }
 
@@ -78,7 +78,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    */
   toggleSettingsSidebar(e) {
     e.preventDefault();
-    this.document.body.classList.toggle('settings-open');
+    document.body.classList.toggle('settings-open');
   }
 
 
@@ -86,8 +86,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    * Open sidebar when hover (in folded folded state)
    */
   operSidebarFolded() {
-    if (this.document.body.classList.contains('sidebar-folded')){
-      this.document.body.classList.add("open-sidebar-folded");
+    if (document.body.classList.contains('sidebar-folded')){
+      document.body.classList.add("open-sidebar-folded");
     }
   }
 
@@ -96,8 +96,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    * Fold sidebar after mouse leave (in folded state)
    */
   closeSidebarFolded() {
-    if (this.document.body.classList.contains('sidebar-folded')){
-      this.document.body.classList.remove("open-sidebar-folded");
+    if (document.body.classList.contains('sidebar-folded')){
+      document.body.classList.remove("open-sidebar-folded");
     }
   }
 
@@ -106,9 +106,9 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    */
   iconSidebar(e) {
     if (e.matches) {
-      this.document.body.classList.add('sidebar-folded');
+      document.body.classList.add('sidebar-folded');
     } else {
-      this.document.body.classList.remove('sidebar-folded');
+      document.body.classList.remove('sidebar-folded');
     }
   }
 
@@ -117,9 +117,9 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    * Switching sidebar light/dark
    */
   onSidebarThemeChange(event) {
-    this.document.body.classList.remove('sidebar-light', 'sidebar-dark');
-    this.document.body.classList.add(event.target.value);
-    this.document.body.classList.remove('settings-open');
+    document.body.classList.remove('sidebar-light', 'sidebar-dark');
+    document.body.classList.add(event.target.value);
+    document.body.classList.remove('settings-open');
   }
 
 

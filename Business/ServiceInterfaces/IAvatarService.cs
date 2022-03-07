@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
-    public interface IAssetService
+    public interface IAvatarService
     {
-        AssetModel SaveProfileImage(UserModel user, IFormFile profileImage);
+        AvatarModel SaveProfileImage(UserModel user, IFormFile profileImage);
     }
 }

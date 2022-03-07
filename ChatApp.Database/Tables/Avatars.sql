@@ -1,10 +1,9 @@
-﻿CREATE TABLE [dbo].[Assets]
+﻿CREATE TABLE [dbo].[Avatars]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY (1,1), 
     [ProfileId] INT NOT NULL, 
     [FileName] NVARCHAR(256) NOT NULL, 
     [FileExtension] NCHAR(10) NOT NULL, 
-    [FileType] NCHAR(256) NOT NULL, 
     [FileSize] BIGINT NOT NULL, 
     [FilePath] VARCHAR(MAX) NOT NULL, 
     [CreatedAt] DATETIME2 NOT NULL, 

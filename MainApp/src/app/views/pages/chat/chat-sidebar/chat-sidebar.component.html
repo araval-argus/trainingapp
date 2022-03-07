@@ -219,35 +219,24 @@
           <ng-template ngbNavContent>
             <div class="ps" [perfectScrollbar]>
               <p class="text-muted mb-1">All Users</p>
+
+              <!-- showing all users  -->
+              <p class="text-center" *ngIf="allUsersLoadingFlag">
+                Loading...
+              </p>
+
               <ul class="list-unstyled chat-list px-1">
-                <li class="chat-item pr-1">
-                  <a href="" (click)="false" class="d-flex align-items-center">
+                <li *ngFor="let user of allUsers" class="chat-item pr-1">
+                  <a href="/chat/{{ user.userName }}" class="d-flex align-items-center">
                     <figure class="mb-0 mr-2">
-                      <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
-                      <div class="status offline"></div>
+                      <img [src]="makeProfileUrl(user.profileUrl)" class="img-xs rounded-circle" alt="user">
+                      <!-- <div class="status offline"></div> -->
                     </figure>
                     <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
                       <div>
-                        <p class="text-body">Amiah Burton</p>
+                        <p class="text-body">{{ user.userName }} <span *ngIf="user.userName == userObj.userName"> <i> (You)</i> </span> </p>
                         <div class="d-flex align-items-center">
-                          <p class="text-muted tx-13">Front-end Developer</p>
-                        </div>
-                      </div>
-                      
-                    </div>
-                  </a>
-                </li>
-                <li class="chat-item pr-1">
-                  <a href="" (click)="false" class="d-flex align-items-center">
-                    <figure class="mb-0 mr-2">
-                      <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
-                      <div class="status online"></div>
-                    </figure>
-                    <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
-                      <div>
-                        <p class="text-body">John Doe</p>
-                        <div class="d-flex align-items-center">
-                          <p class="text-muted tx-13">Back-end Developer</p>
+                          <p class="text-muted tx-13">{{ user.firstName | titlecase}} {{ user.lastName | titlecase }}</p>
                         </div>
                       </div>
                       

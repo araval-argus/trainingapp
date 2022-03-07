@@ -62,6 +62,11 @@ export class UserService {
     return this.httpClient.get<{profileUrl: string}>(environment.apiUrl + "/user/" + username + "/getProfileUrl")
   }
 
+  searchUser(user: string): Observable<LoggedInUser[]> {
+    return this.httpClient.get<LoggedInUser[]>(environment.apiUrl + "/user/search/" + user);
+  }
+
+  
 
   // setting user behavior object
 
@@ -82,5 +87,7 @@ export class UserService {
   updateUserObject(user: LoggedInUser) {
     this._currentUserSubject.next(user);
   }
+
+  // user behavior object set complete 
 
 }

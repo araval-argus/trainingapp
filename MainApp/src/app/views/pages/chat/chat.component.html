@@ -1,16 +1,29 @@
-<div class="row chat-wrapper">
+<div *ngIf="dataLoadingFlag">
+  <p class="text-center">Loading...</p>
+</div>
+
+<div *ngIf="!dataLoadingFlag">
+  <div class="row chat-wrapper">
     <div class="col-md-12">
       <div class="card">
         <div class="card-body">
           <div class="row position-relative">
             <div class="col-lg-4 chat-aside border-lg-right">
-              <app-chat-sidebar [userObj]="userObj" ></app-chat-sidebar>
+              <app-chat-sidebar [userObj]="userObj" [allUsers]="allUsers" [allUsersLoadingFlag]="allUsersLoadingFlag"></app-chat-sidebar>
             </div>
             <div class="col-lg-8 chat-content">
-              <app-chat-page [userObj]="userObj"></app-chat-page>
+              <div *ngIf="userToChat">
+                <app-chat-page [userObj]="userObj" [userToChat]="userToChat"></app-chat-page>
+              </div>
+              <div *ngIf="!userToChat">
+                <div class="d-flex justify-content-center align-items-center">
+                  <p>Select a user to chat</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+</div>  

@@ -14,17 +14,17 @@ using ChatApp.Context.EntityClasses;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
-    public class AssetService : IAssetService
+    public class AvatarService : IAvatarService
     {
         private readonly ChatAppContext context;
 
-        public AssetService(ChatAppContext context)
+        public AvatarService(ChatAppContext context)
         {
             this.context = context;
         }
 
 
-        public AssetModel SaveProfileImage(UserModel user, IFormFile profileImage)
+        public AvatarModel SaveProfileImage(UserModel user, IFormFile profileImage)
         {
             // no validation done here
             // should be done before calling the function
@@ -62,26 +62,26 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             // making entry in database
 
             // check if there is already a entry for the profile for this user
-            Asset asset = context.Assets.FirstOrDefault(x => x.Id == user.Id);
-            Asset returnAsset;
+            Avatar asset = context.Avatars.FirstOrDefault(x => x.ProfileId == user.Id);
+            Avatar returnAvatar;
             if ( asset == null)
             {
                 // create a new entry
                 //asset = 
-                returnAsset = new Asset
+                returnAvatar = new Avatar
                 {
                     ProfileId = user.Id,
                     FileName = fileSaveName,
                     FileExtension = fileExtension,
                     FileSize = fileSize,
-                    FileType = "profile",
+                    //FileType = "profile",
                     FilePath = dbPath,
                     CreatedAt = DateTime.Now,
                     UpdatedAt = DateTime.Now
                 };
                 
 
-                context.Assets.Add(returnAsset);
+                context.Avatars.Add(returnAvatar);
             }
             else
             {
@@ -91,11 +91,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 asset.FileExtension = fileExtension;
                 asset.FileSize = fileSize;
 
-                returnAsset = asset;
+                returnAvatar = asset;
             }
                 context.SaveChanges();
 
-            return ConvertHelpers.ConvetAssetToAssetModel(returnAsset);
+            return ConvertHelpers.ConvetAssetToAssetModel(returnAvatar);
         }
 
     }

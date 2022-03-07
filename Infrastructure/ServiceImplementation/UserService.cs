@@ -19,9 +19,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     public class UserService : IUserService
     {
         private readonly ChatAppContext context;
-        private readonly IAssetService assetService;
+        private readonly IAvatarService assetService;
 
-        public UserService(ChatAppContext context, IAssetService assetService)
+        public UserService(ChatAppContext context, IAvatarService assetService)
         {
             this.context = context;
             this.assetService = assetService;
@@ -29,7 +29,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public UserModel GetUserByUsername(string username)
         {
-            Profile user = this.context.Profiles.FirstOrDefault((user) => String.Equals(user.UserName, username));
+            Profile user = this.context.Profiles.Include(p => p.Avatar).FirstOrDefault((user) => String.Equals(user.UserName, username));
 
             // if not found
             if (user == null)
@@ -44,7 +44,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public IEnumerable<UserModel> GetUsers()
         {
-            IEnumerable<Profile> users = context.Profiles.ToList();
+            IEnumerable<Profile> users = context.Profiles.Include(p => p.Avatar).ToList();
             IEnumerable<UserModel> safeObject = (IEnumerable<UserModel>)ConvertHelpers.ConvertToSafeUserObjects(users);
 
             return safeObject;
@@ -88,15 +88,15 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
 
-        public AssetModel UploadProfileImage(UserModel user, IFormFile profileImage)
+        public AvatarModel UploadProfileImage(UserModel user, IFormFile profileImage)
         {
-            AssetModel returnAsset = assetService.SaveProfileImage(user, profileImage);
+            AvatarModel returnAsset = assetService.SaveProfileImage(user, profileImage);
             return returnAsset;
         }
 
         public string GetUserProfileUrlFromId(int Id)
         {
-            Asset asset = context.Assets.FirstOrDefault(x => x.ProfileId == Id);
+            Avatar asset = context.Avatars.FirstOrDefault(x => x.ProfileId == Id);
 
             if (asset == null)
             {
@@ -105,6 +105,22 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
             return asset.FilePath;
         }
+
+        public IEnumerable<UserModel> SearchUser(string user)
+        {
+            
+
+            IEnumerable<Profile> allUsers = context.Profiles
+                                        .Include(p => p.Avatar)
+                                        .Where(p => p.UserName.Contains(user) 
+                                            || p.FirstName.Contains(user) 
+                                            || p.LastName.Contains(user) 
+                                            || p.Email.Contains(user)).ToList();
+
+            return ConvertHelpers.ConvertToSafeUserObjects(allUsers);
+
+        }
+
 
     }
 }
