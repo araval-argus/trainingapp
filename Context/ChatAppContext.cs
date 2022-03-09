@@ -19,5 +19,7 @@ namespace ChatApp.Context
         public virtual DbSet<Profile> Profiles { get; set; }
 
         public virtual DbSet<Avatar> Avatars { get; set; }
+
+        public virtual DbSet<Chat> Chats { get; set; }
     }
 }

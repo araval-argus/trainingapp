@@ -66,7 +66,9 @@ export class UserService {
     return this.httpClient.get<LoggedInUser[]>(environment.apiUrl + "/user/search/" + user);
   }
 
-  
+  getUserByUserName(username: string) {
+    return this.httpClient.get<LoggedInUser>(environment.apiUrl + "/user/"+ username);
+  }
 
   // setting user behavior object
 

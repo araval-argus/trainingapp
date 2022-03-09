@@ -14,4 +14,32 @@
     <Property Name="ParentElementType" Value="SqlSchema" />
     <Property Name="NewName" Value="[Avatars]" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="f0dd30c0-e9bf-459a-b4f8-ca19ba0ba465" ChangeDateTime="03/08/2022 06:09:45">
+    <Property Name="ElementName" Value="[dbo].[Chat].[Text]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Chat]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Type" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="f25d9b76-43fe-4853-a6a8-92de66710794" ChangeDateTime="03/08/2022 06:12:46">
+    <Property Name="ElementName" Value="[dbo].[Chats].[Created]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Chats]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="CreatedAt" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="4a158e57-0741-4b09-bf39-16439bc5a468" ChangeDateTime="03/08/2022 06:15:34">
+    <Property Name="ElementName" Value="[dbo].[Chats].[From]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Chats]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MessageFrom" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="04cb7b43-0518-42cd-8440-f293bc0a8300" ChangeDateTime="03/08/2022 06:16:04">
+    <Property Name="ElementName" Value="[dbo].[Chats].[To]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Chats]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MessageTo" />
+  </Operation>
 </Operations>

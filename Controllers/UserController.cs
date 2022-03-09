@@ -28,21 +28,13 @@ namespace ChatApp.Controllers
     {
         private IConfiguration config;
         private readonly IUserService userService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IAvatarService assetService;
 
-        // remove lately
-        private readonly ChatAppContext context;
-
-        public UserController(IConfiguration config, IUserService userService, IWebHostEnvironment webHostEnvironment, IAvatarService assetService, ChatAppContext context)
+        public UserController(IConfiguration config, IUserService userService, IAvatarService assetService)
         {
             this.config = config;
             this.userService = userService;
-            this.webHostEnvironment = webHostEnvironment;
             this.assetService = assetService;
-
-            // remove lately
-            this.context = context;
         }
 
 
@@ -111,8 +103,6 @@ namespace ChatApp.Controllers
         }
 
         
-
-        [AllowAnonymous]
         [Route("search/{user}")]
         [HttpGet]
         public IActionResult SearchUser(string user)

@@ -21,5 +21,7 @@ namespace ChatApp.Context.EntityClasses
         public int? LastUpdatedBy { get; set; }
 
         public virtual Avatar Avatar { get; set; }
+
+        //public virtual Chat Chat { get; set; }
     }
 }

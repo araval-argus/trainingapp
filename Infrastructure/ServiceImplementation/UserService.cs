@@ -121,6 +121,5 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         }
 
-
     }
 }
