@@ -23,6 +23,13 @@ namespace ChatApp.Business.ServiceInterfaces
 
         string GetUserProfileUrlFromId(int Id);
 
+        int GetUserIdFromUserName(string username);
+
+
+        public string GetUserNameFromUserId(int id);
+
         IEnumerable<UserModel> SearchUser(string user);
+
+        UserModel GetUserFromUserId(int userId);
     }
 }

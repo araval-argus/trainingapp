@@ -1,6 +1,8 @@
-﻿using ChatApp.Context.EntityClasses;
+﻿using ChatApp.Business.ServiceInterfaces;
+using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using ChatApp.Models.Assets;
+using ChatApp.Models.Chat;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +10,16 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Business.Helpers
 {
+
     public class ConvertHelpers
     {
+        private readonly IUserService userService;
+
+        public ConvertHelpers(IUserService userService)
+        {
+            this.userService = userService;
+        }
+
         // converts the profile object so that password and profile type were not sent to the client side
         public static UserModel ConvertToSafeUserObjects(Profile profile)
         {
@@ -63,5 +73,27 @@ namespace ChatApp.Business.Helpers
                 UpdatedAt = avatar.UpdatedAt
             };
         }
+    
+        
+        // convert chat type object to chat list model
+        public ChatModel ConvertChatToChatModel(Chat chat)
+        {
+            var sender = userService.GetUserNameFromUserId(chat.MessageFrom);
+            var receiver = userService.GetUserNameFromUserId(chat.MessageTo);
+
+            return new ChatModel
+            {
+                Id = chat.Id,
+                MessageFrom = sender,
+                MessageTo = receiver,
+                Type = chat.Type,
+                Content = chat.Content,
+                CreatedAt = chat.CreatedAt,
+                UpdatedAt = chat.UpdatedAt,
+                DeletedAt = chat.DeletedAt
+            };
+        }
+    
     }
+
 }

@@ -9,9 +9,9 @@ namespace ChatApp.Models.Chat
     {
         public int Id { get; set; }
 
-        public int MessageFrom { get; set; }
+        public string MessageFrom { get; set; }
 
-        public int MessageTo { get; set; }
+        public string MessageTo { get; set; }
 
         public string Type { get; set; }
 
@@ -19,8 +19,8 @@ namespace ChatApp.Models.Chat
 
         public DateTime CreatedAt { get; set; }
 
-        public DateTime UpdatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        public DateTime DeletedAt { get; set; }
+        public DateTime? DeletedAt { get; set; }
     }
 }

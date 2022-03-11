@@ -50,6 +50,29 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return safeObject;
         }
 
+        public string GetUserNameFromUserId(int id)
+        {
+            var username = context.Profiles.FirstOrDefault(u => u.Id == id); 
+
+            if ( username == null)
+            {
+                return "";
+            }
+
+            return username.UserName;
+        }
+
+        public int GetUserIdFromUserName(string username)
+        {
+            var user = context.Profiles.FirstOrDefault(u => u.UserName == username);
+
+            if (user == null)
+            {
+                return 0;
+            }
+
+            return user.Id;
+        }
 
         public async Task<UserModel> UpdateUser(UserUpdateModel user, string userName)
         {
@@ -87,6 +110,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         }
 
+        public UserModel GetUserFromUserId(int userId)
+        {
+            var user = context.Profiles.Include(p => p.Avatar).FirstOrDefault(u => u.Id == userId);
+
+            return ConvertHelpers.ConvertToSafeUserObjects(user);
+        }
 
         public AvatarModel UploadProfileImage(UserModel user, IFormFile profileImage)
         {

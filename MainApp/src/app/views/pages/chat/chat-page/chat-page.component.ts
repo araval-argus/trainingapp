@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { Chat } from 'src/app/core/models/chat';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { ChatService } from 'src/app/core/service/chat.service';
@@ -15,9 +15,14 @@ export class ChatPageComponent implements OnInit {
   @Input() userObj: LoggedInUser;
   @Input() userToChat: string;
 
+  @ViewChildren('messages') messages: QueryList<any>;
+  @ViewChild('content') content: ElementRef;
+
   userToChatObj: LoggedInUser;
 
   chatList: Chat[] = [];
+
+  chatMessage: string;
 
   //flag
   userToChatLoadingFlag: boolean = false;
@@ -26,6 +31,9 @@ export class ChatPageComponent implements OnInit {
   constructor(private userService: UserService, private chatService: ChatService) { }
 
   ngOnInit(): void {
+
+    this.chatMessage = "";
+
     this.userService.getUserByUserName(this.userToChat).subscribe(
       (res) => {
         this.userToChatLoadingFlag = true;
@@ -40,6 +48,17 @@ export class ChatPageComponent implements OnInit {
         
       }
     )
+  }
+
+  ngAfterViewInit() {
+    this.scrollToBottom();
+    this.messages.changes.subscribe(this.scrollToBottom);
+  }
+  
+  scrollToBottom = () => {
+    try {
+      this.content.nativeElement.scrollTop = this.content.nativeElement.scrollHeight;
+    } catch (err) {}
   }
 
   getDirectChatWithUser(userToChat: string) {
@@ -57,6 +76,20 @@ export class ChatPageComponent implements OnInit {
     )
   }
 
+  sendMessage() {
+    this.chatService.sendTextMessage(this.userToChatObj.userName, this.chatMessage).subscribe(
+      (res) => {
+        if (res.status.toLowerCase() == "success") {
+          this.chatList.push(res.message);
+          this.chatMessage = "";
+        }
+      },
+      (err) => {
+        console.log(err);
+        
+      }
+    )
+  }
 
   // utilities
   makeProfileUrl(filePath: string) {

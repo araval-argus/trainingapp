@@ -7,6 +7,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { FeatherIconModule } from 'src/app/core/feather-icon/feather-icon.module';
 import { NgbModule, NgbNav, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 const routes: Routes = [
   {
@@ -27,7 +28,9 @@ const routes: Routes = [
     FeatherIconModule,
     NgbModule,
     NgbNavModule,
-    PerfectScrollbarModule
+    PerfectScrollbarModule,
+    ReactiveFormsModule,
+    FormsModule
   ]
 })
 export class ChatModule { }

@@ -27,47 +27,33 @@
           <ng-template ngbNavContent>
             <div class="ps" [perfectScrollbar]>
               <p class="text-muted mb-1">Recent chats</p>
+
+              <!-- showing recent users  -->
+              <p class="text-center" *ngIf="recentChatUserLoadingFlag">
+                Loading...
+              </p>
+
               <ul class="list-unstyled chat-list px-1">
-                <li class="chat-item pr-1">
-                  <a href="" (click)="false" class="d-flex align-items-center">
-                    <figure class="mb-0 mr-2">
-                      <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
-                      <div class="status online"></div>
+                <li *ngFor="let user of recentChatUsers" class="chat-item pr-1" >
+                  <div *ngIf="user.userName != userObj.userName">
+
+                    <a href="/chat/{{ user.userName }}" class="d-flex align-items-center">
+                      <figure class="mb-0 mr-2">
+                      <img [src]="makeProfileUrl(user.profileUrl)" class="img-xs rounded-circle" alt="user">
+                      <!-- <div class="status offline"></div> -->
                     </figure>
-                    <div class="d-flex justify-content-between flex-grow border-bottom">
+                    <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
                       <div>
-                        <p class="text-body font-weight-bold">John Doe</p>
-                        <p class="text-muted tx-13">Hi, How are you?</p>
-                      </div>
-                      <div class="d-flex flex-column align-items-end">
-                        <p class="text-muted tx-13 mb-1">4:32 PM</p>
-                        <div class="badge badge-pill badge-primary ml-auto">5</div>
-                      </div>
-                    </div>
-                  </a>
-                </li>
-                <li class="chat-item pr-1">
-                  <a href="" (click)="false" class="d-flex align-items-center">
-                    <figure class="mb-0 mr-2">
-                      <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
-                      <div class="status offline"></div>
-                    </figure>
-                    <div class="d-flex justify-content-between flex-grow border-bottom">
-                      <div>
-                        <p class="text-body font-weight-bold">Carl Henson</p>
+                        <p class="text-body">{{ user.userName }} <span *ngIf="user.userName == userObj.userName"> <i> (You)</i> </span> </p>
                         <div class="d-flex align-items-center">
-                          <i class="feather icon-image text-muted icon-sm mb-2px"></i>
-                          <p class="text-muted ml-1">Photo</p>
+                          <p class="text-muted tx-13">{{ user.firstName | titlecase}} {{ user.lastName | titlecase }}</p>
                         </div>
                       </div>
-                      <div class="d-flex flex-column align-items-end">
-                        <p class="text-muted tx-13 mb-1">05:24 PM</p>
-                        <div class="badge badge-pill badge-danger ml-auto">3</div>
-                      </div>
+                      
                     </div>
                   </a>
+                </div>
                 </li>
-                
               </ul>
             </div>
           </ng-template>
@@ -226,9 +212,10 @@
               </p>
 
               <ul class="list-unstyled chat-list px-1">
-                <li *ngFor="let user of allUsers" class="chat-item pr-1">
-                  <a href="/chat/{{ user.userName }}" class="d-flex align-items-center">
-                    <figure class="mb-0 mr-2">
+                <li *ngFor="let user of allUsers" class="chat-item pr-1" >
+
+                    <a href="/chat/{{ user.userName }}" class="d-flex align-items-center">
+                      <figure class="mb-0 mr-2">
                       <img [src]="makeProfileUrl(user.profileUrl)" class="img-xs rounded-circle" alt="user">
                       <!-- <div class="status offline"></div> -->
                     </figure>

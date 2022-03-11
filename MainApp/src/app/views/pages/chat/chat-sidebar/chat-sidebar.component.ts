@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { ChatService } from 'src/app/core/service/chat.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -13,11 +14,15 @@ export class ChatSidebarComponent implements OnInit {
   @Input() allUsers: LoggedInUser[];
   @Input() allUsersLoadingFlag: boolean;
 
+  recentChatUsers: LoggedInUser[] = [];
+  recentChatUserLoadingFlag: boolean = true;
+
   defaultNavActiveId = 1;
 
-  constructor() { }
+  constructor(private chatService: ChatService) { }
 
   ngOnInit(): void {
+    this.getRecentChatUsers();
   }
 
 
@@ -28,6 +33,22 @@ export class ChatSidebarComponent implements OnInit {
     }
     
     return environment.hostUrl + '/' + filePath;
+  }
+
+  getRecentChatUsers() {
+    this.chatService.getRecentChatUsers().subscribe(
+      (res) => {
+        this.recentChatUsers = res;
+        this.recentChatUserLoadingFlag = false;
+        console.log("Recentusers");
+        console.log(res);
+        
+      },
+      (err) => {
+        console.log(err);
+        
+      }
+    )
   }
 
 }

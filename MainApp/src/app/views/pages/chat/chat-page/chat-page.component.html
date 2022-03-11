@@ -14,14 +14,19 @@
           <p class="text-muted tx-13">Status text</p>
         </div>
       </div>
+      <div>
+        <button class="btn" (click)="getDirectChatWithUser(this.userToChatObj.userName)">
+          <i class="icon-md" data-feather="refresh-cw" appFeatherIcon></i>
+        </button>
+      </div>
       
     </div>
   </div>
-  <div class="chat-body" [perfectScrollbar]>
-    <ul class="messages">
-      <li *ngFor="let msg of chatList" class="message-item friend" [ngClass]="{'friend': msg.messageFrom == 6, 'me': msg.messageFrom == 1 }">
-        <img *ngIf="msg.messageFrom == 6" [src]="makeProfileUrl(userToChatObj.profileUrl)" class="img-xs rounded-circle" alt="avatar">
-        <img *ngIf="msg.messageFrom == 1" [src]="userObj.profileUrl" class="img-xs rounded-circle" alt="avatar">
+  <div class="chat-body" [perfectScrollbar] #content>
+    <ul class="messages" #messages>
+      <li *ngFor="let msg of chatList" class="message-item" [ngClass]="{'friend': msg.messageFrom == userToChatObj.userName, 'me': msg.messageFrom == userObj.userName }">
+        <img *ngIf="msg.messageFrom == userToChatObj.userName" [src]="makeProfileUrl(userToChatObj.profileUrl)" class="img-xs rounded-circle" alt="avatar">
+        <img *ngIf="userToChatObj.userName != userObj.userName && msg.messageFrom == userObj.userName" [src]="userObj.profileUrl" class="img-xs rounded-circle" alt="avatar">
         <div class="content">
           <div class="message">
             <div class="bubble">
@@ -59,11 +64,11 @@
 <div class="chat-footer d-flex">
   <form class="search-form flex-grow mr-2">
     <div class="input-group">
-      <input type="text" class="form-control rounded-pill" id="chatForm" placeholder="Type a message">
+      <input type="text" name="chatMessage" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" [(ngModel)]="chatMessage">
     </div>
   </form>
   <div>
-    <button type="button" class="btn btn-primary btn-icon rounded-circle">
+    <button type="button" class="btn btn-primary btn-icon rounded-circle" [disabled]="chatMessage.length == 0" (click)="sendMessage()">
       <i class="feather icon-send"></i>
     </button>
   </div>

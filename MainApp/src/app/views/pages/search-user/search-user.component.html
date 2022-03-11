@@ -47,9 +47,15 @@
                   </div>
                   <div class="col-md-8">
                     <div class="card-body">
-                      <h5 class="card-title mb-0">{{ u.userName }} ( {{u.firstName}} {{u.lastName}} )</h5>
+                        <div class="d-flex justify-content-between">
+                            <h5 class="card-title mb-0">{{ u.userName }} ( {{u.firstName}} {{u.lastName}} )</h5>
+                            <a href="/chat/{{ u.userName}}" class="btn stretched-link">
+                                <i class="icon-md" data-feather="message-circle" appFeatherIcon></i>
+                              </a>
+                        </div>
                       <p class="card-text">{{ u.email }}</p>
                       <p class="card-text"><small class="text-muted">Online - 3 mins ago</small></p>
+                      
                     </div>
                   </div>
                 </div>
