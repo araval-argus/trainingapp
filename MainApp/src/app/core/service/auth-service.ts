@@ -1,4 +1,6 @@
+import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
+import { environment } from "src/environments/environment";
 import { JwtHelper } from "../helper/jwt-helper";
 import { LoggedInUser } from "../models/loggedin-user";
 
@@ -6,7 +8,7 @@ import { LoggedInUser } from "../models/loggedin-user";
     providedIn: 'root'
 })
 export class AuthService {
-    constructor(private jwtHelper: JwtHelper) {
+    constructor(private jwtHelper: JwtHelper, private httpClient: HttpClient) {
 
     }
     login(token, callback) {
@@ -18,6 +20,10 @@ export class AuthService {
 
     }
     logout(callback) {
+
+        this.httpClient.post(environment.apiUrl + "/Account/logout", {}).subscribe()
+        console.log("Logout");
+        
         localStorage.removeItem('isLoggedin');
         localStorage.removeItem('USERTOKEN');
         localStorage.removeItem('authToken');

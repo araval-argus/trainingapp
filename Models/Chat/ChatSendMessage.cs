@@ -20,5 +20,7 @@ namespace ChatApp.Models.Chat
         [Required]
         public string Content { get; set; }
 
+        public int? ReplyTo { get; set; }
+
     }
 }

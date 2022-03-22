@@ -24,10 +24,7 @@ namespace ChatApp.Context.EntityClasses
 
         public DateTime? DeletedAt{ get; set; }
 
-        //[ForeignKey("MessageFrom")]
-        // public virtual Profile MessageFromUser { get; set; }
+        public int ReplyTo { get; set; }
 
-        //[ForeignKey("MessageTo")]
-        //public virtual Profile MessageToUser { get; set; }
     }
 }

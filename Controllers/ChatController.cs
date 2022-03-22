@@ -84,9 +84,16 @@ namespace ChatApp.Controllers
                 return BadRequest();
             }
 
+            int replyToMsgId = 0;
+
+            if (message.ReplyTo is not null)
+            {
+                replyToMsgId = (int)message.ReplyTo;
+            }
+
             if (message.Type == "text")
             {
-                var sendMessage = chatService.sendTextMessage(userNameFrom, userNameTo, message.Content);
+                var sendMessage = chatService.sendTextMessage(userNameFrom, userNameTo, message.Content, replyToMsgId);
                 return Ok(new {status= "Success", message=sendMessage });
             }
 
@@ -99,7 +106,7 @@ namespace ChatApp.Controllers
         {
             string userNameFromJWT = JwtHelper.GetUsernameFromRequest(Request);
 
-            if (userNameFromJWT == "")
+            if (userNameFromJWT.Length == 0)
             {
                 return BadRequest("JWT Token tampered!");
             }
@@ -116,7 +123,7 @@ namespace ChatApp.Controllers
                 return BadRequest("User from Token and URL mismatched!");
             }
 
-            var users = chatService.recentChatUsers(userId);
+            var users = chatService.RecentChatUsers(userId);
 
             return Ok(users);
 

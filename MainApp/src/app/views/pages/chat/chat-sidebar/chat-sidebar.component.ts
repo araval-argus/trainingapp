@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { RecentChatUsers } from 'src/app/core/models/recent-chat-users';
 import { ChatService } from 'src/app/core/service/chat.service';
 import { environment } from 'src/environments/environment';
 
@@ -14,7 +15,7 @@ export class ChatSidebarComponent implements OnInit {
   @Input() allUsers: LoggedInUser[];
   @Input() allUsersLoadingFlag: boolean;
 
-  recentChatUsers: LoggedInUser[] = [];
+  recentChatUsers: RecentChatUsers[] = [];
   recentChatUserLoadingFlag: boolean = true;
 
   defaultNavActiveId = 1;
@@ -40,7 +41,7 @@ export class ChatSidebarComponent implements OnInit {
       (res) => {
         this.recentChatUsers = res;
         this.recentChatUserLoadingFlag = false;
-        console.log("Recentusers");
+        console.log("Recent users");
         console.log(res);
         
       },

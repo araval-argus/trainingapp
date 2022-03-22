@@ -31,7 +31,13 @@ namespace ChatApp.Models
         public DateTime? LastUpdatedAt { get; set; }
 
         public int? LastUpdatedBy { get; set; }
-        
+
+        public DateTime? LastSeen { get; set; }
+
+
+#nullable enable
+        public string? StatusText { get; set; }
+
 #nullable enable
         public string? ProfileUrl { get; set; }
     }

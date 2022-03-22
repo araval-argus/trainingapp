@@ -3,6 +3,7 @@ export interface Chat {
     messageFrom?: string
     messageTo?: string
     type?: string
+    replyTo?: string
     content?: string
     createdAt?: Date
     updatedAt?: Date

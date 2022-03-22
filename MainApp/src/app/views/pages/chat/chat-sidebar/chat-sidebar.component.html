@@ -35,19 +35,22 @@
 
               <ul class="list-unstyled chat-list px-1">
                 <li *ngFor="let user of recentChatUsers" class="chat-item pr-1" >
-                  <div *ngIf="user.userName != userObj.userName">
+                  <div *ngIf="user.user.userName != userObj.userName">
 
-                    <a href="/chat/{{ user.userName }}" class="d-flex align-items-center">
+                    <a href="/chat/{{ user.user.userName }}" class="d-flex align-items-center">
                       <figure class="mb-0 mr-2">
-                      <img [src]="makeProfileUrl(user.profileUrl)" class="img-xs rounded-circle" alt="user">
+                      <img [src]="makeProfileUrl(user.user.profileUrl)" class="img-xs rounded-circle" alt="user">
                       <!-- <div class="status offline"></div> -->
                     </figure>
                     <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
                       <div>
-                        <p class="text-body">{{ user.userName }} <span *ngIf="user.userName == userObj.userName"> <i> (You)</i> </span> </p>
+                        <p class="text-body">{{ user.user.userName }} ( {{ user.user.firstName | titlecase}} {{ user.user.lastName | titlecase }} )  <span *ngIf="user.user.userName == userObj.userName"> <i> (You)</i> </span> </p>
                         <div class="d-flex align-items-center">
-                          <p class="text-muted tx-13">{{ user.firstName | titlecase}} {{ user.lastName | titlecase }}</p>
+                          <p class="text-body text-muted ">{{ user.lastMessage }}</p>
                         </div>
+                      </div>
+                      <div *ngIf="user.unreadCount > 0" class="d-flex flex-column align-items-end">
+                        <span class="badge badge-pill badge-primary">{{ user.unreadCount }}</span>
                       </div>
                       
                     </div>
@@ -59,7 +62,7 @@
           </ng-template>
         </li>  <!-- End chat tab-->
 
-        <!-- <li [ngbNavItem]="2">
+        <li [ngbNavItem]="2">
           <a ngbNavLink>
             <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
               <i class="feather icon-phone-call icon-xs mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
@@ -193,7 +196,7 @@
               </ul>
             </div>
           </ng-template>
-        </li>  -->
+        </li> 
         <!-- End calls tab-->
         <li [ngbNavItem]="3">
           <a ngbNavLink>

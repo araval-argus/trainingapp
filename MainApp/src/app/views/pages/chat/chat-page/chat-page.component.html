@@ -30,9 +30,21 @@
         <div class="content">
           <div class="message">
             <div class="bubble">
+              <span *ngIf="msg.replyTo && msg.replyTo.length != 0">
+                <div class="w-100 bg-white">
+
+                  <small class="text-secondary ">
+                    {{msg.replyTo}}
+                  </small>
+                </div>
+              </span>
               <p>{{ msg.content }}</p>
             </div>
-            <span> {{ msg.createdAt | date: 'h:mm a' }}</span>
+            <span class="me-1"> {{ msg.createdAt | date: 'h:mm a' }} 
+              <button class="btn btn-sm m-0 p-0" (click)="setReplyToMsg(msg)">
+                <i class="icon-sm" data-feather="corner-down-left" appFeatherIcon></i>
+              </button>
+            </span>
           </div>
         </div>
       </li>
@@ -60,14 +72,23 @@
     </ul>
   </div>
 </div>
+<p *ngIf="replyToMsgIndicator">
+  <small class="text-secondary">
+    <button class="btn btn-sm m-0 p-0" (click)="unsetReplyToMsg()">
 
+      <i class="icon-sm" data-feather="x" appFeatherIcon></i> 
+    </button>
+    Replying to - {{ replyToMsgIndicator.content}}  
+  </small>
+</p>
 <div class="chat-footer d-flex">
   <form class="search-form flex-grow mr-2">
+    
     <div class="input-group">
       <input type="text" name="chatMessage" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" [(ngModel)]="chatMessage">
     </div>
   </form>
-  <div>
+  <div class="align-bottom">
     <button type="button" class="btn btn-primary btn-icon rounded-circle" [disabled]="chatMessage.length == 0" (click)="sendMessage()">
       <i class="feather icon-send"></i>
     </button>

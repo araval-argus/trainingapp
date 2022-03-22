@@ -12,8 +12,8 @@ namespace ChatApp.Business.ServiceInterfaces
     {
         IEnumerable<ChatModel> chatLists(int userFrom, int userTo, int limit=50);
 
-        IEnumerable<UserModel> recentChatUsers(int userId);
+        IEnumerable<RecentChatUsers> RecentChatUsers(int userId);
 
-        ChatModel sendTextMessage(string userFrom, string userTo, string content);
+        ChatModel sendTextMessage(string userFrom, string userTo, string content, int replyTo);
     }
 }

@@ -19,6 +19,9 @@ namespace ChatApp.Models.Chat
 
         public DateTime CreatedAt { get; set; }
 
+#nullable enable
+        public string? ReplyTo { get; set; }
+
         public DateTime? UpdatedAt { get; set; }
 
         public DateTime? DeletedAt { get; set; }

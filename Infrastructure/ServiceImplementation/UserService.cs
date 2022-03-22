@@ -76,15 +76,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public async Task<UserModel> UpdateUser(UserUpdateModel user, string userName)
         {
-            // check if the username provided is not an existing one
-            //Profile userCheck = this.context.Profiles.FirstOrDefault((u) => String.Equals(u.UserName, user.UserName));
-
-            //// another user exist of same name
-            //if (userCheck != null)
-            //{
-            //    return null;
-            //}
-
             Profile updateObj = context.Profiles.FirstOrDefault((u) => String.Equals(u.UserName, userName));
 
             // if user to update is not found
@@ -149,6 +140,5 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return ConvertHelpers.ConvertToSafeUserObjects(allUsers);
 
         }
-
     }
 }

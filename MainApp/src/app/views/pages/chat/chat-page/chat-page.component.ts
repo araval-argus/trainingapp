@@ -24,6 +24,8 @@ export class ChatPageComponent implements OnInit {
 
   chatMessage: string;
 
+  replyToMsgIndicator: Chat;
+
   //flag
   userToChatLoadingFlag: boolean = false;
   chatLoadingFlag: boolean = true;
@@ -77,7 +79,13 @@ export class ChatPageComponent implements OnInit {
   }
 
   sendMessage() {
-    this.chatService.sendTextMessage(this.userToChatObj.userName, this.chatMessage).subscribe(
+    let msgReplyId: number = 0;
+
+    if (this.replyToMsgIndicator) {
+      msgReplyId = this.replyToMsgIndicator.id;
+    }
+
+    this.chatService.sendTextMessage(this.userToChatObj.userName, this.chatMessage, msgReplyId).subscribe(
       (res) => {
         if (res.status.toLowerCase() == "success") {
           this.chatList.push(res.message);
@@ -89,6 +97,14 @@ export class ChatPageComponent implements OnInit {
         
       }
     )
+  }
+
+  setReplyToMsg(chatMsg: Chat) {
+    this.replyToMsgIndicator = chatMsg;
+  }
+
+  unsetReplyToMsg() {
+    this.replyToMsgIndicator = null;
   }
 
   // utilities

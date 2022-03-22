@@ -18,12 +18,14 @@ namespace ChatApp.Controllers
     [AllowAnonymous]
     public class AccountController : ControllerBase
     {
-        private IConfiguration _config;
-        private readonly IProfileService _profileService;
-        public AccountController(IConfiguration config, IProfileService profileService)
+        private IConfiguration config;
+        private readonly IProfileService profileService;
+        private readonly IUserService userService;
+        public AccountController(IConfiguration config, IProfileService profileService, IUserService userService)
         {
-            _config = config;
-            _profileService = profileService;
+            this.config = config;
+            this.profileService = profileService;
+            this.userService = userService;
         }
 
         [HttpPost("Login")]
@@ -35,10 +37,11 @@ namespace ChatApp.Controllers
             }
 
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
-            var user = _profileService.CheckPassword(loginModel);
+            var user = profileService.CheckPassword(loginModel);
 
             if (user != null)
             {
+                _ = profileService.LoginUser(user.Id);
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenString });
             }
@@ -46,10 +49,29 @@ namespace ChatApp.Controllers
             return response;
         }
 
+        [HttpPost("logout")]
+        public IActionResult LogoutUser()
+        {
+            string username = JwtHelper.GetUsernameFromRequest(Request);
+
+            // check if user exists
+            var userObj = userService.GetUserByUsername(username);
+
+            if (userObj == null)
+            {
+                return BadRequest(new { message = "No user found!" });
+            }
+
+            _ = profileService.LogoutUser(userObj.Id);
+
+            return Ok();
+
+        }
+
         [HttpPost("Register")]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            var user = _profileService.RegisterUser(registerModel);
+            var user = profileService.RegisterUser(registerModel);
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user);
@@ -60,7 +82,7 @@ namespace ChatApp.Controllers
 
         private string GenerateJSONWebToken(Profile profileInfo)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
             var claims = new[] {
@@ -71,8 +93,8 @@ namespace ChatApp.Controllers
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-            _config["Jwt:Issuer"],
+            var token = new JwtSecurityToken(config["Jwt:Issuer"],
+            config["Jwt:Issuer"],
             claims,
             expires: DateTime.Now.AddMinutes(120),
             signingCredentials: credentials);
