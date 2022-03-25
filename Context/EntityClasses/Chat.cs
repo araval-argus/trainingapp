@@ -26,5 +26,7 @@ namespace ChatApp.Context.EntityClasses
 
         public int ReplyTo { get; set; }
 
+        public int IsSeen { get; set; }
+
     }
 }

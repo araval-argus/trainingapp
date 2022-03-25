@@ -50,6 +50,8 @@ export class ChatPageComponent implements OnInit {
         
       }
     )
+
+    this.chatService.markConversationAsRead(this.userToChat).subscribe();
   }
 
   ngAfterViewInit() {

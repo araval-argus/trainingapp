@@ -26,13 +26,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public AvatarModel SaveProfileImage(UserModel user, IFormFile profileImage)
         {
-            // no validation done here
-            // should be done before calling the function
-
-            // tasks done here
-            // entry in db for the asset
-            // actual saving of the file
-
 
             // saving file with the name [username]_profile
             var profileFolder = FolderPaths.PathToProfileFolder;

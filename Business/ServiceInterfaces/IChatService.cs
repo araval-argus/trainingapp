@@ -10,10 +10,12 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IChatService
     {
-        IEnumerable<ChatModel> chatLists(int userFrom, int userTo, int limit=50);
+        IEnumerable<ChatModel> ChatLists(int userFrom, int userTo, int limit=50);
 
         IEnumerable<RecentChatUsers> RecentChatUsers(int userId);
 
-        ChatModel sendTextMessage(string userFrom, string userTo, string content, int replyTo);
+        ChatModel SendTextMessage(string userFrom, string userTo, string content, int replyTo);
+
+        void MarkConversationAsRead(int userId, int friendId);
     }
 }

@@ -37,4 +37,8 @@ export class ChatService {
     return this.httpClient.get<RecentChatUsers[]>(environment.apiUrl + "/chat/getRecentChatUsers/" + userName);
   }
 
+  markConversationAsRead(friendName: string): Observable<void> {
+    return this.httpClient.get<void>(environment.apiUrl + "/chat/markConversationAsRead/" + friendName)
+  }
+
 }

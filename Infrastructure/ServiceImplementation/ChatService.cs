@@ -23,7 +23,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.userService = userService;
         }
 
-        public IEnumerable<ChatModel> chatLists(int userFrom, int userTo, int limit = 50)
+        public IEnumerable<ChatModel> ChatLists(int userFrom, int userTo, int limit = 50)
         {
             var chats = context.Chats.Where(u => (u.MessageFrom == userFrom && u.MessageTo == userTo) || (u.MessageFrom == userTo && u.MessageTo == userFrom)).ToList();
 
@@ -52,7 +52,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
                 int unreadCount = context.Chats
                     .Count(
-                        u => ((u.MessageFrom == friendProfile.Id && u.MessageTo == userId) && u.CreatedAt > userObj.LastSeen)
+                        u => (
+                        ((u.MessageFrom == friendProfile.Id && u.MessageTo == userId))
+                        && u.IsSeen == 0)
                     );
 
                 var lastMsgObj = context.Chats.OrderBy(o => o.CreatedAt).LastOrDefault(
@@ -79,7 +81,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return recentChatUser;
         }
 
-        public ChatModel sendTextMessage(string userFrom, string userTo, string content, int replyTo)
+        public ChatModel SendTextMessage(string userFrom, string userTo, string content, int replyTo)
         {
             int userFromId = userService.GetUserIdFromUserName(userFrom);
             int userToId = userService.GetUserIdFromUserName(userTo);
@@ -120,6 +122,21 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return retrunObj;
 
         }
+
+        public void MarkConversationAsRead(int userId, int friendId)
+        {
+            var p = context.Chats
+                        .Where(
+                            u => (
+                                ((u.MessageFrom == userId && u.MessageTo == friendId) || (u.MessageFrom == friendId && u.MessageTo == userId))
+                                && u.IsSeen == 0
+                            )
+                        ).ToList();
+            p.ForEach(c => c.IsSeen = 1);
+
+            context.SaveChanges();
+        }
+
 
         private IEnumerable<ChatModel> ConvertChatToChatModel(List<Chat> chat, string userFrom, string userTo, int userFromId, int userToId) 
         {

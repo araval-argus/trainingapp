@@ -58,7 +58,7 @@ namespace ChatApp.Controllers
                 return BadRequest();
             }
 
-            var chat = chatService.chatLists(userFrom.Id, userTo.Id);
+            var chat = chatService.ChatLists(userFrom.Id, userTo.Id);
 
             return Ok(chat);
         }
@@ -93,7 +93,7 @@ namespace ChatApp.Controllers
 
             if (message.Type == "text")
             {
-                var sendMessage = chatService.sendTextMessage(userNameFrom, userNameTo, message.Content, replyToMsgId);
+                var sendMessage = chatService.SendTextMessage(userNameFrom, userNameTo, message.Content, replyToMsgId);
                 return Ok(new {status= "Success", message=sendMessage });
             }
 
@@ -127,6 +127,37 @@ namespace ChatApp.Controllers
 
             return Ok(users);
 
+        }
+
+
+        [Route("markConversationAsRead/{friendUserName}")]
+        [HttpGet]
+        public IActionResult MarkConversationAsRead([FromRoute] string friendUserName)
+        {
+            string userNameFromJWT = JwtHelper.GetUsernameFromRequest(Request);
+
+            if (userNameFromJWT.Length == 0)
+            {
+                return BadRequest("JWT Token tampered!");
+            }
+
+            var userId = CheckValidUser(userNameFromJWT);
+
+            if (userId == -1)
+            {
+                return BadRequest("Not a valid user");
+            }
+
+            var friendId = CheckValidUser(friendUserName);
+
+            if (friendId == -1)
+            {
+                return BadRequest("Not a valid friend name");
+            }
+
+            chatService.MarkConversationAsRead(userId, friendId);
+
+            return Ok();
         }
 
         private int CheckValidUser (string userName)
