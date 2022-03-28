@@ -22,7 +22,7 @@ namespace ChatApp
 {
     public class Startup
     {
-        private readonly string _policyName = "CorsPolicy";
+        private readonly string corsPolicyAllowEveryone = "CorsPolicy";
 
         public Startup(IConfiguration configuration)
         {
@@ -36,10 +36,11 @@ namespace ChatApp
         {
 
             services.AddCors(options => {
-                options.AddPolicy(name: _policyName,
+                options.AddPolicy(name: corsPolicyAllowEveryone,
                     builder =>
                     {
-                        builder.AllowAnyOrigin();
+                        builder.WithOrigins("http://localhost:4200");
+                        //builder.AllowAnyOrigin();
                         builder.AllowAnyHeader();
                         builder.AllowAnyMethod();
                     });
@@ -141,7 +142,7 @@ namespace ChatApp
                 app.UseHsts();
             }
 
-            app.UseCors(_policyName);
+            app.UseCors(corsPolicyAllowEveryone);
 
 
             app.UseHttpsRedirection();

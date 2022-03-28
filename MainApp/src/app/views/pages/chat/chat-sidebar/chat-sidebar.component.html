@@ -8,7 +8,7 @@
           </figure>
           <div>
             <h6>{{ userObj.firstName | titlecase }} {{ userObj.lastName | titlecase }} </h6>
-            <p class="text-muted tx-13">My Status</p>
+            <p class="text-muted tx-13">{{ userObj.statusText }}</p>
           </div>
         </div>
       </div>
@@ -62,7 +62,7 @@
           </ng-template>
         </li>  <!-- End chat tab-->
 
-        <li [ngbNavItem]="2">
+        <!-- <li [ngbNavItem]="2">
           <a ngbNavLink>
             <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
               <i class="feather icon-phone-call icon-xs mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
@@ -196,7 +196,7 @@
               </ul>
             </div>
           </ng-template>
-        </li> 
+        </li>  -->
         <!-- End calls tab-->
         <li [ngbNavItem]="3">
           <a ngbNavLink>

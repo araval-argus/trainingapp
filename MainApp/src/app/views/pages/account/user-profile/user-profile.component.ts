@@ -11,7 +11,7 @@ import { environment } from 'src/environments/environment';
 })
 export class UserProfileComponent implements OnInit {
 
-  user: LoggedInUser;
+  userObj: LoggedInUser;
 
   // flags
   dataLoadingFlag: boolean = true;
@@ -21,57 +21,32 @@ export class UserProfileComponent implements OnInit {
   userProfileImageLink: string = "/assets/images/placeholder.jpg";
   hostUrl: string = environment.hostUrl;
 
-  constructor(
-    private authService: AuthService,
-    private userService: UserService
-  ) { 
-    this.fetchProfileUrl();
+  constructor(private authService: AuthService, private userService: UserService) { }
+
+  async ngOnInit(): Promise<void> {
+    if (!this.userService.currentUserObject) {
+      console.log("This user object is undefined");
+      await this.userService.setCurrentUserSubject();
+    }
+ 
+    this.userService.currentUserObject.subscribe(userObj => {  this.userObj = userObj; } )
+
+    this.dataLoadingFlag = false;
+  
   }
 
-  ngOnInit(): void {
-    this.fetchUserDetails();
-  }
 
-  private fetchUserDetails() {
-    this.userService.getCurrentUserDetails().subscribe((result) => {
-      this.user = result;
-      console.log(result);
-      this.dataLoadingFlag = false;
-    },
-    (err) => {
-      console.log(err);
-      this.dataLoadingFlag = false;
-    });
-  }
 
-  public getLinkPicture() {
-    if(this.timeStamp) {
-       return this.userProfileImageLink + '?' + this.timeStamp;
+  public getImageLink() {
+    return this.userObj.profileUrl ? this.userObj.profileUrl + '?' + this.timeStamp : this.userProfileImageLink;
+    if(this.userObj.profileUrl) {
+       return this.userObj.profileUrl + '?' + this.timeStamp;
     }
     return this.userProfileImageLink;
   }
 
-  fetchProfileUrl() {
-    this.userService.getUserProfileUrl().subscribe(
-      (res) => {
-        if (res.profileUrl == "") {
-          return;
-        }
 
-        this.userProfileImageLink = this.hostUrl + "/" + res.profileUrl;
-        this.updateProfileImage();
-      },
-      (err) => {
-        console.log(err);
-      }
-    )
-  }
-
-  public updateProfileImage() {
-    
-    this.timeStamp = new Date();
-    // this.userProfileImageLink + '?' + this.timeStamp;
-}
+  public updateProfileImage() { this.timeStamp = new Date(); }
 
 
 }

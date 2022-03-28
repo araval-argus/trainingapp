@@ -12,5 +12,6 @@ export interface LoggedInUser
     lastUpdatedBy?: number,
     sub?: string,
     profileUrl?: string,
-    unreadCount?:number
+    unreadCount?:number,
+    statusText?: string
 }

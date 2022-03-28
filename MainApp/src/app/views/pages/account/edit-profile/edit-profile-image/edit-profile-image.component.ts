@@ -18,12 +18,15 @@ export class EditProfileImageComponent implements OnInit {
   // utils 
   uploadProgress: number = 0;
   uploadSubscription: Subscription;
-  userProfileImageLink:string;
+  userProfileImageLink:string = "/assets/images/placeholder.jpg";
   timeStamp: Date = new Date();
 
   constructor(private userService: UserService) { }
 
   ngOnInit(): void {
+    if (this.userObj.profileUrl) {
+      this.userProfileImageLink = this.userObj.profileUrl;
+    }
   }
   
   uploadFile(files){

@@ -35,6 +35,15 @@ namespace ChatApp.Business.Helpers
             userModel.LastUpdatedAt = profile.LastUpdatedAt;
             userModel.LastUpdatedBy = profile.LastUpdatedBy;
 
+            if (profile.StatusText == null)
+            {
+                userModel.StatusText = "Hey There! I am using ChatApp!";
+            }
+            else
+            {
+                userModel.StatusText = profile.StatusText;
+            }
+
             if (profile.Avatar != null)
             {
                 userModel.ProfileUrl = profile.Avatar.FilePath;
@@ -71,6 +80,7 @@ namespace ChatApp.Business.Helpers
                 //FileType = asset.FileType,
                 CreatedAt = avatar.CreatedAt,
                 UpdatedAt = avatar.UpdatedAt
+                
             };
         }
     

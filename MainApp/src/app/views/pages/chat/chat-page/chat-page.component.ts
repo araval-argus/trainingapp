@@ -92,6 +92,7 @@ export class ChatPageComponent implements OnInit {
         if (res.status.toLowerCase() == "success") {
           this.chatList.push(res.message);
           this.chatMessage = "";
+          this.replyToMsgIndicator = null;
         }
       },
       (err) => {

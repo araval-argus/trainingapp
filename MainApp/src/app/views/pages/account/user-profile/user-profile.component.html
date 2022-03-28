@@ -1,4 +1,4 @@
-<h4>User profile:</h4>
+<h4>User profile</h4>
 
 <div class="text-center" *ngIf="dataLoadingFlag">Loading...</div>
 
@@ -8,38 +8,33 @@
         <div class="card">
             <table class="table">
                 <tr>
-                    <td>First name:</td>
-                    <td>{{ user.firstName }}</td>
+                    <td>First name</td>
+                    <td>{{ userObj.firstName }}</td>
                 </tr>
                 <tr>
-                    <td>Last name:</td>
-                    <td>{{ user.lastName }}</td>
+                    <td>Last name</td>
+                    <td>{{ userObj.lastName }}</td>
                 </tr>
                 <tr>
-                    <td>Username:</td>
-                    <td>{{ user.userName }}</td>
+                    <td>Username</td>
+                    <td>{{ userObj.userName }}</td>
                 </tr>
                 <tr>
-                    <td>Email:</td>
-                    <td>{{ user.email }}</td>
+                    <td>Email</td>
+                    <td>{{ userObj.email }}</td>
                 </tr>
                 <tr>
-                    <td>Created By:</td>
-                    <td>{{ user.createdBy ? (user.createdAt|date:'medium') : "-"}} </td>
+                    <td>Status</td>
+                    <td>{{ userObj.statusText }}</td>
                 </tr>
                 <tr>
-                    <td>Created At:</td>
-                    <td>{{ user.createdAt | date:'medium' }} </td>
+                    <td>Created At</td>
+                    <td>{{ userObj.createdAt | date:'medium' }} </td>
                 </tr>
                 <tr>
-                    <td>Last Updated At:</td>
-                    <td>{{ user.lastUpdatedAt ? (user.lastUpdatedAt|date:'medium') : "-" }} </td>
+                    <td>Last Edited At</td>
+                    <td>{{ userObj.lastUpdatedAt ? (userObj.lastUpdatedAt|date:'medium') : "-" }} </td>
                 </tr>
-                <tr>
-                    <td>Last Updated By:</td>
-                    <td>{{ user.lastUpdatedBy ? user.lastUpdatedBy : "-" }} </td>
-                </tr>
-                
             </table>
         </div>
     </div>
@@ -48,11 +43,9 @@
 
 
         <div class="text-center">
-            <img [src]="getLinkPicture()" class="rounded-circle mb-3" height="200px" width="200px" alt="User Profile">
-            <h4 class="mb-3"> {{ user.userName }} 
-              
-            </h4>
-    
+            <img [src]="getImageLink()" class="rounded-circle mb-3" height="200px" width="200px" alt="User Profile">
+            <h4 class="mb-1"> {{ userObj.userName }} </h4>
+            <p class="text-secondary m-0">{{ userObj.statusText }}</p>
             
         </div>
     </div>

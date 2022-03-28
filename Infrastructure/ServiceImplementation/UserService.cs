@@ -76,7 +76,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public async Task<UserModel> UpdateUser(UserUpdateModel user, string userName)
         {
-            Profile updateObj = context.Profiles.FirstOrDefault((u) => String.Equals(u.UserName, userName));
+            Profile updateObj = context.Profiles.Include(p => p.Avatar).FirstOrDefault((u) => String.Equals(u.UserName, userName));
 
             // if user to update is not found
             if (updateObj == null)
@@ -89,6 +89,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             updateObj.LastName = user.LastName;
             updateObj.Email = user.Email;
             updateObj.LastUpdatedAt = DateTime.Now;
+            updateObj.StatusText = user.StatusText;
 
             // temporary -- will be updated after profile type will be implemented
             updateObj.LastUpdatedBy = updateObj.Id;

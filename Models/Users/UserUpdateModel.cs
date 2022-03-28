@@ -23,5 +23,9 @@ namespace ChatApp.Models.Users
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Email is not correct")]
         public string Email { get; set; }
+
+        [Required]
+        [StringLength(100, MinimumLength = 5)]
+        public string StatusText { get; set; }
     }
 }
