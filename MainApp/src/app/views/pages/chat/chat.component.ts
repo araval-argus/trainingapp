@@ -52,5 +52,9 @@ export class ChatComponent implements OnInit {
     )
   }
   
+  changeUser() {
+    console.log("User changed");
+    this.userToChat =  this.activatedRoute.snapshot.paramMap.get("user");
+  }
   
 }

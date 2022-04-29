@@ -22,6 +22,9 @@ namespace ChatApp.Models.Chat
 #nullable enable
         public string? ReplyTo { get; set; }
 
+#nullable enable
+        public string? ReplyToType { get; set; }
+
         public DateTime? UpdatedAt { get; set; }
 
         public DateTime? DeletedAt { get; set; }

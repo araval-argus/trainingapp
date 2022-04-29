@@ -45,6 +45,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Resources\Assets\ImagesDump\" />
     <Folder Include="Resources\Assets\ProfilePic\" />
   </ItemGroup>
 

@@ -37,7 +37,7 @@
                 <li *ngFor="let user of recentChatUsers" class="chat-item pr-1" >
                   <div *ngIf="user.user.userName != userObj.userName">
 
-                    <a href="/chat/{{ user.user.userName }}" class="d-flex align-items-center">
+                    <a href="/chat/{{user.user.userName}}" class="d-flex align-items-center">
                       <figure class="mb-0 mr-2">
                       <img [src]="makeProfileUrl(user.user.profileUrl)" class="img-xs rounded-circle" alt="user">
                       <!-- <div class="status offline"></div> -->
@@ -46,7 +46,15 @@
                       <div>
                         <p class="text-body">{{ user.user.userName }} ( {{ user.user.firstName | titlecase}} {{ user.user.lastName | titlecase }} )  <span *ngIf="user.user.userName == userObj.userName"> <i> (You)</i> </span> </p>
                         <div class="d-flex align-items-center">
-                          <p class="text-body text-muted ">{{ user.lastMessage }}</p>
+                          <p class="text-body text-muted ">
+                            <span *ngIf="user.lastMessageType == 'image'">
+                              <i class="feather icon-image"></i> image
+                            </span>
+                            <span *ngIf="user.lastMessageType == 'text'">
+                              {{ user.lastMessage }}
+                            </span>
+                          </p>
+                          
                         </div>
                       </div>
                       <div *ngIf="user.unreadCount > 0" class="d-flex flex-column align-items-end">

@@ -31,11 +31,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             var profileFolder = FolderPaths.PathToProfileFolder;
             var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), profileFolder);
 
-            //if (profileImage.Length == 0)
-            //{
-            //    return null;
-            //}
-
             // save image to server
             var fileName = ContentDispositionHeaderValue.Parse(profileImage.ContentDisposition).FileName.Trim('"');
             var fileExtension = Path.GetExtension(fileName);

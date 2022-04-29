@@ -52,6 +52,7 @@ namespace ChatApp.Business.Helpers
             return userModel;
         }
 
+
         // converts the profile object so that password and profile type were not sent to the client side
         public static IEnumerable<UserModel> ConvertToSafeUserObjects(IEnumerable<Profile> profiles)
         {
@@ -65,6 +66,7 @@ namespace ChatApp.Business.Helpers
 
             return userModels;
         }
+
 
         // converts asset type object to asset model
         public static AvatarModel ConvetAssetToAssetModel(Avatar avatar)

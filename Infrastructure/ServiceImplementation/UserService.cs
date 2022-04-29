@@ -45,7 +45,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public IEnumerable<UserModel> GetUsers()
         {
             IEnumerable<Profile> users = context.Profiles.Include(p => p.Avatar).ToList();
-            IEnumerable<UserModel> safeObject = (IEnumerable<UserModel>)ConvertHelpers.ConvertToSafeUserObjects(users);
+            IEnumerable<UserModel> safeObject = ConvertHelpers.ConvertToSafeUserObjects(users);
 
             return safeObject;
         }

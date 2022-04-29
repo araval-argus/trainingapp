@@ -4,10 +4,13 @@ using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using ChatApp.Models.Chat;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using System.Threading.Tasks;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
@@ -63,16 +66,19 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     );
 
                 string lastMsg = "";
+                string lastMsgType = "";
 
                 if (lastMsgObj != null)
                 {
                     lastMsg = lastMsgObj.Content;
+                    lastMsgType = lastMsgObj.Type;
                 }
 
                 var userListObj = new RecentChatUsers();
                 userListObj.User = friendProfile;
                 userListObj.UnreadCount = unreadCount;
                 userListObj.LastMessage = lastMsg;
+                userListObj.LastMessageType = lastMsgType;
 
 
                 recentChatUser.Add(userListObj);
@@ -101,7 +107,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             var sendMessage = context.Chats.Add(chat);
             context.SaveChanges();
 
-            string replyToMsg = "";
+            Chat replyToMsg = new();
 
             if ( replyTo != 0)
             {
@@ -116,11 +122,76 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 Type = "text",
                 Content = content,
                 CreatedAt = sendMessage.Entity.CreatedAt,
-                ReplyTo = replyToMsg
+                ReplyTo = replyToMsg.Content,
+                ReplyToType = replyToMsg.Type
             };
 
             return retrunObj;
 
+        }
+
+
+        public ChatModel SendImageMessage (string userFrom, string userTo, IFormFile content, int replyTo)
+        {
+            // saving file with the name [username]_profile
+            var imageDumpFolder = FolderPaths.PathToImageDumpFolder;
+            var pathToSave = Path.Combine(Directory.GetCurrentDirectory(), imageDumpFolder);
+
+            // save image to server
+            var fileName = ContentDispositionHeaderValue.Parse(content.ContentDisposition).FileName.Trim('"');
+            var fileExtension = Path.GetExtension(fileName);
+            var fileSize = content.Length;
+            var fileSaveName = DateTime.Now.ToString("yyyyMMddHHmmssffff");
+
+            var fullFileSaveName = fileSaveName + fileExtension;
+            var fullPath = Path.Combine(pathToSave, fullFileSaveName);
+
+            var dbPath = Path.Combine(imageDumpFolder, fullFileSaveName);
+
+            using (var stream = new FileStream(fullPath, FileMode.Create))
+            {
+                content.CopyTo(stream);
+            }
+
+            // making entry in database
+            int userFromId = userService.GetUserIdFromUserName(userFrom);
+            int userToId = userService.GetUserIdFromUserName(userTo);
+
+            Chat chat = new();
+
+            // setting chat object
+            chat.MessageFrom = userFromId;
+            chat.MessageTo = userToId;
+            chat.Type = "image";
+            chat.Content = dbPath;
+            chat.CreatedAt = DateTime.Now;
+            chat.UpdatedAt = DateTime.Now;
+            chat.ReplyTo = replyTo;
+
+
+            var sendMessage = context.Chats.Add(chat);
+            context.SaveChanges();
+
+            Chat replyToMsg = new();
+
+            if (replyTo != 0)
+            {
+                replyToMsg = GetChatMsgById(replyTo);
+            }
+
+            var retrunObj = new ChatModel
+            {
+                Id = sendMessage.Entity.Id,
+                MessageFrom = userFrom,
+                MessageTo = userTo,
+                Type = "image",
+                Content = dbPath,
+                CreatedAt = sendMessage.Entity.CreatedAt,
+                ReplyTo = replyToMsg.Content,
+                ReplyToType = replyToMsg.Type
+            };
+
+            return retrunObj;
         }
 
         public void MarkConversationAsRead(int userId, int friendId)
@@ -144,7 +215,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
             for ( int i=0; i< chat.Count; i++)
             {
-                string replyMsg = "";
+                Chat replyMsg = new();
+
 
                 if (chat[i].ReplyTo != 0)
                 {
@@ -156,9 +228,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Id = chat[i].Id,
                     MessageFrom = (chat[i].MessageFrom == userFromId) ? userFrom : userTo,
                     MessageTo = (chat[i].MessageTo == userFromId) ? userFrom : userTo,
-                    Type = "text",
+                    Type = chat[i].Type,
                     Content = chat[i].Content,
-                    ReplyTo = replyMsg,
+                    ReplyTo = replyMsg.Content,
+                    ReplyToType = replyMsg.Type,
                     CreatedAt = chat[i].CreatedAt,
                     UpdatedAt = chat[i].UpdatedAt,
                     DeletedAt = chat[i].DeletedAt
@@ -170,9 +243,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return returnObj;
         }
         
-        private string GetChatMsgById(int id)
+        private Chat GetChatMsgById(int id)
         {
-            return context.Chats.FirstOrDefault(c => c.Id == id).Content;
+            return context.Chats.FirstOrDefault(c => c.Id == id);
         }
 
     }

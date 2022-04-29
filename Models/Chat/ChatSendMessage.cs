@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -17,8 +18,10 @@ namespace ChatApp.Models.Chat
         [Required]
         public string Type { get; set; }
 
-        [Required]
-        public string Content { get; set; }
+#nullable enable
+        public string? Content { get; set; }
+#nullable enable
+        public IFormFile? Image{ get; set; }
 
         public int? ReplyTo { get; set; }
 

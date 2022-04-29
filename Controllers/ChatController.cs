@@ -65,7 +65,7 @@ namespace ChatApp.Controllers
 
         [Route("direct/{userNameTo}/")]
         [HttpPost]
-        public IActionResult SendMessageTo([FromRoute] string userNameTo, [FromBody] ChatSendMessage message)
+        public IActionResult SendMessageTo([FromRoute] string userNameTo, [FromForm] ChatSendMessage message)
         {
             string userNameFrom = JwtHelper.GetUsernameFromRequest(Request);
 
@@ -95,6 +95,12 @@ namespace ChatApp.Controllers
             {
                 var sendMessage = chatService.SendTextMessage(userNameFrom, userNameTo, message.Content, replyToMsgId);
                 return Ok(new {status= "Success", message=sendMessage });
+            }
+
+            if (message.Type == "image")
+            {
+                var sendMessage = chatService.SendImageMessage(userNameFrom, userNameTo, message.Image, replyToMsgId);
+                return Ok(new { status = "Success", message = sendMessage });
             }
 
             return BadRequest("This request type isn't implemented by the server.");

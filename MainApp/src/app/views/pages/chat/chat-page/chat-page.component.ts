@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Component, ElementRef, Input, OnChanges, OnInit, QueryList, SimpleChanges, ViewChild, ViewChildren } from '@angular/core';
 import { Chat } from 'src/app/core/models/chat';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { ChatService } from 'src/app/core/service/chat.service';
@@ -10,7 +10,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './chat-page.component.html',
   styleUrls: ['./chat-page.component.scss']
 })
-export class ChatPageComponent implements OnInit {
+export class ChatPageComponent implements OnInit, OnChanges {
 
   @Input() userObj: LoggedInUser;
   @Input() userToChat: string;
@@ -52,6 +52,25 @@ export class ChatPageComponent implements OnInit {
     )
 
     this.chatService.markConversationAsRead(this.userToChat).subscribe();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+      console.log("Onngchange called");
+      
+        this.userService.getUserByUserName(this.userToChat).subscribe(
+      (res) => {
+        this.userToChatLoadingFlag = true;
+        this.userToChatObj = res;
+        console.log("This is the counter person");
+        console.log(res);
+
+        this.getDirectChatWithUser(this.userToChatObj.userName);
+      },
+      (err) => {
+        console.log(err);
+        
+      }
+    )
   }
 
   ngAfterViewInit() {
@@ -102,6 +121,36 @@ export class ChatPageComponent implements OnInit {
     )
   }
 
+  sendImage(images) {
+
+    if (images === 0) { return; }
+
+    let imageToSend = <File>images[0];
+    let msgReplyId:number = 0;
+
+    if (this.replyToMsgIndicator) {
+      msgReplyId = this.replyToMsgIndicator.id;
+    }
+    
+    this.chatService.sendImageMessage(this.userToChatObj.userName, imageToSend, msgReplyId).subscribe(
+      (res) => {
+        console.log(res);
+        if (res.status.toLocaleLowerCase() == "success") {
+          this.chatList.push(res.message);
+          this.chatMessage = "";
+          this.replyToMsgIndicator = null;
+        }
+      },
+      (err) => {
+        console.log(err);
+        
+      }
+    )
+    
+    // if ()
+
+  }
+
   setReplyToMsg(chatMsg: Chat) {
     this.replyToMsgIndicator = chatMsg;
   }
@@ -117,6 +166,10 @@ export class ChatPageComponent implements OnInit {
     }
   
     return environment.hostUrl + '/' + filePath;
+  }
+
+  createImageLink(imgPath: string) {
+    return environment.hostUrl + "/" + imgPath;
   }
 
 }

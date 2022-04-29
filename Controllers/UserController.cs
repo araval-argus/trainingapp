@@ -102,7 +102,6 @@ namespace ChatApp.Controllers
             return Ok( new { asset.FilePath });
         }
 
-        
         [Route("search/{user}")]
         [HttpGet]
         public IActionResult SearchUser(string user)
@@ -111,8 +110,6 @@ namespace ChatApp.Controllers
 
             return Ok(searchResult);
         }
-
-
        
     }
 }

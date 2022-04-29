@@ -21,15 +21,40 @@ export class ChatService {
   sendTextMessage(userTo: string, content: string, replyTo: number ): Observable<{status: string, message: Chat}> {
     let userFrom: string = this.authService.getLoggedInUserInfo().sub;
 
-    let reqObj = {
-      sender : userFrom,
-      receiver : userTo,
-      type: "text",
-      content: content ,
-      replyTo: replyTo
-    }
+    let request = new FormData()
 
-    return this.httpClient.post<{status: string, message: Chat}>(environment.apiUrl + "/chat/direct/" + userTo, reqObj)
+    request.append('sender', userFrom)
+    request.append('receiver', userTo)
+    request.append('type', 'text')
+    request.append('content', content)
+    request.append('replyTo', replyTo.toString())
+
+    // let reqObj = {
+    //   sender : userFrom,
+    //   receiver : userTo,
+    //   type: "text",
+    //   content: content ,
+    //   replyTo: replyTo
+    // }
+
+    return this.httpClient.post<{status: string, message: Chat}>(environment.apiUrl + "/chat/direct/" + userTo, request)
+  }
+
+
+  sendImageMessage(userTo: string, image: File, replyTo: number) {
+    let userFrom: string = this.authService.getLoggedInUserInfo().sub;
+
+    let request = new FormData()
+
+    request.append('sender', userFrom)
+    request.append('receiver', userTo)
+    request.append('type', 'image')
+    request.append('image', image)
+    request.append('replyTo', replyTo.toString())
+
+    return this.httpClient.post<{status: string, message: Chat}>(environment.apiUrl + "/chat/direct/" + userTo, request)
+
+
   }
 
   getRecentChatUsers():Observable<RecentChatUsers[]> {

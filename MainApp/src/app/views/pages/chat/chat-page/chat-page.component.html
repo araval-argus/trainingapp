@@ -29,17 +29,34 @@
         <img *ngIf="userToChatObj.userName != userObj.userName && msg.messageFrom == userObj.userName" [src]="userObj.profileUrl" class="img-xs rounded-circle" alt="avatar">
         <div class="content">
           <div class="message">
-            <div class="bubble">
-              <span *ngIf="msg.replyTo && msg.replyTo.length != 0">
-                <div class="w-100 bg-white">
 
-                  <small class="text-secondary ">
-                    {{msg.replyTo}}
+            <div class="bubble">
+
+              <!-- reply indicator -->
+              <div *ngIf="msg.replyTo && msg.replyTo.length != 0">
+
+                <div *ngIf="msg.replyToType == 'image'">
+                  <div class="d-flex justify-content-end">
+
+                    <img class="" [src]="createImageLink(msg.replyTo)" height="70px"  alt="Reply to msg">
+                  </div>
+                </div>
+
+                <div class="my-1">
+                  <small *ngIf="msg.replyToType == 'text'" class="text-secondary bg-white">
+                    {{ msg.replyTo }}
                   </small>
                 </div>
-              </span>
-              <p>{{ msg.content }}</p>
+              </div>
+
+              <!-- actual message -->
+              <div *ngIf="msg.type == 'image'">
+                <img class="img-fluid" [src]="createImageLink(msg.content)" alt=" Msg">
+              </div>
+
+              <p *ngIf="msg.type == 'text'">{{ msg.content }}</p>
             </div>
+
             <span class="me-1"> {{ msg.createdAt | date: 'h:mm a' }} 
               <button class="btn btn-sm m-0 p-0" (click)="setReplyToMsg(msg)">
                 <i class="icon-sm" data-feather="corner-down-left" appFeatherIcon></i>
@@ -78,10 +95,20 @@
 
       <i class="icon-sm" data-feather="x" appFeatherIcon></i> 
     </button>
-    Replying to - {{ replyToMsgIndicator.content}}  
+    Replying to - 
+    <span *ngIf="replyToMsgIndicator.type == 'text'">
+      {{ replyToMsgIndicator.content}}  
+    </span>
+    <span *ngIf="replyToMsgIndicator.type == 'image'">
+      <img class="my-1" [src]="createImageLink(replyToMsgIndicator.content)" height="50px"  alt="Reply to msg">
+    </span>
+
   </small>
 </p>
 <div class="chat-footer d-flex">
+  <button type="button" class="btn mx-1 btn-icon rounded-circle" (click)="image.click()">
+    <i class="feather icon-image"></i>
+  </button>
   <form class="search-form flex-grow mr-2">
     
     <div class="input-group">
@@ -94,3 +121,6 @@
     </button>
   </div>
 </div>
+
+
+<input type="file" class="d-none" #image id="profileUploadInput" name="profile" accept="image/jpeg image/png" (change)="sendImage(image.files)" >

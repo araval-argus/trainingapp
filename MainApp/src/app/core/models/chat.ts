@@ -4,6 +4,7 @@ export interface Chat {
     messageTo?: string
     type?: string
     replyTo?: string
+    replyToType?: string
     content?: string
     createdAt?: Date
     updatedAt?: Date

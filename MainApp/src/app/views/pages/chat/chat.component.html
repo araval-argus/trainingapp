@@ -9,7 +9,7 @@
         <div class="card-body">
           <div class="row position-relative">
             <div class="col-lg-4 chat-aside border-lg-right">
-              <app-chat-sidebar [userObj]="userObj" [allUsers]="allUsers" [allUsersLoadingFlag]="allUsersLoadingFlag"></app-chat-sidebar>
+              <app-chat-sidebar [userObj]="userObj" [allUsers]="allUsers" [allUsersLoadingFlag]="allUsersLoadingFlag" (selectedUser)="changeUser()"></app-chat-sidebar>
             </div>
             <div class="col-lg-8 chat-content">
               <div *ngIf="userToChat">
