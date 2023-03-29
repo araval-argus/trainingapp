@@ -45,6 +45,7 @@ namespace ChatApp.Controllers
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
             var user = _profileService.RegisterUser(registerModel);
+
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user);
