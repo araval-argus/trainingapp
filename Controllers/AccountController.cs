@@ -16,6 +16,7 @@ namespace ChatApp.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
+    
     public class AccountController : ControllerBase
     {
         private IConfiguration _config;

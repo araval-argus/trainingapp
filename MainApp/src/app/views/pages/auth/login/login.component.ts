@@ -32,6 +32,7 @@ export class LoginComponent implements OnInit {
   onLoggedin(e) {
     e.preventDefault();
     console.log(this.loginModel);
+
     // Implementation of API.
     this.accountService.login(this.loginModel).subscribe((result: any) => {
       this.authService.login(result.token, () => {

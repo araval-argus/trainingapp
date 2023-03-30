@@ -49,5 +49,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             return context.Profiles.Any(x => x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim());
         }
+
+       
     }
 }
