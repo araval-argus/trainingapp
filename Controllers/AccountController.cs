@@ -21,16 +21,24 @@ namespace ChatApp.Controllers
     {
         private IConfiguration _config;
         private readonly IProfileService _profileService;
+        private Validations _validations;
+
         public AccountController(IConfiguration config, IProfileService profileService)
         {
             _config = config;
             _profileService = profileService;
+            _validations = new Validations();
         }
 
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
+            if(!_validations.ValidateLoginField(loginModel))
+            {
+                response = BadRequest(new { Message = "fields cant be validated" });
+                return response;
+            }
             var user = _profileService.CheckPassword(loginModel);
 
             if (user != null)
@@ -45,6 +53,10 @@ namespace ChatApp.Controllers
         [HttpPost("Register")]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
+            if (!_validations.ValidateRegistrationField(registerModel))
+            {
+                return BadRequest(new { Message = "fields cant be validated" });
+            }
             var user = _profileService.RegisterUser(registerModel);
 
             if (user != null)
@@ -53,6 +65,19 @@ namespace ChatApp.Controllers
                 return Ok(new { token = tokenString, user = user });
             }
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
+        }
+
+        [HttpPost("Update")]
+        public IActionResult UpdateUserDetails([FromBody] RegisterModel registerModel)
+        {
+            var user = _profileService.FetchProfile(registerModel.UserName);
+            if(user!= null)
+            {
+                user = _profileService.UpdateProfile(registerModel);
+                var tokenString = GenerateJSONWebToken(user);
+                return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
+            }
+            return BadRequest(new { Message = "User does not exists" });
         }
 
         private string GenerateJSONWebToken(Profile profileInfo)

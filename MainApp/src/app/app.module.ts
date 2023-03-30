@@ -15,11 +15,13 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
+import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
+    EditFormComponent,
   ],
   imports: [
     BrowserModule,
