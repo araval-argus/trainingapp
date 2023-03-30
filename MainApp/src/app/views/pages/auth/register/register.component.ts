@@ -1,5 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
 import { AccountService } from 'src/app/core/service/account-service';
@@ -47,7 +46,6 @@ export class RegisterComponent implements OnInit {
           });
           setTimeout(() => {
             this.router.navigate(["/"]);
-            this.disableRegButtton = false;
 
           }, (3000));
         })
@@ -63,13 +61,5 @@ export class RegisterComponent implements OnInit {
 
   }
 
-  private validate = (regModel: RegistrationModel) => {
-    if(regModel.firstName === '' || regModel.firstName === undefined){return}
-    if(regModel.lastName === '' || regModel.lastName === undefined){return}
-    if(regModel.email === '' || regModel.email === undefined){return}
-    if(regModel.userName === '' || regModel.userName === undefined){return}
-    if(regModel.password === '' || regModel.password === undefined){return}
-    this.disableRegButtton = false
-  }
 
 }

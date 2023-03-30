@@ -66,6 +66,19 @@ namespace ChatApp.Controllers
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
         }
 
+        [HttpPost("Update")]
+        public IActionResult UpdateUserDetails([FromBody] RegisterModel registerModel)
+        {
+            var user = _profileService.FetchProfile(registerModel.UserName);
+            if(user!= null)
+            {
+                user = _profileService.UpdateProfile(registerModel);
+                var tokenString = GenerateJSONWebToken(user);
+                return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
+            }
+            return BadRequest(new { Message = "User does not exists" });
+        }
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

@@ -45,11 +45,34 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return newUser;
         }
 
+        public Profile UpdateProfile(RegisterModel regModel)
+        {
+            Profile user = FetchProfile(regModel.UserName);
+            if(user != null)
+            {
+
+                user.FirstName = regModel.FirstName;
+                user.LastName = regModel.LastName;
+                user.Email = regModel.Email;
+
+                context.Profiles.Update(user);
+                context.SaveChanges();
+            }
+            return user;
+        }
+
         private bool CheckEmailOrUserNameExists(string userName, string email)
         {
             return context.Profiles.Any(x => x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim());
         }
 
-       
+        public Profile FetchProfile(string userName)
+        {
+            Profile user = null;
+            user =  context.Profiles.FirstOrDefault(u => u.UserName.Trim() == userName.Trim());
+            return user;
+        }
+
+        
     }
 }
