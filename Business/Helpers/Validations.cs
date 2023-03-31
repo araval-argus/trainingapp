@@ -7,7 +7,7 @@ namespace ChatApp.Business.Helpers
     {
         public bool ValidateLoginField(LoginModel loginModel)
         {
-            if ((IsFieldNullOrEmpty(loginModel.Username) || !IsValidEmail(loginModel.EmailAddress)) || IsFieldNullOrEmpty(loginModel.Password))
+            if ((IsFieldNullOrEmpty(loginModel.Username) && !IsValidEmail(loginModel.EmailAddress)) || IsFieldNullOrEmpty(loginModel.Password))
             {
                 return false;
             }

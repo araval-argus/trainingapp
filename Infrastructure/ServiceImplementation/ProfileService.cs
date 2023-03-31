@@ -18,6 +18,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             this.context = context;
         }
+
+        // this method checks (username and password) or (email and password)
         public Profile CheckPassword(LoginModel model)
         {
             return this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
