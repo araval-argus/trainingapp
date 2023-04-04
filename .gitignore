@@ -226,6 +226,4 @@ _Pvt_Extensions
 
 # Paket dependency manager
 .paket/paket.exe
-
-# FAKE - F# Make
-.fake/
+/ChatApp.Database/ChatApp.Database.jfm
