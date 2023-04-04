@@ -30,6 +30,12 @@ namespace ChatApp
         {
             services.AddDbContext<ChatAppContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("Default")));
 
+            //This service is added for allowing local host to send request
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowedOrigin", builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
+            });
+
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
              {
@@ -112,6 +118,10 @@ namespace ChatApp
                 // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
+
+
+            //TO add CORS service which we have created
+            app.UseCors("AllowedOrigin");
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
