@@ -16,6 +16,7 @@ namespace ChatApp.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
+
     public class AccountController : ControllerBase
     {
         private IConfiguration _config;
@@ -27,6 +28,8 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("Login")]
+        [Authorize]
+
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
@@ -42,6 +45,8 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("Register")]
+        [Authorize]
+
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
             var user = _profileService.RegisterUser(registerModel);
@@ -53,6 +58,38 @@ namespace ChatApp.Controllers
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
         }
 
+        [HttpPut("update/{username}")]
+        [Authorize]
+
+        public IActionResult update([FromForm] UpdateModel updateModel,string username)
+        {
+            var user = _profileService.UpdateUser(updateModel, username);
+            // service will return null if user not found based on username
+            if(user == null)
+            {
+                return BadRequest(new { Message = "User Not Found" });
+            }
+            // service will return new profile
+            if(user.UserName == null)
+            {
+                return BadRequest(new { Message = "Email is already used in different account" });
+            }
+            var tokenString = GenerateJSONWebToken(user);
+            return Ok(new { token = tokenString });
+        }
+
+
+        [HttpGet("getImage")]
+        [Authorize]
+
+        public IActionResult GetImage(string username) { 
+            string imgPath = _profileService.GetImage(username);
+            if(imgPath == null)
+            {
+                return BadRequest(new { Message = "Email is already used in different account" });
+            }
+            return Ok(new { imgPath = imgPath });
+        }
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

@@ -1,7 +1,7 @@
-export interface LoggedInUser
-{
+export interface LoggedInUser {
     firstName?: string,
     lastName?: string,
-    email?:string,
-    userName?: string
+    email?: string,
+    sub?: string,
+    imageURL?: string;
 }

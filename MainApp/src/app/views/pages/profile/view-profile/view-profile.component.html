@@ -1,0 +1,27 @@
+<div class="row auth-form-wrapper">
+    <div class="col-xs-4">
+        <figure class="py-3 px-5">
+            <img src="https://via.placeholder.com/200x200"  class="rounded-circle" alt="profile" *ngIf="imageURL === null">
+            <img [src]="imageURL" height="200" width="200"  class="rounded-circle" alt="profile" *ngIf="imageURL !== null">
+        </figure>
+    </div>
+    <div class="col-md-4">
+        <div class="form-group">
+            <label>First Name</label>
+            <input type="text" class="form-control" [value]="loggedInUser.firstName" readonly>
+        </div>
+        <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" class="form-control" [value]="loggedInUser.lastName" readonly>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="text" class="form-control" [value]="loggedInUser.email" readonly>
+        </div>
+        <div class="form-group">
+            <label>UserName</label>
+            <input type="text" class="form-control" [value]="loggedInUser.sub" readonly>
+        </div>
+        
+    </div>
+</div>

@@ -35,12 +35,20 @@ export class LoginComponent implements OnInit {
     // Implementation of API.
     this.accountService.login(this.loginModel).subscribe((result: any) => {
       this.authService.login(result.token, () => {
+        // After Login set user Name in case we have logged in using email
+        this.loginModel.userName = this.authService.getLoggedInUserInfo().sub;
+        // After login set up image
+        this.accountService.getImage(this.loginModel.userName).subscribe((data: any) => {
+          this.loginModel.imageURL = data.imgPath;
+          localStorage.setItem('imagePath', this.accountService.getImageUrl(data.imgPath));
+          this.accountService.updateDetails.next();
+        })
         Swal.fire({
           title: 'Success!',
           text: 'User loggedin successfully.',
           icon: 'success',
           timer: 2000,
-         timerProgressBar: true,
+          timerProgressBar: true,
         });
         setTimeout(() => {
           this.router.navigate(["/"]);

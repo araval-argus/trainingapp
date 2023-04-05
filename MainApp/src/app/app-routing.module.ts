@@ -6,7 +6,7 @@ import { ErrorPageComponent } from './views/pages/error-page/error-page.componen
 
 
 const routes: Routes = [
-  { path:'auth', loadChildren: () => import('./views/pages/auth/auth.module').then(m => m.AuthModule) },
+  { path: 'auth', loadChildren: () => import('./views/pages/auth/auth.module').then(m => m.AuthModule) },
   {
     path: '',
     component: BaseComponent,
@@ -16,14 +16,14 @@ const routes: Routes = [
         path: 'dashboard',
         loadChildren: () => import('./views/pages/dashboard/dashboard.module').then(m => m.DashboardModule)
       },
-      //{
-      //   path: 'profile',
-      //   loadChildren: () => import('./views/pages/profile/profile.module').then(m => m.ProfileModule)
-      // },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, 
+      {
+        path: 'profile',
+        loadChildren: () => import('./views/pages/profile/profile.module').then(m => m.ProfileModule)
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },
-  { 
+  {
     path: 'error',
     component: ErrorPageComponent,
     data: {

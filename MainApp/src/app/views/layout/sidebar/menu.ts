@@ -16,12 +16,12 @@ export const MENU: MenuItem[] = [
   },
   {
     label: 'Edit Profile',
-    icon: 'home',
+    icon: 'edit-2',
     link: '/profile/editProfile'
   },
   {
     label: 'View Profile',
-    icon: 'home',
+    icon: 'eye',
     link: '/profile/viewProfile'
   }
 ];

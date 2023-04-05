@@ -12,5 +12,9 @@ namespace ChatApp.Business.ServiceInterfaces
         Profile CheckPassword(LoginModel loginModel);
 
         Profile RegisterUser(RegisterModel regModel);
+
+        Profile UpdateUser(UpdateModel updateModel, string username);
+
+        string GetImage(string username);
     }
 }

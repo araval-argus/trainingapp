@@ -13,7 +13,6 @@ namespace ChatApp.Models
         [Required(ErrorMessage = "Invalid Credential")]
         public string Username { get; set; }
         [Required(ErrorMessage = "Invalid Credential")]
-        [EmailAddress(ErrorMessage = "Enter Valid Email")]
         public string EmailAddress { get; set; }
         [Required(ErrorMessage = "Invalid Credential")]
         public string Password { get; set; }

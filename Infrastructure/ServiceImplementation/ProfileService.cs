@@ -3,20 +3,26 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
     public class ProfileService : IProfileService
     {
         private readonly ChatAppContext context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProfileService(ChatAppContext context)
+        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
+            this._webHostEnvironment = webHostEnvironment;
         }
         public Profile CheckPassword(LoginModel model)
         {
@@ -43,6 +49,74 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 context.SaveChanges();
             }
             return newUser;
+        }
+
+        public Profile UpdateUser(UpdateModel updateModel, string username)
+        {
+            Profile profile = getUser(username);
+            // If user not found
+            if(profile == null)
+            {
+                return null;
+            }
+            // If entered Email is already in use 
+            if (CheckEmailExists(updateModel.Email, username))
+            {
+                return new Profile();
+            }
+            profile.FirstName = updateModel.FirstName;
+            profile.LastName = updateModel.LastName;
+            profile.Email = updateModel.Email;
+            if(updateModel.file!= null)
+            {
+                var file = updateModel.file;
+                string rootPath = _webHostEnvironment.WebRootPath;
+                string fileName = Guid.NewGuid().ToString();
+                var extension = Path.GetExtension(file.FileName);
+                var pathToSave = Path.Combine(rootPath, @"images");
+           
+                //delete old file
+                if (profile.imagePath != null)
+                {
+                    string currDir = Path.Combine(rootPath, @"images");
+                    string currFile = Path.Combine(currDir, profile.imagePath);
+                    if(File.Exists(currFile))
+                    {
+                        File.Delete(currFile);
+                    }
+                }
+
+                var dbPath = Path.Combine(pathToSave, fileName + extension);
+                using (var fileStreams = new FileStream(dbPath, FileMode.Create))
+                {
+                    file.CopyTo(fileStreams);
+                }
+
+                profile.imagePath = fileName + extension;
+            }
+            context.Profiles.Update(profile);
+            context.SaveChanges();
+            return profile;
+        }
+
+
+        public string GetImage(string username)
+        {
+            Profile profile = getUser(username);
+            if(profile == null)
+            {
+                return null;
+            }
+            return profile.imagePath;
+        }
+        private Profile getUser(string username)
+        {
+            return context.Profiles.FirstOrDefault(x => x.UserName == username);
+        }
+
+        private bool CheckEmailExists(string email, string username) 
+        {
+            return context.Profiles.Any(e => e.Email == email && e.UserName != username);
         }
 
         private bool CheckEmailOrUserNameExists(string userName, string email)
