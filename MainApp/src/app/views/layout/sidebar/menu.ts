@@ -9,5 +9,19 @@ export const MENU: MenuItem[] = [
     label: 'Dashboard',
     icon: 'home',
     link: '/dashboard'
+  },
+  {
+    label: 'Profile',
+    isTitle: true
+  },
+  {
+    label: 'Edit Profile',
+    icon: 'home',
+    link: '/profile/editProfile'
+  },
+  {
+    label: 'View Profile',
+    icon: 'home',
+    link: '/profile/viewProfile'
   }
 ];
