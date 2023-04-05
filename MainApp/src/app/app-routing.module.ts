@@ -4,6 +4,7 @@ import { BaseComponent } from './views/layout/base/base.component';
 import { AuthGuard } from './core/guard/auth.guard';
 import { ErrorPageComponent } from './views/pages/error-page/error-page.component';
 import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
+import { NewEditFormComponent } from './views/pages/new-edit-form/new-edit-form.component';
 
 
 const routes: Routes = [
@@ -19,7 +20,7 @@ const routes: Routes = [
       },
       {
         path: 'edit',
-        component: EditFormComponent
+        component: NewEditFormComponent
       },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]

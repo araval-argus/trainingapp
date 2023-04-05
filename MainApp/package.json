@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "set NODE_OPTIONS=--openssl-legacy-provider && ng serve -o",
+    "start": "ng serve",
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
@@ -12,6 +12,7 @@
   "private": true,
   "dependencies": {
     "@angular/animations": "~11.0.8",
+    "@angular/cdk": "~11.0.4",
     "@angular/common": "~11.0.8",
     "@angular/compiler": "~11.0.8",
     "@angular/core": "~11.0.8",
@@ -54,6 +55,8 @@
     "ngx-owl-carousel-o": "5.0.0",
     "ngx-perfect-scrollbar": "^10.1.0",
     "ngx-quill": "^13.0.1",
+    "primeicons": "^6.0.1",
+    "primeng": "^11.0.0-rc.1",
     "progressbar.js": "^1.1.0",
     "quill": "^1.3.7",
     "rxjs": "~6.6.3",
