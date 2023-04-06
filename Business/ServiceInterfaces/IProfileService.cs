@@ -15,6 +15,8 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Profile FetchProfile(string UserName);
 
-        Profile UpdateProfile(RegisterModel regModel);
+        Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false);
+
+        bool CheckUserNameExists(string? userName);
     }
 }

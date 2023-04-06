@@ -1,8 +1,8 @@
 <h4>Edit Your Details</h4>
 <div class="container float-left mt-4">
-
+  <div class="row">
   <div class="col-md-8">
-    <form #formVar="ngForm">
+    <form #formVar="ngForm" enctype="multipart/form-data">
       <input type="hidden" [(ngModel)]="loggedInUser.userName" name="userName">
     <div class="form-group">
       <label for="firstNameInput">First Name</label>
@@ -14,16 +14,41 @@
       <input type="text" class="form-control" id="lastNameInput" [(ngModel)]="loggedInUser.lastName" #lastNameInput="ngModel" name="lastNameInput" required>
       <span class="text-danger" *ngIf="lastNameInput.invalid && lastNameInput.touched">*Required field</span>
     </div>
-
-
-
-
+    <div class="form-group">
+      <label for="lastNameInput">Username</label>
+      <input type="text"
+      class="form-control"
+      id="usernameInput"
+      [(ngModel)]="loggedInUser.userName"
+       #usernameInput="ngModel"
+       name="usernameInput"
+       (input)="onUserNameValueChange($event)"
+       required>
+      <span class="text-danger" *ngIf="usernameInput.invalid && usernameInput.touched">*Required field</span>
+      <span class="text-danger" *ngIf="usernameInput.valid && usernameExists">*username already exists</span>
+    </div>
     <div class="form-group">
       <label for="emailInput">Email Address</label>
       <input type="text" class="form-control" id="emailInput" [(ngModel)]="loggedInUser.email" #emailInput="ngModel" name="emailInput" required email>
-      <span class="text-danger" *ngIf="emailInput.invalid && emailInput.touched">*Required field</span>
+      <span class="text-danger" *ngIf="emailInput.invalid && emailInput.touched">*Enter an email id</span>
     </div>
+    <div style="display: none">
+      <label for="pictureInput">Add Display Picture</label>
+      <input type="file" class="form-control" id="pictureInput" #fileInput
+      (change)="onFileChange($event)">
+    </div>
+
     <button class="btn btn-primary" (click)="onUpdate($event)">Update</button>
   </form>
   </div>
+  <div class="col">
+    <div class="card" style="max-width: 307px; background-color: rgba(0, 0, 0, 0);">
+      <img [src]="imgUrl" alt="" class="img-responsive" style="max-width: 307px; max-height: 307px;">
+      <div class="file-upload text-right">
+        <button pButton class="p-button-rounded p-button-info p-button-text p-ripple p-button p-component p-button-icon-only" label="" icon="pi pi-user-edit" (click)="fileInput.click()"></button>
+      </div>
+    </div>
+
+  </div>
+</div>
 </div>

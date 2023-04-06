@@ -17,16 +17,15 @@ import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
 import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { NewEditFormComponent } from './views/pages/new-edit-form/new-edit-form.component';
 import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
-    EditFormComponent,
-    NewEditFormComponent
+    EditFormComponent
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   imports: [
@@ -37,7 +36,8 @@ import { TableModule } from 'primeng/table';
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
-    TableModule
+    TableModule,
+    ButtonModule
   ],
   providers: [
     AuthGuard,

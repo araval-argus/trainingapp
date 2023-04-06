@@ -5,5 +5,6 @@ export interface LoggedInUser
     email?:string,
     userName?: string,
     // userName is stored as sub in token
-    sub?: string
+    sub?: string,
+    imageUrl?:string
 }

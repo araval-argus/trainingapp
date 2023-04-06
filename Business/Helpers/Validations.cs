@@ -5,28 +5,14 @@ namespace ChatApp.Business.Helpers
 {
     public  class Validations
     {
-        public bool ValidateLoginField(LoginModel loginModel)
-        {
-            if ((IsFieldNullOrEmpty(loginModel.Username) && !IsValidEmail(loginModel.EmailAddress)) || IsFieldNullOrEmpty(loginModel.Password))
-            {
-                return false;
-            }
-            return true;
-        }
+        
 
         public bool ValidateRegistrationField(RegisterModel registerModel)
         {
-            // checking any field is empty or null
-            if(IsFieldNullOrEmpty(registerModel.FirstName) ||
-               IsFieldNullOrEmpty(registerModel.LastName)  ||
-               IsFieldNullOrEmpty(registerModel.UserName)  ||
-               IsFieldNullOrEmpty(registerModel.Password))
-            {
-                return false;
-            }
+           
 
             // check email pattern and password length
-            if(!IsValidEmail(registerModel.Email) || registerModel.Password.Length < 6)
+            if(!IsValidEmail(registerModel.Email) || (registerModel.Password.Length > 16 && registerModel.Password.Length < 8))
             {
                 return false;
             }
@@ -45,9 +31,6 @@ namespace ChatApp.Business.Helpers
         }
 
 
-        private bool IsFieldNullOrEmpty(string field)
-        {
-            return field.Equals(null) && field.Equals("");
-        }
+        
     }
 }

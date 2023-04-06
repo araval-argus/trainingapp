@@ -1,5 +1,5 @@
 import { Injectable } from "@angular/core";
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from "src/environments/environment";
 import { RegistrationModel } from "../models/registration-model";
 import { LoginModel } from "../models/login-model";
@@ -11,8 +11,6 @@ import { LoggedInUser } from "../models/loggedin-user";
 export class AccountService {
     constructor(private http: HttpClient) { }
 
-
-
     register(registerModel: RegistrationModel) {
         return this.http.post(environment.apiUrl + "/account/register", registerModel);
     }
@@ -22,7 +20,19 @@ export class AccountService {
         return this.http.post(environment.apiUrl + "/account/login", loginModel);
     }
 
-    update(loggedInUser: LoggedInUser){
-        return this.http.post(environment.apiUrl + "/account/update", loggedInUser);
+    update(formData: FormData){
+        return this.http.post(environment.apiUrl + "/account/update", formData);
+    }
+
+    checkUsername(username: string){
+      return this.http.get<{ [key: string]: boolean } >(environment.apiUrl + "/account/checkUsername",
+      {
+        params: new HttpParams().append('username', username)
+      });
+    }
+
+
+    dummyRequest(formData: FormData){
+      return this.http.post(environment.apiUrl + "/account/dummy", formData);
     }
 }

@@ -28,18 +28,26 @@
     <Compile Remove="BusinessLogic\**" />
     <Compile Remove="ChatApp.Database\**" />
     <Compile Remove="Helper\**" />
+    <Compile Remove="wwwroot\Resource\**" />
     <Content Remove="$(SpaRoot)**" />
     <Content Remove="BusinessLogic\**" />
     <Content Remove="ChatApp.Database\**" />
     <Content Remove="Helper\**" />
+    <Content Remove="wwwroot\Resource\**" />
     <EmbeddedResource Remove="BusinessLogic\**" />
     <EmbeddedResource Remove="ChatApp.Database\**" />
     <EmbeddedResource Remove="Helper\**" />
+    <EmbeddedResource Remove="wwwroot\Resource\**" />
     <None Remove="$(SpaRoot)**" />
     <None Remove="BusinessLogic\**" />
     <None Remove="ChatApp.Database\**" />
     <None Remove="Helper\**" />
+    <None Remove="wwwroot\Resource\**" />
     <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\Users\" />
   </ItemGroup>
 
   

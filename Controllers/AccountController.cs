@@ -1,5 +1,8 @@
 ﻿using System;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
+using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
 using ChatApp.Business.Helpers;
@@ -7,6 +10,8 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -22,23 +27,21 @@ namespace ChatApp.Controllers
         private IConfiguration _config;
         private readonly IProfileService _profileService;
         private Validations _validations;
+        private IWebHostEnvironment _webHostEnvironment;
 
-        public AccountController(IConfiguration config, IProfileService profileService)
+        public AccountController(IConfiguration config, IProfileService profileService, IWebHostEnvironment webHostEnvironment)
         {
             _config = config;
             _profileService = profileService;
             _validations = new Validations();
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
-            if(!_validations.ValidateLoginField(loginModel))
-            {
-                response = BadRequest(new { Message = "fields cant be validated" });
-                return response;
-            }
+            
             var user = _profileService.CheckPassword(loginModel);
 
             if (user != null)
@@ -68,18 +71,37 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("Update")]
-        public IActionResult UpdateUserDetails([FromBody] RegisterModel registerModel)
+        public IActionResult UpdateUserDetails([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
-            var user = _profileService.FetchProfile(registerModel.UserName);
-            if(user!= null)
+
+            var usernameFromToken = GetUsernameFromToken(Authorization);
+
+            var user = _profileService.FetchProfile(usernameFromToken);
+            if (user != null)
             {
-                user = _profileService.UpdateProfile(registerModel);
+                if (updateModel.ImageFile != null)
+                {
+                    user.ImageUrl = createUniqueImgFile(updateModel.ImageFile);
+                    user = _profileService.UpdateProfile(updateModel, usernameFromToken, true);
+                }
+                else
+                {
+                    user = _profileService.UpdateProfile(updateModel, usernameFromToken);
+                }
                 var tokenString = GenerateJSONWebToken(user);
                 return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
-            }
-            return BadRequest(new { Message = "User does not exists" });
+             }
+                return BadRequest(new { Message = "User does not exists" });
         }
 
+        [HttpGet("checkUsername")]
+        public IActionResult CheckUsername([FromQuery] string username)
+        {
+           
+            
+            return Ok(new { usernameExists = _profileService.CheckUserNameExists(username) });
+        }
+            
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -90,6 +112,7 @@ namespace ChatApp.Controllers
                     new Claim(JwtRegisteredClaimNames.Email, profileInfo.Email),
                     new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
+                    new Claim(ClaimsConstant.ImageUrlClaim, profileInfo.ImageUrl),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -102,6 +125,51 @@ namespace ChatApp.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        //[HttpPost("updateImage")]
+        //public IActionResult uploadImage(IFormFile formFile)
+        //{
+        //    Console.WriteLine(formFile.ToString());
+        //    return Ok(new { message = formFile });
+        //}
 
+        [HttpPost("dummy")]
+        public IActionResult dummyRequest([FromForm] IFormFile imageData)
+        {
+            //if (formData != null && formData.Length > 0)
+            //{
+            //    var fileName = Path.GetFileName(formData.FileName);
+            //    Console.WriteLine(fileName);
+            //}
+            //else
+            //{
+            //    Console.WriteLine("inside else");
+            //}
+            return Ok(new { message = "image" });
+        }
+
+        string GetUsernameFromToken(string token)
+        {
+            string newToken = token.Split(" ")[1];
+            var handler = new JwtSecurityTokenHandler();
+            var jsonToken = handler.ReadJwtToken(newToken);
+            return jsonToken.Claims.First(claim => claim.Type == "sub").Value;
+        }
+
+        string createUniqueImgFile(IFormFile imageFile)
+        {
+
+            string fileName = Guid.NewGuid().ToString();
+
+            var location = Path.Combine(_webHostEnvironment.WebRootPath, @"Images/Users");
+
+            var extension = Path.GetExtension(imageFile.FileName);
+
+            using (FileStream fileStream = new FileStream(Path.Combine(location, fileName + extension), FileMode.Create))
+            {
+                imageFile.CopyTo(fileStream);
+            }
+
+            return fileName + extension;
+        }
     }
 }

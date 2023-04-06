@@ -3,8 +3,10 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -13,10 +15,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     public class ProfileService : IProfileService
     {
         private readonly ChatAppContext context;
+        private IWebHostEnvironment _webHostEnvironment;
 
-        public ProfileService(ChatAppContext context)
+        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
+            this._webHostEnvironment = webHostEnvironment;
         }
 
         // this method checks (username and password) or (email and password)
@@ -39,7 +43,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     UserName = regModel.UserName,
                     Email = regModel.Email,
                     CreatedAt = DateTime.UtcNow,
-                    ProfileType = ProfileType.User
+                    ProfileType = ProfileType.User,
+                    ImageUrl = SetDefaultImage()
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
@@ -47,15 +52,15 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return newUser;
         }
 
-        public Profile UpdateProfile(RegisterModel regModel)
+        public Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false)
         {
-            Profile user = FetchProfile(regModel.UserName);
-            if(user != null)
+            Profile user = FetchProfile(username);
+            if (user != null)
             {
-
-                user.FirstName = regModel.FirstName;
-                user.LastName = regModel.LastName;
-                user.Email = regModel.Email;
+                user.UserName = updateModel.UserName;
+                user.FirstName = updateModel.FirstName;
+                user.LastName = updateModel.LastName;
+                user.Email = updateModel.Email;
 
                 context.Profiles.Update(user);
                 context.SaveChanges();
@@ -71,10 +76,31 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public Profile FetchProfile(string userName)
         {
             Profile user = null;
-            user =  context.Profiles.FirstOrDefault(u => u.UserName.Trim() == userName.Trim());
+            user = context.Profiles.FirstOrDefault(u => u.UserName.Trim() == userName.Trim());
             return user;
         }
 
-        
+        public bool CheckUserNameExists(string? userName = null)
+        {
+            if (userName == null)
+            {
+                return false;
+            }
+            return context.Profiles.Any(p => p.UserName.Trim() == userName.Trim());
+        }
+
+        private string SetDefaultImage()
+        {
+            string fileName = Guid.NewGuid().ToString() + ".jpg";
+            
+            var DefaultFileLoc = Path.Combine(_webHostEnvironment.WebRootPath, @"Images/default_profile.jpg");
+            var FileLoc = Path.Combine(DefaultFileLoc, @"../Users", fileName );
+
+            File.Copy(DefaultFileLoc, FileLoc);
+
+            return fileName;
+        }
+
     }
 }
+
