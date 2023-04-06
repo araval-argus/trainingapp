@@ -78,21 +78,21 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 //delete old file
                 if (profile.imagePath != null)
                 {
-                    string currDir = Path.Combine(rootPath, @"images");
-                    string currFile = Path.Combine(currDir, profile.imagePath);
+                    var currFile = Path.Combine(pathToSave, profile.imagePath);
+                    
                     if(File.Exists(currFile))
                     {
                         File.Delete(currFile);
                     }
                 }
-
-                var dbPath = Path.Combine(pathToSave, fileName + extension);
+                var fullFile = fileName+extension;
+                var dbPath = Path.Combine(pathToSave, fullFile);
                 using (var fileStreams = new FileStream(dbPath, FileMode.Create))
                 {
                     file.CopyTo(fileStreams);
                 }
 
-                profile.imagePath = fileName + extension;
+                profile.imagePath = fullFile;
             }
             context.Profiles.Update(profile);
             context.SaveChanges();
@@ -108,6 +108,20 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 return null;
             }
             return profile.imagePath;
+        }
+
+        public List<profileDTO> getAll()
+        {
+            List<Profile> profiles =  context.Profiles.ToList();
+            List<profileDTO> profileDTOs = profileMapper.Mapper(profiles);
+            return profileDTOs;
+        }
+
+        public List<profileDTO> GetProfileDTOs(string s)
+        {
+            List<Profile> profiles = context.Profiles.Where(e => e.FirstName.Contains(s) || e.LastName.Contains(s)).ToList();
+            List<profileDTO> profileDTOs = profileMapper.Mapper(profiles);
+            return profileDTOs;
         }
         private Profile getUser(string username)
         {

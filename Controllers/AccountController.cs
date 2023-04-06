@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -78,6 +79,21 @@ namespace ChatApp.Controllers
             return Ok(new { token = tokenString });
         }
 
+        [HttpGet("getprofiles")]
+        [Authorize]
+        public IActionResult getprofiles([FromQuery]string s)
+        {
+            List<profileDTO> profiles = _profileService.GetProfileDTOs(s);
+            return Ok(profiles);
+        }
+
+        [HttpGet("getAll")]
+        [Authorize]
+        public IActionResult getAll()
+        {
+            List<profileDTO> profiles = _profileService.getAll();
+            return Ok(profiles);
+        }
 
         [HttpGet("getImage")]
         [Authorize]

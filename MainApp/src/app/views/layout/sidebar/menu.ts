@@ -23,5 +23,14 @@ export const MENU: MenuItem[] = [
     label: 'View Profile',
     icon: 'eye',
     link: '/profile/viewProfile'
+  },
+  {
+    label: 'Chat',
+    isTitle: true
+  },
+  {
+    label: 'Messages',
+    icon: 'inbox',
+    link: '/app/chat'
   }
 ];

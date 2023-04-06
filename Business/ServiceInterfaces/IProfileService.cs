@@ -16,5 +16,9 @@ namespace ChatApp.Business.ServiceInterfaces
         Profile UpdateUser(UpdateModel updateModel, string username);
 
         string GetImage(string username);
+
+        List<profileDTO> getAll();
+
+        List<profileDTO> GetProfileDTOs(string s);
     }
 }

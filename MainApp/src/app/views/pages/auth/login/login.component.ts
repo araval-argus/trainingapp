@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
         // After login set up image
         this.accountService.getImage(this.loginModel.userName).subscribe((data: any) => {
           this.loginModel.imageURL = data.imgPath;
-          localStorage.setItem('imagePath', this.accountService.getImageUrl(data.imgPath));
+          localStorage.setItem('imagePath', this.accountService.fetchImage(data.imgPath));
           this.accountService.updateDetails.next();
         })
         Swal.fire({

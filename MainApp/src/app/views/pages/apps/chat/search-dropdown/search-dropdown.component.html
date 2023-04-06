@@ -1,0 +1,14 @@
+<div class="dropdown">
+      <a class="dropdown-item pr-1 d-flex align-items-center" *ngFor="let item of items" (click)="selectItem(item)">
+        <figure class="mb-0 mr-2 d-flex">
+          <img [src]="getImage(item.imagePath)" class="img-xs rounded-circle" alt="user">
+          <div class="status offline"></div>
+        </figure>
+        <div class="d-flex justify-content-between flex-grow border-bottom p-2">
+          <div>
+            <p class="text-body">{{item.firstName}} {{item.lastName}}</p>
+            <p class="text-muted tx-13">{{item.userName}}</p>    
+          </div>
+        </div>
+      </a>
+</div>

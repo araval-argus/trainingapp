@@ -50,7 +50,7 @@ export class EditProfileComponent implements OnInit {
       localStorage.setItem('USERTOKEN', data.token);
       this.accountService.getImage(this.loggedInUser.sub).subscribe((data: any) => {
         this.loggedInUser.imageURL = data.imgPath;
-        localStorage.setItem('imagePath', this.accountService.getImageUrl(data.imgPath));
+        localStorage.setItem('imagePath', this.accountService.fetchImage(data.imgPath));
         this.accountService.updateDetails.next();
       })
       Swal.fire({

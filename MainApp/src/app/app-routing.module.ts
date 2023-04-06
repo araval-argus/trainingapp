@@ -20,6 +20,10 @@ const routes: Routes = [
         path: 'profile',
         loadChildren: () => import('./views/pages/profile/profile.module').then(m => m.ProfileModule)
       },
+      {
+        path: 'app',
+        loadChildren: () => import('./views/pages/apps/apps.module').then(m => m.AppsModule)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },

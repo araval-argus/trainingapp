@@ -3,8 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from "src/environments/environment";
 import { RegistrationModel } from "../models/registration-model";
 import { LoginModel } from "../models/login-model";
-import { Subject } from "rxjs";
+import { Observable, Subject } from "rxjs";
 import { LoggedInUser } from "../models/loggedin-user";
+import { Profile } from "../models/profile-model";
 
 @Injectable({
     providedIn: 'root'
@@ -31,7 +32,14 @@ export class AccountService {
         return this.http.get(environment.apiUrl + "/account/getImage?username=" + username);
     }
 
-    getImageUrl(imageName: string) {
-        return environment.api + "/images/" + imageName;
+    fetchImage(str: string) {
+        return environment.api + "/images/" + str;
+    }
+    searchProfiles(seachName: string): Observable<Profile[]> {
+        return this.http.get<Profile[]>(environment.apiUrl + "/account/getprofiles?s=" + seachName);
+    }
+
+    getAll(): Observable<Profile[]> {
+        return this.http.get<Profile[]>(environment.apiUrl + "/account/getAll");
     }
 }
