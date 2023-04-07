@@ -24,14 +24,11 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   }
 
-  // back to chat-list for tablet and mobile devices
-  backToChatList() {
-    document.querySelector('.chat-content').classList.toggle('show');
-  }
+
 
   save() {
     console.log('passs');
-    
+
   }
 
 }

@@ -32,8 +32,7 @@ export class EditFormComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.loggedInUser.userName = this.loggedInUser.sub;
-    this.imgUrl =
-      environment.apiUrl + "/../Images/Users/" + this.loggedInUser.imageUrl;
+    this.imgUrl = this.loggedInUser.imageUrl;
   }
 
   onUpdate(e: Event) {
@@ -106,6 +105,7 @@ export class EditFormComponent implements OnInit {
       this.imgUrl = e.target.result;
     };
     if(this.imgFile){
+      console.log("inside if")
       reader.readAsDataURL(this.imgFile);
     }
   }

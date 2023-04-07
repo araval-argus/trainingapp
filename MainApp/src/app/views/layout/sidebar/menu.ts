@@ -9,5 +9,10 @@ export const MENU: MenuItem[] = [
     label: 'Dashboard',
     icon: 'home',
     link: '/dashboard'
+  },
+  {
+    label: 'Chats',
+    icon: 'inbox',
+    link: '/chats'
   }
 ];

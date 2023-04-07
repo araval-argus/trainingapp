@@ -20,5 +20,7 @@ namespace ChatApp.Models
         public string Password { get; set; }
 
         public string imageUrl { get; set; }
+
+        public int Designation { get; set; }
     }
 }

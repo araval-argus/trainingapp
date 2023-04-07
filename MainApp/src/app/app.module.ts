@@ -19,13 +19,23 @@ import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
+import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { SIMPLEMDE_CONFIG, SimplemdeModule } from 'ng2-simplemde';
+import { ChatComponent } from './views/pages/chat/chat.component';
+import { NgSelectModule } from '@ng-select/ng-select';
+import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
+import { ChatSidebarComponent } from './views/pages/chat/chat-sidebar/chat-sidebar.component';
+import { ChatBodyComponent } from './views/pages/chat/chat-body/chat-body.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
-    EditFormComponent
+    EditFormComponent,
+    ChatComponent,
+    ChatSidebarComponent,
+    ChatBodyComponent
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   imports: [
@@ -37,7 +47,13 @@ import { ButtonModule } from 'primeng/button';
     FormsModule,
     ReactiveFormsModule,
     TableModule,
-    ButtonModule
+    ButtonModule,
+    NgbDropdownModule,
+    NgbTooltipModule,
+    NgbNavModule,
+    NgbCollapseModule,
+    NgSelectModule,
+    PerfectScrollbarModule
   ],
   providers: [
     AuthGuard,

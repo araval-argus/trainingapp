@@ -28,12 +28,13 @@ export class RegisterComponent implements OnInit {
       userName: '',
       email: '',
       password: '',
+      designation: 2
     }
   }
 
   onRegister(e) {
     e.preventDefault();
-    console.log(this.regModel);
+    console.log("regModel inside onRegister method :- ",this.regModel);
     this.accountService.register(this.regModel)
       .subscribe((data: any) => {
         this.authService.login(data.token, ()=>{

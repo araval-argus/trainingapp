@@ -81,6 +81,7 @@ namespace ChatApp.Controllers
             {
                 if (updateModel.ImageFile != null)
                 {
+                    DeleteOlderImage(user.ImageUrl);
                     user.ImageUrl = createUniqueImgFile(updateModel.ImageFile);
                     user = _profileService.UpdateProfile(updateModel, usernameFromToken, true);
                 }
@@ -97,8 +98,6 @@ namespace ChatApp.Controllers
         [HttpGet("checkUsername")]
         public IActionResult CheckUsername([FromQuery] string username)
         {
-           
-            
             return Ok(new { usernameExists = _profileService.CheckUserNameExists(username) });
         }
             
@@ -113,6 +112,7 @@ namespace ChatApp.Controllers
                     new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
                     new Claim(ClaimsConstant.ImageUrlClaim, profileInfo.ImageUrl),
+                    new Claim(ClaimsConstant.DesignationClaim, profileInfo.Designation.ToString()),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -125,26 +125,13 @@ namespace ChatApp.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        //[HttpPost("updateImage")]
-        //public IActionResult uploadImage(IFormFile formFile)
-        //{
-        //    Console.WriteLine(formFile.ToString());
-        //    return Ok(new { message = formFile });
-        //}
+       
 
         [HttpPost("dummy")]
-        public IActionResult dummyRequest([FromForm] IFormFile imageData)
+        public IActionResult dummyRequest()
         {
-            //if (formData != null && formData.Length > 0)
-            //{
-            //    var fileName = Path.GetFileName(formData.FileName);
-            //    Console.WriteLine(fileName);
-            //}
-            //else
-            //{
-            //    Console.WriteLine("inside else");
-            //}
-            return Ok(new { message = "image" });
+            
+            return Ok(new { message = "dummy" });
         }
 
         string GetUsernameFromToken(string token)
@@ -170,6 +157,15 @@ namespace ChatApp.Controllers
             }
 
             return fileName + extension;
+        }
+
+        void DeleteOlderImage(string path)
+        {
+            var location = Path.Combine(_webHostEnvironment.WebRootPath, @"Images/Users", path);
+            if (System.IO.File.Exists(location))
+            {
+                System.IO.File.Delete(location);
+            }
         }
     }
 }

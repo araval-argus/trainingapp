@@ -44,7 +44,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Email = regModel.Email,
                     CreatedAt = DateTime.UtcNow,
                     ProfileType = ProfileType.User,
-                    ImageUrl = SetDefaultImage()
+                    ImageUrl = SetDefaultImage(),
+                    Designation = regModel.Designation
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();

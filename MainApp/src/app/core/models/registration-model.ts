@@ -5,5 +5,6 @@ export interface RegistrationModel
     email: string,
     userName: string,
     password:string,
-    imageUrl?:string
+    imageUrl?:string,
+    designation: number
 }

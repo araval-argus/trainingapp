@@ -20,5 +20,6 @@ namespace ChatApp.Context.EntityClasses
         public DateTime? LastUpdatedAt { get; set; }
         public int? LastUpdatedBy { get; set; }
         public string? ImageUrl { get; set; }
+        public int Designation { get; set; }
     }
 }

@@ -14,7 +14,6 @@ import { environment } from 'src/environments/environment';
 export class NavbarComponent implements OnInit {
   loggedInUser: LoggedInUser;
   apiUrl : string = environment.apiUrl;
-  image : string;
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
@@ -24,11 +23,9 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.image = environment.apiUrl  + '/../Images/Users/' + this.loggedInUser.imageUrl;
-    console.log('details of loggedin user from ngoninit of navbar component' ,this.loggedInUser);
+    //console.log('details of loggedin user from ngoninit of navbar component' ,this.loggedInUser);
     this.authService.loggedInUserChanged.subscribe( () => {
       this.loggedInUser = this.authService.getLoggedInUserInfo();
-      this.image = environment.apiUrl  + '/../Images/Users/' + this.loggedInUser.imageUrl;
     });
   }
 

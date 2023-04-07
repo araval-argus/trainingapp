@@ -11,5 +11,7 @@
     [CreatedBy] INT NULL, 
     [LastUpdatedAt] DATETIME2 NULL, 
     [LastUpdatedBy] INT NULL, 
-    [ImageUrl] NVARCHAR(1000) NULL
+    [ImageUrl] NVARCHAR(1000) NULL,
+    [Designation] INT,
+    FOREIGN KEY ([Designation]) REFERENCES [Designations]([id])
 )
