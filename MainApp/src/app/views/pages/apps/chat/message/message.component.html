@@ -1,0 +1,10 @@
+<li class="message-item" [class.friend]="!me" [class.me]="me">
+    <div class="content">
+      <div class="message">
+        <div class="bubble">
+          <p>{{message.content}}</p>
+        </div>
+        <span>{{message.sentAt.getHours()}}:{{message.sentAt.getMinutes()}}</span>
+      </div>
+    </div>
+</li>

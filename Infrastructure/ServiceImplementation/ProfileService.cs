@@ -113,14 +113,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public List<profileDTO> getAll()
         {
             List<Profile> profiles =  context.Profiles.ToList();
-            List<profileDTO> profileDTOs = profileMapper.Mapper(profiles);
+            List<profileDTO> profileDTOs = Mapper.profileMapper(profiles);
             return profileDTOs;
         }
 
         public List<profileDTO> GetProfileDTOs(string s)
         {
             List<Profile> profiles = context.Profiles.Where(e => e.FirstName.Contains(s) || e.LastName.Contains(s)).ToList();
-            List<profileDTO> profileDTOs = profileMapper.Mapper(profiles);
+            List<profileDTO> profileDTOs = Mapper.profileMapper(profiles);
             return profileDTOs;
         }
         private Profile getUser(string username)

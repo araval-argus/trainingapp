@@ -1,4 +1,5 @@
 ﻿using ChatApp.Context.EntityClasses;
+using ChatApp.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,6 @@ namespace ChatApp.Context
         /// Gets or sets Answers.
         /// </summary>
         public virtual DbSet<Profile> Profiles { get; set; }
+        public virtual DbSet<Chat> Chats { get; set; }
     }
 }
