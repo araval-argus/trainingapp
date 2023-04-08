@@ -4,7 +4,7 @@
         <div class="bubble">
           <p>{{message.content}}</p>
         </div>
-        <span>{{message.sentAt.getHours()}}:{{message.sentAt.getMinutes()}}</span>
+        <span>{{message.sentAt | date:'shortTime'}}</span>
       </div>
     </div>
 </li>

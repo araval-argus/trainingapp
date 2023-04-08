@@ -14,7 +14,7 @@ namespace ChatApp.Controllers
     [AllowAnonymous]
     public class ChatController : ControllerBase
     {
-        private IConfiguration _config;
+        private readonly IConfiguration _config;
         private readonly IChatService _chatService;
         public ChatController(IConfiguration config, IChatService chatService)
         {
@@ -57,6 +57,22 @@ namespace ChatApp.Controllers
             if(claim != null)
             {
                 var chats = _chatService.GetAllChats(claim.Value, s);
+                response = Ok(new { chats });
+            }
+            return response;
+        }
+
+        [HttpGet("recent")]
+        [Authorize]
+        public IActionResult recent([FromHeader]string authorization)
+        {
+            IActionResult response = Unauthorized(new { message = "Something Went Wrong" });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var chats = _chatService.recent(claim.Value);
                 response = Ok(new { chats });
             }
             return response;

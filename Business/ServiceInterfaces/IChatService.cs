@@ -8,5 +8,7 @@ namespace ChatApp.Business.ServiceInterfaces
         bool AddChat(ChatModel chatModel, string userName);
 
         List<ChatDTO> GetAllChats(string from, string to);
+
+        List<recentChatDTO> recent(string from);
     }
 }

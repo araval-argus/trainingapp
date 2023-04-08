@@ -1,11 +1,11 @@
 import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
-import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { Subject, Subscription } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { debounceTime, switchMap } from 'rxjs/operators';
 import { ChatModel } from 'src/app/core/models/chat-model';
 import { loadChatModel } from 'src/app/core/models/loadingChat-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { Profile } from 'src/app/core/models/profile-model';
+import { recentChat } from 'src/app/core/models/recentChat-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
@@ -18,23 +18,41 @@ import { ChatService } from 'src/app/core/service/chat-service';
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterViewChecked {
 
   loggedInUser: LoggedInUser
-  imageURL: string;
-  profiles: Profile[]
-  defaultNavActiveId = 1;
-  private searchSubscription?: Subscription;
-  private reloadNewInbox?: Subscription;
-  searchQuery: string;
-  removeResult: boolean = false;
-  hideRightBox: boolean = true;
   selectedUser: Profile = {
     firstName: '',
     lastName: '',
     userName: '',
   }
-  chat: ChatModel;
-  chatsToLoad = new Array<loadChatModel>();
+
+  removeResult: boolean = false;
+  hideRightBox: boolean = true;
+
+  imageURL: string;
   selectedUserImagePath: string = null;
+  searchQuery: string;
+
+  profiles: Profile[]
+  recentChatProfile: recentChat[] = [];
+  newRecentChatProfile: recentChat = {
+    to: null,
+    chatContent: {
+      content: null,
+      sentAt: null
+    },
+  }
+  defaultNavActiveId = 1;
+  chatsToLoad = new Array<loadChatModel>();
+
+
+  chat: ChatModel;
+
+  private searchSubscription?: Subscription;
+  private reloadNewInbox?: Subscription;
+
+
   @ViewChild('chatForm', { static: false }) chatContent: ElementRef;
+  @ViewChild('searchBar', { static: false }) searchBar: ElementRef;
+  @ViewChild('scrollMe') scrollMe: ElementRef
 
   // To convert user input to the observable
   private readonly searchProfile = new Subject<string | undefined>();
@@ -51,7 +69,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     }
     this.searchSubscription = this.searchProfile.pipe(
       debounceTime(1000),//operator waits for 1000 milliseconds
-      distinctUntilChanged(),//search query is different from the previous search
       switchMap((searchQuery) => this.accountService.searchProfiles(searchQuery)),//operator will cancel any ongoing search request if a new search query is emitted, and only the latest search request will be sent to the server.
     ).subscribe(data => {
       this.profiles = data;
@@ -72,7 +89,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     })
   }
 
-  @ViewChild('scrollMe') scrollMe: ElementRef
+  //To navigate to bottom of the list
   ngAfterViewChecked(): void {
     try {
       this.scrollMe.nativeElement.scrollTop =
@@ -121,6 +138,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.hideRightBox = false;
     this.reloadInbox.next(event);
     this.reloadChat();
+    (this.searchBar.nativeElement as HTMLInputElement).value = "";
   }
 
   // Purpose of not to set sender here is security, intruder can change the sender username in request
@@ -131,6 +149,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       to: this.selectedUser.userName,
       content: chat,
     }
+
+    // console.log(this.recentChatProfile);
     this.chatService.addChat(this.chat).subscribe(data => {
       this.reloadChat();
     })
@@ -149,7 +169,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   loadChat(data: any) {
     var sent = data.chats[0];
     var recieved = data.chats[1];
-    if (sent.chatList != null) {
+    if (sent != null && sent.chatList != null) {
       sent.chatList.forEach(element => {
         this.chatsToLoad.push({
           sent: true,
@@ -158,7 +178,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
         })
       });
     }
-    if (recieved.chatList != null) {
+    if (recieved != null && recieved.chatList != null) {
       recieved.chatList.forEach(element => {
         this.chatsToLoad.push({
           sent: false,
@@ -169,4 +189,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     }
     this.chatsToLoad.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
   }
+
+
 }

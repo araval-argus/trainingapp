@@ -1,4 +1,5 @@
-﻿using ChatApp.Context.EntityClasses;
+﻿using ChatApp.Context;
+using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using System.Collections.Generic;
 
@@ -8,7 +9,7 @@ namespace ChatApp.Business.Helpers
     {
         public static List<profileDTO> profileMapper(List<Profile> profiles)
         {
-            List<profileDTO> profileDTOs = new List<profileDTO>();
+            List<profileDTO> profileDTOs = new();
             foreach (Profile profile in profiles)
             {
                 profileDTOs.Add(new profileDTO
@@ -30,13 +31,13 @@ namespace ChatApp.Business.Helpers
 
         public static List<ChatDTO> chatMapper(List<Chat> sent, List<Chat> recieved)
         {
-            List<ChatDTO> chatDTOs = new List<ChatDTO>();
-            ChatDTO sentChats = new ChatDTO();            
-            ChatDTO receivedChat = new ChatDTO();
+            List<ChatDTO> chatDTOs = new();
+            ChatDTO sentChats = new();            
+            ChatDTO receivedChat = new();
             if(sent.Count > 0)
             {
                 sentChats.IsSent= true;
-                List<chatFormat> temp = new List<chatFormat>();
+                List<chatFormat> temp = new();
                 foreach (Chat chat in sent)
                 {
                     temp.Add(new chatFormat
@@ -50,7 +51,7 @@ namespace ChatApp.Business.Helpers
             if(recieved.Count > 0)
             {
                 receivedChat.IsSent = false;
-                List<chatFormat> temp = new List<chatFormat>();
+                List<chatFormat> temp = new();
                 foreach (Chat chat in recieved)
                 {
                     temp.Add(new chatFormat
@@ -64,6 +65,24 @@ namespace ChatApp.Business.Helpers
             chatDTOs.Add(sentChats);
             chatDTOs.Add(receivedChat);
             return chatDTOs;
+        }
+
+        public static List<recentChatDTO> recentChatMapper(List<Chat> chats, string sender)
+        {
+            List<recentChatDTO> recentChatDTOs= new();
+            foreach (Chat chat in chats)
+            {
+                recentChatDTOs.Add(new recentChatDTO
+                {
+                    to = chat.To == sender ? chat.From : chat.To,
+                    chatContent = new chatFormat
+                    {
+                        content = chat.content,
+                        sentAt = chat.sentAt
+                    }
+                });
+            }
+            return recentChatDTOs;
         }
     }
 }

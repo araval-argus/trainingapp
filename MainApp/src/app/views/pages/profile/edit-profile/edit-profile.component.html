@@ -5,7 +5,7 @@
             <img [src]="profileImage" height="200" width="200" class="rounded-circle" alt="profile" *ngIf="profileImage !== null">
         </figure>
     </div>
-    <div class="col-xs-8">
+    <div class="col-md-4">
         <form [formGroup]="editForm" (ngSubmit)="onSubmit($event)" class="row">
             <div class="col-xs-8">
                 <div class="form-group">

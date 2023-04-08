@@ -1,0 +1,18 @@
+<li class="chat-item pr-1 py-2">
+    <a href="" (click)="false" class="d-flex align-items-center">
+      <div class="mb-0 mr-2">
+        <img [src]="thumbnail" class="img-xs rounded-circle" alt="user">
+        <div class="status online"></div>
+      </div>
+      <div class="d-flex justify-content-between flex-grow border-bottom">
+        <div>
+          <p class="text-body font-weight-bold">{{recentChat.to}}</p>
+          <p class="text-muted tx-13">{{recentChat.chatContent.content}}</p>
+        </div>
+        <div class="d-flex flex-column align-items-end">
+          <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'shortTime'}}</p>
+          <div class="badge badge-pill badge-primary ml-auto">5</div>
+        </div>
+      </div>
+    </a>
+  </li>

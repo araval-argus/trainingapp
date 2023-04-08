@@ -14,4 +14,10 @@ namespace ChatApp.Models
         public string content { get; set; }
         public DateTime sentAt { get; set; }
     }
+
+    public class recentChatDTO
+    {
+        public string to { get; set; }
+        public chatFormat chatContent { get; set; }
+    }
 }

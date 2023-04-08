@@ -26,6 +26,8 @@ import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { SearchDropdownComponent } from './chat/search-dropdown/search-dropdown.component';
 import { MessageComponent } from './chat/message/message.component';
+import { ChatSidebarComponent } from './chat/chat-sidebar/chat-sidebar.component';
+import { RecentChatComponent } from './chat/chat-sidebar/recent-chat/recent-chat.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true
@@ -84,7 +86,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [EmailComponent, ChatComponent, CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent, SearchDropdownComponent, MessageComponent],
+  declarations: [EmailComponent, ChatComponent, CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent, SearchDropdownComponent, MessageComponent, ChatSidebarComponent, RecentChatComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
