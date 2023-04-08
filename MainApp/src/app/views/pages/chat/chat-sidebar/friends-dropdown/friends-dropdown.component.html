@@ -1,0 +1,31 @@
+<!-- form to search the name of friend -->
+<form class="search-form">
+  <div class="input-group border rounded-sm">
+    <div class="input-group-prepend">
+      <div class="input-group-text border-0 rounded-sm">
+        <i class="feather icon-search icon-sm cursor-pointer"></i>
+      </div>
+    </div>
+    <input type="text"
+    class="form-control  border-0 rounded-sm"
+    id="searchForm" placeholder="Search here..."
+    (input)="onInputChange($event)">
+  </div>
+</form>
+ <!-- dropdown to show friends list -->
+ <div class="dropdown appDropdown" style="position: absolute;z-index: 100; background-color: white; width: 92%"
+ appDropdown (hideDropdown)="emptyList()">
+
+  <div class="dropdown-item pl-0" *ngFor="let friend of friendsProfiles" (click)="friendSelected()">
+    <div class="d-inline-flex">
+      <div>
+        <img [src]="friend.imageUrl" alt="" class="img-xs rounded-circle mr-3" />
+      </div>
+      <div>
+        <p>{{friend.firstName}} {{friend.lastName}}</p>
+        <p class="text-muted">@{{friend.userName}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<!--dropdown end-->

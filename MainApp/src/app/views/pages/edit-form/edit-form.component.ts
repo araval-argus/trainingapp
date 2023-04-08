@@ -25,6 +25,7 @@ export class EditFormComponent implements OnInit {
   loggedInUser: LoggedInUser;
   usernameExists: boolean = false;
   imgFile: File;
+  timeOutId;
 
   //for displaying image
   imgUrl: any;
@@ -71,27 +72,34 @@ export class EditFormComponent implements OnInit {
     );
   }
 
+
   onUserNameValueChange(event: Event) {
     const value = (event.target as HTMLInputElement).value;
 
-    let timeOutId;
-    if (timeOutId) {
-      clearTimeout(timeOutId);
+
+    console.log("at the begining : ", this.timeOutId)
+    if (this.timeOutId) {
+      clearTimeout(this.timeOutId);
     }
 
-    timeOutId = setTimeout(() => {
+    this.timeOutId =  setTimeout(() => {
       //compare the username stored in token with new edited username
       const token = this.authService.getUserToken();
       const decodedToken = this.jwtHelper.decodeToken(token);
+
+      //console.log("timeout in username change")
 
       //dont send a request if both are equal
       if (value !== decodedToken.sub) {
         this.accountService.checkUsername(value).subscribe((data) => {
           console.log(data.usernameExists);
           this.usernameExists = data.usernameExists;
+
         });
       }
     }, 1000);
+
+    console.log("at the end : "+ this.timeOutId)
   }
 
   onFileChange(event: Event) {

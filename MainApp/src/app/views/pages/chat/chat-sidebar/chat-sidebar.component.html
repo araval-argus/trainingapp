@@ -33,23 +33,17 @@
       </div>
     </div>
 
-    <!-- form to search the name of friend -->
-    <form class="search-form">
-      <div class="input-group border rounded-sm">
-        <div class="input-group-prepend">
-          <div class="input-group-text border-0 rounded-sm">
-            <i class="feather icon-search icon-sm cursor-pointer"></i>
-          </div>
-        </div>
-        <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Search here...">
-      </div>
-    </form>
+
+
+     <!-- dropdown to show friends list -->
+    <app-friends-dropdown></app-friends-dropdown>
+
 
   </div>
   <!-- left column header end -->
 
   <!-- left column body start -->
-  <div class="aside-body" [perfectScrollbar]>
+  <div class="aside-body" [perfectScrollbar] style=" z-index: 50">
 
     <!-- navigation bar but we want only chats feature that is why there is no other options except chats -->
     <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs mt-3">

@@ -23,7 +23,7 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    //console.log('details of loggedin user from ngoninit of navbar component' ,this.loggedInUser);
+   // console.log('details of loggedin user from ngoninit of navbar component' ,this.loggedInUser);
     this.authService.loggedInUserChanged.subscribe( () => {
       this.loggedInUser = this.authService.getLoggedInUserInfo();
     });

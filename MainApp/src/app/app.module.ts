@@ -20,12 +20,13 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
 import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
-import { SIMPLEMDE_CONFIG, SimplemdeModule } from 'ng2-simplemde';
 import { ChatComponent } from './views/pages/chat/chat.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ChatSidebarComponent } from './views/pages/chat/chat-sidebar/chat-sidebar.component';
 import { ChatBodyComponent } from './views/pages/chat/chat-body/chat-body.component';
+import { DropdownDirective } from './core/helper/dropdown-directive';
+import { FriendsDropdownComponent } from './views/pages/chat/chat-sidebar/friends-dropdown/friends-dropdown.component';
 
 
 @NgModule({
@@ -35,7 +36,9 @@ import { ChatBodyComponent } from './views/pages/chat/chat-body/chat-body.compon
     EditFormComponent,
     ChatComponent,
     ChatSidebarComponent,
-    ChatBodyComponent
+    ChatBodyComponent,
+    DropdownDirective,
+    FriendsDropdownComponent
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   imports: [
@@ -54,6 +57,7 @@ import { ChatBodyComponent } from './views/pages/chat/chat-body/chat-body.compon
     NgbCollapseModule,
     NgSelectModule,
     PerfectScrollbarModule
+
   ],
   providers: [
     AuthGuard,

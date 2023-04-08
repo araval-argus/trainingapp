@@ -100,7 +100,7 @@ namespace ChatApp.Controllers
         {
             return Ok(new { usernameExists = _profileService.CheckUserNameExists(username) });
         }
-            
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -123,15 +123,6 @@ namespace ChatApp.Controllers
             signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-        }
-
-       
-
-        [HttpPost("dummy")]
-        public IActionResult dummyRequest()
-        {
-            
-            return Ok(new { message = "dummy" });
         }
 
         string GetUsernameFromToken(string token)

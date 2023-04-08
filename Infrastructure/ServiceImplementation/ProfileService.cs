@@ -102,6 +102,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return fileName;
         }
 
+        public IEnumerable<FriendProfileModel> FetchFriends(string searchTerm)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

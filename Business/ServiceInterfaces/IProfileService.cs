@@ -1,5 +1,6 @@
 ﻿using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,5 +19,7 @@ namespace ChatApp.Business.ServiceInterfaces
         Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false);
 
         bool CheckUserNameExists(string? userName);
+
+        IEnumerable<FriendProfileModel> FetchFriends(string searchTerm);
     }
 }

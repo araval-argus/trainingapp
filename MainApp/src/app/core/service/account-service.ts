@@ -24,7 +24,7 @@ export class AccountService {
         return this.http.post(environment.apiUrl + "/account/update", formData);
     }
 
-    checkUsername(username: string){
+    checkUsername(username: string) {
       return this.http.get<{ [key: string]: boolean } >(environment.apiUrl + "/account/checkUsername",
       {
         params: new HttpParams().append('username', username)
@@ -32,7 +32,4 @@ export class AccountService {
     }
 
 
-    dummyRequest(formData: FormData){
-      return this.http.post(environment.apiUrl + "/account/dummy", formData);
-    }
 }
