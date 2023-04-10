@@ -13,14 +13,15 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Profile RegisterUser(RegisterModel regModel);
 
-        Profile UpdateUser(UpdateModel updateModel, string username);
+        Profile UpdateUser(UpdateModel updateModel, string userName);
 
-        string GetImage(string username);
+        string GetImage(int userId);
 
         List<profileDTO> getAll();
 
         List<profileDTO> GetProfileDTOs(string s);
 
-        Profile getUser(string userName);
+        Profile getUser(int userName);
+        Profile getUserFromUserName(string userName);
     }
 }

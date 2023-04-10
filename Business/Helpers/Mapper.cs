@@ -7,6 +7,7 @@ namespace ChatApp.Business.Helpers
 {
     public static class Mapper
     {
+        //Mapper for mulitple profile
         public static List<profileDTO> profilesMapper(List<Profile> profiles)
         {
             List<profileDTO> profileDTOs = new();
@@ -29,6 +30,8 @@ namespace ChatApp.Business.Helpers
             return profileDTOs;
         }
 
+
+        //Mapper for single profile
         public static profileDTO profileMapper(Profile profile)
         {
             profileDTO profileDTO = new()
@@ -47,6 +50,7 @@ namespace ChatApp.Business.Helpers
             return profileDTO;
         }
 
+        //Mapper for 
         public static List<ChatDTO> chatMapper(List<Chat> sent, List<Chat> recieved)
         {
             List<ChatDTO> chatDTOs = new();

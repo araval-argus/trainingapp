@@ -53,7 +53,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public Profile UpdateUser(UpdateModel updateModel, string username)
         {
-            Profile profile = getUser(username);
+            Profile profile = getUserFromUserName(username);
             // If user not found
             if(profile == null)
             {
@@ -100,9 +100,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
 
-        public string GetImage(string username)
+        public string GetImage(int userId)
         {
-            Profile profile = getUser(username);
+            Profile profile = getUser(userId);
             if(profile == null)
             {
                 return null;
@@ -116,9 +116,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
         }
-        public Profile getUser(string username)
+
+        public Profile getUserFromUserName(string userName)
         {
-            return context.Profiles.FirstOrDefault(x => x.UserName == username);
+            return context.Profiles.FirstOrDefault(x => x.UserName == userName);
+        }
+        public Profile getUser(int userId)
+        {
+            return context.Profiles.FirstOrDefault(x => x.Id == userId);
         }
 
         public List<profileDTO> GetProfileDTOs(string s)
@@ -128,9 +133,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return profileDTOs;
         }
 
-        private bool CheckEmailExists(string email, string username) 
+        private bool CheckEmailExists(string email, string userName) 
         {
-            return context.Profiles.Any(e => e.Email == email && e.UserName != username);
+            return context.Profiles.Any(e => e.Email == email && e.UserName != userName);
         }
 
         private bool CheckEmailOrUserNameExists(string userName, string email)

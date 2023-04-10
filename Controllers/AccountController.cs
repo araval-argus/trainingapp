@@ -98,8 +98,9 @@ namespace ChatApp.Controllers
         [HttpGet("getImage")]
         [Authorize]
 
-        public IActionResult GetImage(string username) { 
-            string imgPath = _profileService.GetImage(username);
+        public IActionResult GetImage(string userName) { 
+            Profile profile = _profileService.getUserFromUserName(userName);
+            string imgPath = _profileService.GetImage(profile.Id);
             if(imgPath == null)
             {
                 return BadRequest(new { Message = "Email is already used in different account" });

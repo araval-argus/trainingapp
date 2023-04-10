@@ -11,5 +11,6 @@
     [CreatedBy] INT NULL, 
     [LastUpdatedAt] DATETIME2 NULL, 
     [LastUpdatedBy] INT NULL, 
-    [imagePath] NVARCHAR(1000) NULL
+    [imagePath] NVARCHAR(1000) NULL, 
+    CONSTRAINT [PK_Profiles] PRIMARY KEY ([Id])
 )

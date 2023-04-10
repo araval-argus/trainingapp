@@ -63,6 +63,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.imageURL = localStorage.getItem('imagePath');
+    console.log(this.loggedInUser);
     if (this.imageURL == null) {
       this.imageURL = "https://via.placeholder.com/37x37";
     }
@@ -85,6 +86,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       } else {
         this.selectedUserImagePath = "https://via.placeholder.com/43x43";
       }
+      this.removeResult = true;
+      this.hideRightBox = false;
       this.reloadChat();
     })
   }
@@ -136,8 +139,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   //This will load inbox based on selected user from search Result
   loadInbox(event) {
-    this.removeResult = true;
-    this.hideRightBox = false;
     this.chatService.reloadInbox.next(event);
     (this.searchBar.nativeElement as HTMLInputElement).value = "";
   }

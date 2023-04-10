@@ -5,7 +5,7 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IChatService
     {
-        bool AddChat(ChatModel chatModel, string userName);
+        bool AddChat(ChatModel chatModel, string userId);
 
         List<ChatDTO> GetAllChats(string from, string to);
 
