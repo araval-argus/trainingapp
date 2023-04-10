@@ -19,7 +19,13 @@ export class ChatSidebarComponent implements OnInit {
     this.chatService.recentChat().subscribe((data: any) => {
       data.chats.forEach(element => {
         this.recentChats.push({
-          to: element.to,
+          to: {
+            firstName: element.to.firstName,
+            lastName: element.to.lastName,
+            email: element.to.email,
+            imagePath: element.to.imagePath,
+            userName: element.to.userName,
+          },
           chatContent: {
             content: element.chatContent.content,
             sentAt: new Date(element.chatContent.sentAt)

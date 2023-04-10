@@ -113,19 +113,19 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public List<profileDTO> getAll()
         {
             List<Profile> profiles =  context.Profiles.ToList();
-            List<profileDTO> profileDTOs = Mapper.profileMapper(profiles);
+            List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
+        }
+        public Profile getUser(string username)
+        {
+            return context.Profiles.FirstOrDefault(x => x.UserName == username);
         }
 
         public List<profileDTO> GetProfileDTOs(string s)
         {
             List<Profile> profiles = context.Profiles.Where(e => e.FirstName.Contains(s) || e.LastName.Contains(s)).ToList();
-            List<profileDTO> profileDTOs = Mapper.profileMapper(profiles);
+            List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
-        }
-        private Profile getUser(string username)
-        {
-            return context.Profiles.FirstOrDefault(x => x.UserName == username);
         }
 
         private bool CheckEmailExists(string email, string username) 

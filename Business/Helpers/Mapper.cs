@@ -7,7 +7,7 @@ namespace ChatApp.Business.Helpers
 {
     public static class Mapper
     {
-        public static List<profileDTO> profileMapper(List<Profile> profiles)
+        public static List<profileDTO> profilesMapper(List<Profile> profiles)
         {
             List<profileDTO> profileDTOs = new();
             foreach (Profile profile in profiles)
@@ -27,6 +27,24 @@ namespace ChatApp.Business.Helpers
                 });
             }
             return profileDTOs;
+        }
+
+        public static profileDTO profileMapper(Profile profile)
+        {
+            profileDTO profileDTO = new()
+            {
+                FirstName = profile.FirstName,
+                LastName = profile.LastName,
+                UserName = profile.UserName,
+                Email = profile.Email,
+                ProfileType = profile.ProfileType,
+                CreatedAt = profile.CreatedAt,
+                CreatedBy = profile.CreatedBy,
+                LastUpdatedAt = profile.LastUpdatedAt,
+                LastUpdatedBy = profile.LastUpdatedBy,
+                imagePath = profile.imagePath
+            };
+            return profileDTO;
         }
 
         public static List<ChatDTO> chatMapper(List<Chat> sent, List<Chat> recieved)
@@ -65,24 +83,6 @@ namespace ChatApp.Business.Helpers
             chatDTOs.Add(sentChats);
             chatDTOs.Add(receivedChat);
             return chatDTOs;
-        }
-
-        public static List<recentChatDTO> recentChatMapper(List<Chat> chats, string sender)
-        {
-            List<recentChatDTO> recentChatDTOs= new();
-            foreach (Chat chat in chats)
-            {
-                recentChatDTOs.Add(new recentChatDTO
-                {
-                    to = chat.To == sender ? chat.From : chat.To,
-                    chatContent = new chatFormat
-                    {
-                        content = chat.content,
-                        sentAt = chat.sentAt
-                    }
-                });
-            }
-            return recentChatDTOs;
         }
     }
 }

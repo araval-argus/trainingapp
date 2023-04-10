@@ -24,7 +24,7 @@ import { ComposeComponent } from './email/compose/compose.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
-import { SearchDropdownComponent } from './chat/search-dropdown/search-dropdown.component';
+import { SearchDropdownComponent } from './chat/chat-sidebar/search-dropdown/search-dropdown.component';
 import { MessageComponent } from './chat/message/message.component';
 import { ChatSidebarComponent } from './chat/chat-sidebar/chat-sidebar.component';
 import { RecentChatComponent } from './chat/chat-sidebar/recent-chat/recent-chat.component';

@@ -17,7 +17,7 @@ namespace ChatApp.Models
 
     public class recentChatDTO
     {
-        public string to { get; set; }
+        public profileDTO to { get; set; }
         public chatFormat chatContent { get; set; }
     }
 }

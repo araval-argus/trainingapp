@@ -6,14 +6,18 @@ using ChatApp.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
     public class ChatService : IChatService
     {
         private readonly ChatAppContext context;
-        public ChatService(ChatAppContext context) {
+        private readonly IProfileService _profileService;
+        public ChatService(ChatAppContext context, IProfileService profileService)
+        {
             this.context = context;
+            _profileService = profileService;
         }
 
         public bool AddChat(ChatModel chatModel, string userName)
@@ -45,19 +49,27 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return chatDTOs;
         }
 
-        public List<recentChatDTO> recent(string from)
+        public List<recentChatDTO> recent(string user)
         {
             //Get all the sent chat from user
-            List<Chat> sentChats = context.Chats.Where(e => e.From == from || e.To == from ).ToList();
-            return GetRecent(sentChats, from);
-        }
-
-        private static List<recentChatDTO> GetRecent(List<Chat> chats, string sender)
-        {
-            List<Chat> recentChats = chats.GroupBy(chat => chat.From == sender ? chat.To : chat.From)
-                .Select(grp => grp.OrderByDescending(msg => msg.sentAt).FirstOrDefault())
-                .ToList();
-            List<recentChatDTO> recentChatDTOs = Mapper.recentChatMapper(recentChats, sender);
+            List<Chat> sentChats = context.Chats.Where(e => e.From == user || e.To == user ).ToList();
+            List<Chat> recentChats = sentChats.GroupBy(chat => chat.From == user ? chat.To : chat.From)
+            .Select(grp => grp.OrderByDescending(msg => msg.sentAt).FirstOrDefault())
+            .ToList();
+            List<recentChatDTO> recentChatDTOs = new();
+            foreach (Chat chat in recentChats)
+            {
+                Profile receiver = _profileService.getUser(chat.To == user ? chat.From : chat.To);
+                recentChatDTOs.Add(new recentChatDTO
+                {
+                    to = Mapper.profileMapper(receiver),
+                    chatContent = new chatFormat
+                    {
+                        content = chat.content,
+                        sentAt = chat.sentAt
+                    }
+                });
+            }
             return recentChatDTOs;
         }
     }

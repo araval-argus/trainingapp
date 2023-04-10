@@ -20,5 +20,7 @@ namespace ChatApp.Business.ServiceInterfaces
         List<profileDTO> getAll();
 
         List<profileDTO> GetProfileDTOs(string s);
+
+        Profile getUser(string userName);
     }
 }
