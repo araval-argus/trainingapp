@@ -9,6 +9,7 @@ import { Subject } from "rxjs";
 })
 export class ChatService {
     public readonly reloadInbox = new Subject<Event>();
+    public readonly replyToChat = new Subject<number>();
     constructor(private http: HttpClient) { }
     addChat(chat: ChatModel) {
         return this.http.post(environment.apiUrl + "/chat/addChat", chat);

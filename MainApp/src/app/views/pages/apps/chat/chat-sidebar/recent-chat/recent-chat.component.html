@@ -7,7 +7,7 @@
       <div class="d-flex justify-content-between flex-grow border-bottom">
         <div>
           <p class="text-body font-weight-bold">{{recentChat.to.firstName}} {{recentChat.to.lastName}}</p>
-          <p class="text-muted tx-13">{{recentChat.chatContent.content}}</p>
+          <p class="text-muted tx-13">{{contentToDisplay}}</p>
         </div>
         <div class="d-flex flex-column align-items-end">
           <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'shortTime'}}</p>

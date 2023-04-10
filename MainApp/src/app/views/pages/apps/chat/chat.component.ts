@@ -42,12 +42,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   }
   defaultNavActiveId = 1;
   chatsToLoad = new Array<loadChatModel>();
-
+  //To store message to be replied
+  replytoMessage: loadChatModel;
 
   chat: ChatModel;
+  replyingToChat: number = -1;
 
+  //Manages subscription to be unsubscribe on destroy
   private searchSubscription?: Subscription;
   private reloadNewInbox?: Subscription;
+  private replyChatSub?: Subscription;
+
+  //
+  private resetReplySubject: Subject<void>;
 
 
   @ViewChild('chatForm', { static: false }) chatContent: ElementRef;
@@ -58,12 +65,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   private readonly searchProfile = new Subject<string | undefined>();
 
 
-  constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) { }
+  constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) {
+    this.resetReplySubject = new Subject();
+  }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.imageURL = localStorage.getItem('imagePath');
-    console.log(this.loggedInUser);
     if (this.imageURL == null) {
       this.imageURL = "https://via.placeholder.com/37x37";
     }
@@ -90,6 +98,18 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       this.hideRightBox = false;
       this.reloadChat();
     })
+
+    //Replying to chat
+    this.replyChatSub = this.chatService.replyToChat.subscribe((data => {
+      this.replyingToChat = data;
+      this.replyToChat();
+    }))
+
+    this.resetReplySubject.subscribe(() => {
+      this.replytoMessage = null;
+      this.replyingToChat = -1;
+    })
+
   }
 
   //To navigate to bottom of the list
@@ -115,6 +135,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   ngOnDestroy(): void {
     this.searchSubscription.unsubscribe();
     this.reloadNewInbox.unsubscribe();
+    this.resetReplySubject.unsubscribe();
+    this.replyChatSub.unsubscribe();
   }
 
   // back to chat-list for tablet and mobile devices
@@ -148,14 +170,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     const chat = this.chatContent.nativeElement.value;
     this.chatContent.nativeElement.value = "";
     this.chat = {
+      replyToChat: this.replyingToChat,
       to: this.selectedUser.userName,
       content: chat,
     }
-
-    // console.log(this.recentChatProfile);
     this.chatService.addChat(this.chat).subscribe(() => {
       this.reloadChat();
     })
+    this.replyingToChat = -1;
   }
 
 
@@ -165,6 +187,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.chatService.getChat(this.selectedUser.userName).subscribe((data: any) => {
       this.loadChat(data);
     })
+    this.resetReply();
   }
 
   // This Method will convert CHATDTO to chat model to render on screen.
@@ -175,8 +198,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       sent.chatList.forEach(element => {
         this.chatsToLoad.push({
           sent: true,
+          id: element.id,
           content: element.content,
-          sentAt: new Date(element.sentAt)
+          sentAt: new Date(element.sentAt),
+          replyToChat: element.replyToChat
         })
       });
     }
@@ -184,8 +209,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       recieved.chatList.forEach(element => {
         this.chatsToLoad.push({
           sent: false,
+          id: element.id,
           content: element.content,
-          sentAt: new Date(element.sentAt)
+          sentAt: new Date(element.sentAt),
+          replyToChat: element.replyToChat
+
         })
       });
     }
@@ -193,4 +221,14 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   }
 
 
+  //Set message as replying to message
+  replyToChat() {
+    this.replytoMessage = this.chatsToLoad.find(c => c.id == this.replyingToChat);
+  }
+
+
+  //reset replying to message
+  resetReply() {
+    this.resetReplySubject.next();
+  }
 }

@@ -64,8 +64,10 @@ namespace ChatApp.Business.Helpers
                 {
                     temp.Add(new chatFormat
                     {
+                        id = chat.Id,
                         content = chat.content,
-                        sentAt = chat.sentAt
+                        sentAt = chat.sentAt,
+                        replyToChat = chat.replyToChat,
                     });
                 }
                 sentChats.chatList = temp;
@@ -78,8 +80,10 @@ namespace ChatApp.Business.Helpers
                 {
                     temp.Add(new chatFormat
                     {
+                        id = chat.Id,
                         content = chat.content,
-                        sentAt = chat.sentAt
+                        sentAt = chat.sentAt,
+                        replyToChat = chat.replyToChat,
                     });
                 }
                 receivedChat.chatList = temp;

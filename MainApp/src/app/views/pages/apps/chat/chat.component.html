@@ -82,6 +82,7 @@
                 <app-message *ngFor="let message of chatsToLoad" [message]="message"></app-message>
               </ul>
             </div>
+            <app-reply-message [message]="replytoMessage" *ngIf="replytoMessage != null" (cancelReplying)="resetReply()"></app-reply-message>
             <div class="chat-footer d-flex">
               <div>
                 <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">

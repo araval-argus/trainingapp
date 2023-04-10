@@ -3,6 +3,7 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 From = profile.Id,
                 To = receiver.Id,
                 content = chatModel.content,
-                sentAt = DateTime.Now
+                sentAt = DateTime.Now,
+                replyToChat = chatModel.replyToChat
             };
             context.Chats.Add(chat);
             context.SaveChanges();
@@ -55,23 +57,28 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<recentChatDTO> recent(string user)
         {
-            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == user);
-            //Get all the sent chat from user
-            List<Chat> sentChats = context.Chats.Where(e => e.From == profile.Id || e.To == profile.Id ).ToList();
-            List<Chat> recentChats = sentChats.GroupBy(chat => chat.From == profile.Id ? chat.To : chat.From)
+            var id = context.Profiles.FirstOrDefault(p => p.UserName == user).Id;
+
+            //IEnumerable<Chat> abcc = context.Set<Chat>();
+
+            IEnumerable<Chat> sentChats = context.Chats.Where(e => e.From == id || e.To == id ).ToList();
+
+            IEnumerable<Chat> recentChats = sentChats.GroupBy(chat => chat.From == id ? chat.To : chat.From)
             .Select(grp => grp.OrderByDescending(msg => msg.sentAt).FirstOrDefault())
             .ToList();
             List<recentChatDTO> recentChatDTOs = new();
             foreach (Chat chat in recentChats)
             {
-                Profile receiver = _profileService.getUser(chat.To == profile.Id ? chat.From : chat.To);
+                Profile receiver = _profileService.getUser(chat.To == id ? chat.From : chat.To);
                 recentChatDTOs.Add(new recentChatDTO
                 {
                     to = Mapper.profileMapper(receiver),
                     chatContent = new chatFormat
                     {
+                        id = chat.Id,
                         content = chat.content,
-                        sentAt = chat.sentAt
+                        sentAt = chat.sentAt,
+                        replyToChat = chat.replyToChat
                     }
                 });
             }
