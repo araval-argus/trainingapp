@@ -56,7 +56,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   // To convert user input to the observable
   private readonly searchProfile = new Subject<string | undefined>();
-  private readonly reloadInbox = new Subject<Event>();
 
 
   constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) { }
@@ -76,7 +75,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
 
     // This will update User every time new user selected
-    this.reloadNewInbox = this.reloadInbox.subscribe((event: any) => {
+    this.reloadNewInbox = this.chatService.reloadInbox.subscribe((event: any) => {
       this.selectedUser.firstName = event.firstName;
       this.selectedUser.lastName = event.lastName;
       this.selectedUser.userName = event.userName;
@@ -86,6 +85,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       } else {
         this.selectedUserImagePath = "https://via.placeholder.com/43x43";
       }
+      this.reloadChat();
     })
   }
 
@@ -101,7 +101,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   ngAfterViewInit(): void {
     // Show chat-content when clicking on chat-item for tablet and mobile devices
     document.querySelectorAll('.chat-list .chat-item').forEach(item => {
-      item.addEventListener('click', event => {
+      item.addEventListener('click', () => {
         document.querySelector('.chat-content').classList.toggle('show');
       })
     });
@@ -123,6 +123,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     console.log('passs');
   }
 
+  //This will search the user based on search string
   fetchProfile(event: Event) {
     this.searchQuery = (event.target as HTMLInputElement).value;
     this.removeResult = false;
@@ -133,11 +134,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     }
   }
 
+  //This will load inbox based on selected user from search Result
   loadInbox(event) {
     this.removeResult = true;
     this.hideRightBox = false;
-    this.reloadInbox.next(event);
-    this.reloadChat();
+    this.chatService.reloadInbox.next(event);
     (this.searchBar.nativeElement as HTMLInputElement).value = "";
   }
 
@@ -151,13 +152,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     }
 
     // console.log(this.recentChatProfile);
-    this.chatService.addChat(this.chat).subscribe(data => {
+    this.chatService.addChat(this.chat).subscribe(() => {
       this.reloadChat();
     })
   }
 
 
-  //Load new Chat
+  //this will fetch the all the chats that goes on between user and selected user
   reloadChat() {
     this.chatsToLoad = [];
     this.chatService.getChat(this.selectedUser.userName).subscribe((data: any) => {
