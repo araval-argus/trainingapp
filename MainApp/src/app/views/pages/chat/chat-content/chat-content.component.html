@@ -1,0 +1,15 @@
+<div *ngIf="!selectedFriend" class="text-center">
+  <h3>Select a friend to chat</h3>
+</div>
+
+<div *ngIf="selectedFriend" class="chat-content">
+
+  <!-- contains basic information of selected user for chatting -->
+  <app-chat-content-header [selectedFriend]="selectedFriend"></app-chat-content-header>
+
+  <!-- chat body-->
+  <app-chat-content-body [selectedFriend]="selectedFriend"></app-chat-content-body>
+
+  <!-- different buttons and inputs -->
+  <app-chat-content-footer [selectedFriend]="selectedFriend"></app-chat-content-footer>
+</div>

@@ -10,6 +10,6 @@
         public string Email { get; set; }
 
         public string imageUrl { get; set; }
-        public int Designation { get; set; }
+        public string Designation { get; set; }
     }
 }

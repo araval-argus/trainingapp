@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FriendProfile } from 'src/app/core/models/friend-profile-model';
+import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { environment } from 'src/environments/environment';
 
@@ -8,19 +9,23 @@ import { environment } from 'src/environments/environment';
   templateUrl: './friends-dropdown.component.html',
   styleUrls: ['./friends-dropdown.component.scss']
 })
-export class FriendsDropdownComponent implements OnInit {
+export class FriendsDropdownComponent implements OnInit, OnDestroy {
+
   timeOutId;
   apiUrl: string = environment.apiUrl;
-  constructor(private chatService: ChatService) { }
   friendsProfiles: FriendProfile[];
+
+  constructor(private chatService: ChatService,
+    private authService: AuthService) { }
+
   ngOnInit(): void {
   }
 
   onInputChange(event: Event){
 
     let searchTerm = (event.target as HTMLInputElement).value;
-    if(this.timeOutId){
 
+    if(this.timeOutId){
       clearTimeout(this.timeOutId);
     }
 
@@ -36,14 +41,25 @@ export class FriendsDropdownComponent implements OnInit {
           error => {
             console.log(error)
           })
-    }, 1000);
+    }, 300);
 
   }
 
-  friendSelected(){
+  friendSelected(friend :FriendProfile){
+    this.chatService.friendSelected.emit(friend);
+    //console.log("inside dropdown component :- ", friend)
+    this.chatService.fetchMessages(this.authService.getLoggedInUserInfo().sub, friend.userName).subscribe((data)=>{
+      this.chatService.messagesRecieved.emit(data);
+    });
     this.emptyList();
   }
+
   emptyList(){
     this.friendsProfiles = [];
   }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.timeOutId);
+  }
+
 }

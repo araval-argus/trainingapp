@@ -20,6 +20,8 @@ namespace ChatApp.Business.ServiceInterfaces
 
         bool CheckUserNameExists(string? userName);
 
-        IEnumerable<FriendProfileModel> FetchFriends(string searchTerm);
+        int FetchIdFromUserName(string userName);
+        string FetchUserNameFromId(int id);
+
     }
 }

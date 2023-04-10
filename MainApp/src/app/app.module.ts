@@ -24,9 +24,13 @@ import { ChatComponent } from './views/pages/chat/chat.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ChatSidebarComponent } from './views/pages/chat/chat-sidebar/chat-sidebar.component';
-import { ChatBodyComponent } from './views/pages/chat/chat-body/chat-body.component';
+
 import { DropdownDirective } from './core/helper/dropdown-directive';
 import { FriendsDropdownComponent } from './views/pages/chat/chat-sidebar/friends-dropdown/friends-dropdown.component';
+import { ChatContentComponent } from './views/pages/chat/chat-content/chat-content.component';
+import { ChatContentBodyComponent } from './views/pages/chat/chat-content/chat-content-body/chat-content-body.component';
+import { ChatContentFooterComponent } from './views/pages/chat/chat-content/chat-content-footer/chat-content-footer.component';
+import { ChatContentHeaderComponent } from './views/pages/chat/chat-content/chat-content-header/chat-content-header.component';
 
 
 @NgModule({
@@ -36,9 +40,12 @@ import { FriendsDropdownComponent } from './views/pages/chat/chat-sidebar/friend
     EditFormComponent,
     ChatComponent,
     ChatSidebarComponent,
-    ChatBodyComponent,
+    ChatContentComponent,
     DropdownDirective,
-    FriendsDropdownComponent
+    FriendsDropdownComponent,
+    ChatContentHeaderComponent,
+    ChatContentBodyComponent,
+    ChatContentFooterComponent,
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   imports: [

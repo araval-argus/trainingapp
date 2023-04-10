@@ -16,7 +16,7 @@
  <div class="dropdown appDropdown" style="position: absolute;z-index: 100; background-color: white; width: 92%"
  appDropdown (hideDropdown)="emptyList()">
 
-  <div class="dropdown-item pl-0" *ngFor="let friend of friendsProfiles" (click)="friendSelected()">
+  <div class="dropdown-item pl-0" *ngFor="let friend of friendsProfiles" (click)="friendSelected(friend)">
     <div class="d-inline-flex">
       <div>
         <img [src]="friend.imageUrl" alt="" class="img-xs rounded-circle mr-3" />

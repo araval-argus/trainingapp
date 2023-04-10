@@ -1,0 +1,91 @@
+<div class="chat-body" [perfectScrollbar]>
+  <ul class="messages">
+
+    <div *ngFor="let message of messages">
+      <div *ngIf="message.sender === loggedInUser.sub">
+        <li class="message-item me">
+          <img [src]="loggedInUser.imageUrl" class="img-xs rounded-circle" alt="avatar">
+          <div class="content">
+            <div class="message">
+              <div class="bubble">
+                <p>
+                  {{message.message}}
+                </p>
+              </div>
+              <span>{{message.createdAt | date : "shortTime"}}</span>
+            </div>
+          </div>
+        </li>
+      </div>
+
+      <div *ngIf="message.sender !== loggedInUser.sub">
+        <li class="message-item friend">
+          <img [src]="selectedFriend.imageUrl" class="img-xs rounded-circle" alt="avatar">
+          <div class="content">
+            <div class="message">
+              <div class="bubble">
+                <p>
+                  {{message.message}}
+                </p>
+              </div>
+              <span>{{message.createdAt | date : "shortTime"}}</span>
+            </div>
+          </div>
+        </li>
+      </div>
+    </div>
+
+  </ul>
+</div>
+
+
+
+<!-- check below code for reference -->
+
+
+
+<!-- repeatative component of message sent by selected user for chat start-->
+
+      <!-- <li class="message-item friend"> -->
+
+        <!-- selected user image -->
+        <!-- <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="avatar">
+
+        <div class="content">
+          <div class="message">
+            <div class="bubble">
+              <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry.
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Harum, recusandae nam? Blanditiis quas, fugiat
+                velit veritatis, natus id recusandae ad sequi facere, voluptatem mollitia ipsa consectetur deleniti
+                deserunt! Dolorem perspiciatis dolorum porro necessitatibus quasi. Eligendi ea ipsam fugit debitis modi
+                unde perferendis sit quae, dolorum laudantium iusto eveniet impedit. Nostrum!
+              </p>
+            </div>
+            <span>8:12 PM</span>
+          </div>
+        </div> -->
+      <!-- </li> -->
+
+    <!-- repeatative component end -->
+
+    <!-- repeatative component of message sent by us to selected user for chat start -->
+
+      <!-- <li class="message-item me">
+        <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="avatar">
+        <div class="content">
+          <div class="message">
+            <div class="bubble">
+              <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry printing and typesetting
+                industry.</p>
+            </div>
+          </div>
+          <div class="message">
+            <div class="bubble">
+              <p>Lorem Ipsum.</p>
+            </div>
+            <span>8:13 PM</span>
+          </div>
+        </div>
+      </li> -->
+
+    <!-- repeatative component end -->

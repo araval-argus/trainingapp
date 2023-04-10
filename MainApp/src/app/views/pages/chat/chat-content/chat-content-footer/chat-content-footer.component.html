@@ -1,0 +1,25 @@
+<div class="chat-footer d-flex mt-auto">
+  <div>
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">
+      <i class="feather icon-sun text-muted"></i>
+    </button>
+  </div>
+  <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files">
+      <i class="feather icon-paperclip text-muted"></i>
+    </button>
+  </div>
+  <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">
+      <i class="feather icon-mic text-muted"></i>
+    </button>
+  </div>
+  <form class="search-form flex-grow">
+    <div class="input-group">
+      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput>
+      <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="sendMessage()">
+        <i class="feather icon-send"></i>
+      </button>
+    </div>
+  </form>
+</div>

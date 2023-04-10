@@ -102,9 +102,18 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return fileName;
         }
 
-        public IEnumerable<FriendProfileModel> FetchFriends(string searchTerm)
+
+        public int FetchIdFromUserName(string userName)
         {
-            throw new NotImplementedException();
+            return this.context.Profiles.FirstOrDefault(
+                profile => profile.UserName.Equals(userName)).Id;
+        }
+
+        public string FetchUserNameFromId(int id)
+        {
+            return this.context.Profiles.FirstOrDefault(
+                profile => profile.Id == id
+                ).UserName;
         }
     }
 }

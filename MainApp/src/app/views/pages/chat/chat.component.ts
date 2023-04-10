@@ -1,17 +1,27 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { FriendProfile } from 'src/app/core/models/friend-profile-model';
+import { ChatService } from 'src/app/core/service/chat-service';
 
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, AfterViewInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   defaultNavActiveId = 1;
 
-  constructor() { }
+  selectedFriend: FriendProfile;
 
-  ngOnInit(): void { }
+  constructor(private chatService: ChatService) { }
+
+  ngOnInit(): void {
+    //console.log("inside chat component")
+    this.chatService.friendSelected.subscribe(profile => {
+      //console.log("frined selected msg from chat component")
+      this.selectedFriend = profile;
+    })
+  }
 
   ngAfterViewInit(): void {
 
@@ -28,7 +38,10 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
   save() {
     console.log('passs');
+  }
 
+  ngOnDestroy(){
+   // this.chatService.friendSelected.unsubscribe();
   }
 
 }
