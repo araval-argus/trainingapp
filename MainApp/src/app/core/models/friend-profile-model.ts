@@ -5,4 +5,6 @@ export interface FriendProfile {
   email: string;
   imageUrl: string;
   designation: string;
+  lastMessage?: string;
+  lastMessageTimeStamp?: Date
 }

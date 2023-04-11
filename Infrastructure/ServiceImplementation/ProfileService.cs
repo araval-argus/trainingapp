@@ -6,6 +6,8 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
 using System;
 using System.Collections.Generic;
+
+using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -115,6 +117,49 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 profile => profile.Id == id
                 ).UserName;
         }
+
+       //This method will return a list of users who have interacted with the logged in user
+        public IEnumerable<FriendProfileModel> FetchAllUsers(int userId)
+        {
+            
+            // Fetch distinct user ids with whome the user with 'userId' had interacted
+            IEnumerable<int> Ids = this.context.Messages.Where(
+                m => m.SenderID == userId || m.RecieverID == userId
+                )
+                .Select(
+                    m => m.SenderID == userId ? m.RecieverID : m.SenderID
+                ).Distinct();
+
+            IList<Profile> friendsProfiles = new List<Profile>(); 
+
+            //for fetching the profiles
+            foreach(int id in Ids)
+            {
+                var profile = this.context.Profiles.FirstOrDefault(p => p.Id == id);
+                friendsProfiles.Add(profile);
+            }
+
+            return friendsProfiles
+                .Select(
+                profile => {
+
+                    MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => m.SenderID == profile.Id || m.RecieverID == profile.Id);
+
+                    return new FriendProfileModel()
+                    {
+                        UserName = profile.UserName,
+                        Designation = Business.Helpers.Designation.getDesignationType(profile.Designation),
+                        Email = profile.Email,
+                        FirstName = profile.FirstName,
+                        LastName = profile.LastName,
+                        imageUrl = profile.ImageUrl,
+                        LastMessage = lastMessage.Message,
+                        LastMessageTimeStamp = lastMessage.CreatedAt
+                    };
+                })
+                .OrderByDescending(profile => profile.LastMessageTimeStamp);
+        }
+
     }
 }
 

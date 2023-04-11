@@ -22,9 +22,14 @@ export class ChatService {
   }
 
   fetchMessages(loggedInUserName: string, friendUserName: string){
-
     return this.http.get<MessageModel[]>(environment.apiUrl + "/chat/fetchMessages",{
       params: new HttpParams().append("loggedInUserName", loggedInUserName).append("friendUserName",friendUserName)
+    });
+  }
+
+  fetchAll(username: string){
+    return this.http.get(environment.apiUrl+ "/chat/fetchAll",{
+      params: new HttpParams().append("username", username)
     });
   }
 

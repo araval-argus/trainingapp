@@ -13,6 +13,8 @@ import { ChatService } from 'src/app/core/service/chat-service';
 export class ChatContentFooterComponent implements OnInit {
 
   @Input() selectedFriend: FriendProfile;
+  @Input() messageToBeReplied: MessageModel;
+
   loggedInUser : LoggedInUser = this.authService.getLoggedInUserInfo();
 
 
@@ -28,9 +30,18 @@ export class ChatContentFooterComponent implements OnInit {
     const messageModel: MessageModel = {
       sender: this.loggedInUser.sub,
       reciever: this.selectedFriend.userName,
-      message: this.messageInput.nativeElement.value
+      message: this.messageInput.nativeElement.value,
+      repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"
     };
+    console.log(messageModel);
     this.chatService.sendMessage(messageModel);
+    this.messageInput.nativeElement.value = "";
+    this.messageToBeReplied = null;
+  }
+
+  cancelReply(){
+    console.log(this.messageToBeReplied.id);
+    this.messageToBeReplied = null;
   }
 
 }

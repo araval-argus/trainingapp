@@ -1,7 +1,9 @@
-﻿using ChatApp.Business.ServiceInterfaces;
+﻿using ChatApp.Business.Helpers;
+using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -26,9 +28,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     LastName = profile.LastName,
                     Email = profile.Email,
                     UserName = profile.UserName,
-                    Designation = GetDesignation(profile.Designation),
+                    Designation = Business.Helpers.Designation.getDesignationType(profile.Designation),
                     imageUrl = profile.ImageUrl,
-                });
+                }); ;
         }
 
         public MessageEntity AddMessage(MessageModel messageModel)
@@ -37,7 +39,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             {
                 Message = messageModel.Message,
                 SenderID = messageModel.SenderID,
-                RecieverID = messageModel.RecieverID
+                RecieverID = messageModel.RecieverID,
+                RepliedToMsg= messageModel.RepliedToMsg,
             };
             this.context.Messages.Add(messageEntity);
             this.context.SaveChanges();
@@ -53,25 +56,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 );
         }
 
-        public static string GetDesignation(int designation)
+        public string FetchMessageFromId(int id)
         {
-            switch (designation)
+            string result = "";
+            if (this.context.Messages.Any(m => m.Id == id))
             {
-                case 2:
-                    return "Programmer Analyst";
-                case 3:
-                    return "Solution Analyst";
-                case 4:
-                    return "Lead Solution Analyst";
-                case 5:
-                    return "Intern";
-                case 6:
-                    return "Probationer";
-                case 7:
-                    return "Quality Analyst";
-                default:
-                    return "Imposter";
+                result = this.context.Messages.FirstOrDefault(m => m.Id == id).Message;
             }
+            return result;
         }
     }
 }

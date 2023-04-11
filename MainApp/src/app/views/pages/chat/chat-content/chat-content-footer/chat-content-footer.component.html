@@ -1,3 +1,11 @@
+<div class="reply-message-box mx-2 p-3 d-flex flex-row" *ngIf="messageToBeReplied">
+  <div class="flex-grow-1">
+    Reply to this message: <b>{{messageToBeReplied.message}}</b>
+  </div>
+  <div class="">
+    <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
+  </div>
+</div>
 <div class="chat-footer d-flex mt-auto">
   <div>
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">
@@ -14,10 +22,11 @@
       <i class="feather icon-mic text-muted"></i>
     </button>
   </div>
-  <form class="search-form flex-grow">
+
+  <form class="search-form flex-grow" ngForm (ngSubmit)="sendMessage()">
     <div class="input-group">
-      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput>
-      <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="sendMessage()">
+      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput required>
+      <button type="submit" class="btn btn-primary btn-icon rounded-circle">
         <i class="feather icon-send"></i>
       </button>
     </div>

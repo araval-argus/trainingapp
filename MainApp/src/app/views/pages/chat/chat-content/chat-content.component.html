@@ -8,8 +8,8 @@
   <app-chat-content-header [selectedFriend]="selectedFriend"></app-chat-content-header>
 
   <!-- chat body-->
-  <app-chat-content-body [selectedFriend]="selectedFriend"></app-chat-content-body>
+  <app-chat-content-body [selectedFriend]="selectedFriend" (replyButtonClicked)="replyButtonClicked($event)"></app-chat-content-body>
 
   <!-- different buttons and inputs -->
-  <app-chat-content-footer [selectedFriend]="selectedFriend"></app-chat-content-footer>
+  <app-chat-content-footer [selectedFriend]="selectedFriend" [messageToBeReplied]="messageToBeReplied"></app-chat-content-footer>
 </div>

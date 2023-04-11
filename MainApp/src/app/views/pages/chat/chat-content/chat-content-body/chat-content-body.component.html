@@ -1,4 +1,4 @@
-<div class="chat-body" [perfectScrollbar]>
+<div class="chat-body" [perfectScrollbar] #scrollbar>
   <ul class="messages">
 
     <div *ngFor="let message of messages">
@@ -8,7 +8,11 @@
           <div class="content">
             <div class="message">
               <div class="bubble">
-                <p>
+                <p class="text-muted" *ngIf="message.repliedToMsg">
+                  {{message.repliedToMsg}}<br>
+                </p>
+
+                <p class="d-flex justify-content-end">
                   {{message.message}}
                 </p>
               </div>
@@ -28,11 +32,19 @@
                   {{message.message}}
                 </p>
               </div>
-              <span>{{message.createdAt | date : "shortTime"}}</span>
+              <span>
+                {{message.createdAt | date : "shortTime"}}
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyToThisMessage(message)"
+                ngbTooltip="Reply">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
             </div>
           </div>
         </li>
       </div>
+
     </div>
 
   </ul>

@@ -11,5 +11,7 @@ namespace ChatApp.Business.ServiceInterfaces
         MessageEntity AddMessage(MessageModel messageModel);
 
         IEnumerable<MessageEntity> FetchMessages(int senderID, int recieverID);
+
+        string FetchMessageFromId(int id);
     }
 }

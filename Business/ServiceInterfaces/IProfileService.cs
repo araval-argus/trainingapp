@@ -2,6 +2,7 @@
 using ChatApp.Models;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -22,6 +23,8 @@ namespace ChatApp.Business.ServiceInterfaces
 
         int FetchIdFromUserName(string userName);
         string FetchUserNameFromId(int id);
+
+        IEnumerable<FriendProfileModel> FetchAllUsers(int id);
 
     }
 }

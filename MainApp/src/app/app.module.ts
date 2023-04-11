@@ -64,7 +64,6 @@ import { ChatContentHeaderComponent } from './views/pages/chat/chat-content/chat
     NgbCollapseModule,
     NgSelectModule,
     PerfectScrollbarModule
-
   ],
   providers: [
     AuthGuard,

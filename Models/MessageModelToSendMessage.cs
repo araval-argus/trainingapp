@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChatApp.Models
 {
     public class MessageModelToSendMessage
     {
+
         [Required]
         public string Message { get; set; }
 
@@ -12,5 +14,8 @@ namespace ChatApp.Models
 
         [Required]
         public string Reciever { get; set; }
+
+
+        public string RepliedToMsg { get; set; } = "-1";
     }
 }

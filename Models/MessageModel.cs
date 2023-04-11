@@ -13,5 +13,8 @@ namespace ChatApp.Models
         [Required]
         public int RecieverID { get; set; }
 
+        [Required]
+        public int RepliedToMsg {  get; set; }
+
     }
 }

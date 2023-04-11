@@ -11,18 +11,17 @@ export class ChatContentHeaderComponent implements OnInit {
 
   @Input() selectedFriend: FriendProfile;
 
-  constructor(private chatService: ChatService) {
-    console.log("chatcontentheader constructor")
-   }
+  constructor(private chatService: ChatService) {   }
 
-  ngOnInit(): void {
-    console.log("inside chat content header :- ", this.selectedFriend)
-
-  }
+  ngOnInit(): void {}
 
   // back to chat-list for tablet and mobile devices
   backToChatList() {
     document.querySelector('.chat-content').classList.toggle('show');
+  }
+
+  replyButtonClicked(event: any){
+    console.log(event);
   }
 
 }

@@ -1,4 +1,6 @@
-﻿namespace ChatApp.Models
+﻿using System;
+
+namespace ChatApp.Models
 {
     public class FriendProfileModel
     {
@@ -11,5 +13,9 @@
 
         public string imageUrl { get; set; }
         public string Designation { get; set; }
+
+        public string? LastMessage { get; set; } = null;
+
+        public DateTime? LastMessageTimeStamp { get; set; } = null;
     }
 }

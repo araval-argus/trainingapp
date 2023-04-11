@@ -1,6 +1,8 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
 import { FriendProfile } from 'src/app/core/models/friend-profile-model';
+import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-chat',
@@ -13,13 +15,22 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   selectedFriend: FriendProfile;
 
-  constructor(private chatService: ChatService) { }
+  friends: FriendProfile[] = [];
+
+
+
+  constructor(private chatService: ChatService, private authService: AuthService) { }
 
   ngOnInit(): void {
-    //console.log("inside chat component")
     this.chatService.friendSelected.subscribe(profile => {
-      //console.log("frined selected msg from chat component")
       this.selectedFriend = profile;
+    })
+    this.chatService.fetchAll(this.authService.getLoggedInUserInfo().sub).subscribe((data:any) => {
+      this.friends = data.data;
+      //console.log("all users fetched" , this.friends)
+      this.friends.forEach((friend, index)=>{
+        this.friends[index].imageUrl = environment.apiUrl + "/../Images/Users/" + friend.imageUrl;
+      })
     })
   }
 

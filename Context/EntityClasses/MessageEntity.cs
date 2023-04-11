@@ -15,5 +15,7 @@ namespace ChatApp.Context.EntityClasses
         public DateTime CreatedAt { get; set; } = DateTime.Now;
 
         public bool IsSeen { get; set; } = false;
+
+        public int RepliedToMsg { get; set; } = -1;
     }
 }

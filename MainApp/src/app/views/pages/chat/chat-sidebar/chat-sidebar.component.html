@@ -61,26 +61,26 @@
               <ul class="list-unstyled chat-list px-1">
 
                 <!-- Repeatation start -->
-                <li class="chat-item pr-1">
-                  <a href="" (click)="false" class="d-flex align-items-center">
+                <li class="chat-item pr-1" *ngFor="let friend of friends">
+                  <a (click)="onClickUser(friend)" class="d-flex align-items-center">
 
                     <figure class="mb-0 mr-2">
                       <!-- profile picture -->
-                      <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                      <img [src]="friend.imageUrl" class="img-xs rounded-circle" alt="user">
                       <div class="status online"></div>
                     </figure>
 
                     <div class="d-flex justify-content-between flex-grow border-bottom">
                       <div>
                         <!-- name  -->
-                        <p class="text-body font-weight-bold">John Doe</p>
+                        <p class="text-body font-weight-bold">{{friend.firstName}} {{friend.lastName }}</p>
                         <!-- last message -->
-                        <p class="text-muted tx-13">Hi, How are you?</p>
+                        <p class="text-muted tx-13">{{friend.lastMessage}}</p>
                       </div>
 
                       <div class="d-flex flex-column align-items-end">
                         <!-- last message time -->
-                        <p class="text-muted tx-13 mb-1">4:32 PM</p>
+                        <p class="text-muted tx-13 mb-1">{{friend.lastMessageTimeStamp | date: "shortTime"}} </p>
                         <!-- unread message count -->
                         <div class="badge badge-pill badge-primary ml-auto">5</div>
                       </div>
@@ -240,7 +240,7 @@
                     </div>
                   </a>
                 </li> -->
-                <li class="chat-item pr-1">
+                <!-- <li class="chat-item pr-1">
                   <a href="" (click)="false" class="d-flex align-items-center">
                     <figure class="mb-0 mr-2">
                       <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
@@ -256,7 +256,7 @@
                       </div>
                     </div>
                   </a>
-                </li>
+                </li> -->
               </ul>
             </div>
           </div>
