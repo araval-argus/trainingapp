@@ -11,7 +11,7 @@
         </div>
         <div class="d-flex flex-column align-items-end">
           <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'shortTime'}}</p>
-          <div class="badge badge-pill badge-primary ml-auto">5</div>
+          <div class="badge badge-pill badge-primary ml-auto" *ngIf="recentChat.unreadCount > 0">{{recentChat.unreadCount}}</div>
         </div>
       </div>
     </a>

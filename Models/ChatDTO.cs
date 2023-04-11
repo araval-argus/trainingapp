@@ -15,11 +15,13 @@ namespace ChatApp.Models
         public string content { get; set; }
         public DateTime sentAt { get; set; }
         public int replyToChat { get; set; }
+        public int isRead { get; set; }
     }
 
     public class recentChatDTO
     {
         public profileDTO to { get; set; }
         public chatFormat chatContent { get; set; }
+        public int unreadCount { get; set; }
     }
 }

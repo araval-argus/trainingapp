@@ -8,6 +8,8 @@
           </span>
           <p>{{message.content}}</p>
         </div>
+        <span *ngIf="message.isRead == 0 && me"><i class="feather icon-eye-off"></i></span>
+        <span *ngIf="message.isRead == 1 && me"><i class="feather icon-eye"></i></span>
         <span>{{message.sentAt | date:'shortTime'}}</span>
       </div>
     </div>

@@ -6,4 +6,5 @@ export interface recentChat {
         content: string,
         sentAt: Date
     }
+    unreadCount: number
 }

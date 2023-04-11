@@ -39,6 +39,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       content: null,
       sentAt: null
     },
+    unreadCount: 0
   }
   defaultNavActiveId = 1;
   chatsToLoad = new Array<loadChatModel>();
@@ -196,6 +197,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   // This Method will convert CHATDTO to chat model to render on screen.
   loadChat(data: any) {
+    console.log(data.chats);
     var sent = data.chats[0];
     var recieved = data.chats[1];
     //We had to intialize replyToContent null cause chatsToLoad will only complete after all chats are initialize.
@@ -207,7 +209,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           content: element.content,
           sentAt: new Date(element.sentAt),
           replyToChat: element.replyToChat,
-          replyToContent: null
+          replyToContent: null,
+          isRead: element.isRead
         })
       });
     }
@@ -219,11 +222,13 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           content: element.content,
           sentAt: new Date(element.sentAt),
           replyToChat: element.replyToChat,
-          replyToContent: null
+          replyToContent: null,
+          isRead: element.isRead
         })
+
       });
     }
-    //This will add content to all chat if it's reply of other chat
+    //This will add content to all chat if it's reply of other chat && user can't find chats that not belongs to him
     this.chatsToLoad.forEach(e => {
       e.replyToContent = e.replyToChat != -1 ? this.chatsToLoad.find(el => el.id == e.replyToChat).content.substring(0, 30) : null
     })

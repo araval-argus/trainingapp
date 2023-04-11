@@ -12,11 +12,13 @@ export class ChatSidebarComponent implements OnInit {
   constructor(private chatService: ChatService) { }
 
   ngOnInit(): void {
+    this.reloadRecent();
   }
 
   reloadRecent() {
     this.recentChats = [];
     this.chatService.recentChat().subscribe((data: any) => {
+      console.log(data.chats);
       data.chats.forEach(element => {
         this.recentChats.push({
           to: {
@@ -29,7 +31,8 @@ export class ChatSidebarComponent implements OnInit {
           chatContent: {
             content: element.chatContent.content,
             sentAt: new Date(element.chatContent.sentAt)
-          }
+          },
+          unreadCount: element.unreadCount
         })
       })
       this.recentChats.sort((a, b) => b.chatContent.sentAt.getTime() - a.chatContent.sentAt.getTime());
