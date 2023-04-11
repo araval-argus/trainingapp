@@ -1,6 +1,7 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using System.IdentityModel.Tokens.Jwt;
@@ -74,6 +75,23 @@ namespace ChatApp.Controllers
             {
                 var chats = _chatService.recent(claim.Value);
                 response = Ok(new { chats });
+            }
+            return response;
+        }
+
+        [HttpPost("addFile")]
+        [Authorize]
+        public IActionResult addFile([FromForm] ChatFileModel chatFile, [FromHeader] string authorization)
+        {
+            IActionResult response = Unauthorized(new { message = "Something Went Wrong" });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if(claim!= null)
+            {
+                var chats = _chatService.addFile(claim.Value, chatFile);
+                response = Ok(new { chats });
+
             }
             return response;
         }

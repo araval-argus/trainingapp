@@ -66,6 +66,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   private readonly searchProfile = new Subject<string | undefined>();
 
 
+  //To manage Uploaded File
+  uploadFile: File;
+  private sendFileSubscription?: Subscription;
+
+
   constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) {
     this.resetReplySubject = new Subject();
   }
@@ -109,6 +114,12 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.resetReplySubject.subscribe(() => {
       this.replytoMessage = null;
       this.replyingToChat = -1;
+    })
+
+
+    //Sending File
+    this.sendFileSubscription = this.chatService.sendFileSub.subscribe(() => {
+      this.sendFile();
     })
   }
 
@@ -197,7 +208,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   // This Method will convert CHATDTO to chat model to render on screen.
   loadChat(data: any) {
-    console.log(data.chats);
     var sent = data.chats[0];
     var recieved = data.chats[1];
     //We had to intialize replyToContent null cause chatsToLoad will only complete after all chats are initialize.
@@ -252,4 +262,29 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   //   const element = document.getElementById(id);
   //   element.scrollIntoView({ block: "start", inline: "nearest" });
   // }
+
+
+  //TO manage File
+  uploadedFile(event: Event) {
+    var files = (event.target as HTMLInputElement).files;
+    if (files[0] != null) {
+      this.uploadFile = files[0];
+    }
+    console.log("uploadedFile called");
+
+    this.chatService.displayModal.next(this.uploadFile);
+  }
+
+
+  //Will make formdata by using file and selected user's username
+  sendFile() {
+    const formData: FormData = new FormData();
+    formData.append('file', this.uploadFile);
+    formData.append('to', this.selectedUser.userName);
+    this.chatService.sendFile(formData).subscribe(data => {
+      console.log(data);
+
+    })
+  }
+
 }

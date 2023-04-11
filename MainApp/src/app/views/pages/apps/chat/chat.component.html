@@ -1,3 +1,4 @@
+<app-file-modal></app-file-modal>
 <div class="row chat-wrapper">
   <div class="col-md-12">
     <div class="card fullScreen">
@@ -90,9 +91,10 @@
                 </button>
               </div>
               <div class="d-none d-md-block">
-                <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files">
+                <button type="button" (click)="file.click()" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files">
                   <i class="feather icon-paperclip text-muted"></i>
                 </button>
+                <input type="file" accept="image/png, image/jpeg, video/mp4, video/mpeg, image/gif, video/webm, audio/aac, audio/mpeg, audio/wav, audio/webm" #file (change)="uploadedFile($event)" hidden>
               </div>
               <div class="d-none d-md-block">
                 <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">

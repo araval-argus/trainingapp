@@ -3,9 +3,11 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -15,10 +17,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext context;
         private readonly IProfileService _profileService;
-        public ChatService(ChatAppContext context, IProfileService profileService)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ChatService(ChatAppContext context, IProfileService profileService, IWebHostEnvironment webHostEnvironment)
         {
             this.context = context;
-            _profileService = profileService;
+            this._profileService = profileService;
+            this._webHostEnvironment = webHostEnvironment;
         }
 
         public bool AddChat(ChatModel chatModel, string userName)
@@ -64,8 +69,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<recentChatDTO> recent(string user)
         {
-            var id = context.Profiles.FirstOrDefault(p => p.UserName == user).Id;
-            IEnumerable<Chat> sentChats = context.Chats.AsNoTracking().Where(e => e.From == id || e.To == id ).ToList();
+            var id = context.Profiles.AsNoTracking().FirstOrDefault(p => p.UserName == user).Id;
+            IEnumerable<Chat> sentChats = context.Chats.AsNoTracking().AsNoTracking().Where(e => e.From == id || e.To == id ).ToList();
             IEnumerable<IGrouping<int, Chat>> recentChatsGroups = sentChats.GroupBy(chat => chat.From == id ? chat.To : chat.From);
             IDictionary<int, int> unreadCountDictionary = new Dictionary<int, int>();
             foreach(var group in recentChatsGroups)
@@ -98,6 +103,41 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 });
             }
             return recentChatDTOs;
+        }
+
+
+        public bool addFile(string userName, ChatFileModel chatFile)
+        {
+            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
+            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == chatFile.to);
+            if(sender != null && receiver != null) { 
+                if(chatFile.file != null)
+                {
+                    var file = chatFile.file;
+                    string rootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = Guid.NewGuid().ToString();
+                    var extension = Path.GetExtension(file.FileName);
+                    var pathToSave = Path.Combine(rootPath, @"files");
+                    var fullFile = fileName + extension;
+                    var dbPath = Path.Combine(pathToSave, fullFile);
+                    using (var fileStreams = new FileStream(dbPath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStreams);
+                    }
+                    Chat chat = new()
+                    {
+                        From = sender.Id,
+                        To = receiver.Id,
+                        content = fullFile,
+                        sentAt = DateTime.Now,
+                        type = file.ContentType
+                    };
+                    context.Chats.Add(chat);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

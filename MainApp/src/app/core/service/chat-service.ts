@@ -10,6 +10,9 @@ import { Subject } from "rxjs";
 export class ChatService {
     public readonly reloadInbox = new Subject<Event>();
     public readonly replyToChat = new Subject<number>();
+    public readonly displayModal = new Subject<File>();
+    public readonly sendFileSub = new Subject<File>();
+
     constructor(private http: HttpClient) { }
     addChat(chat: ChatModel) {
         return this.http.post(environment.apiUrl + "/chat/addChat", chat);
@@ -22,4 +25,7 @@ export class ChatService {
         return this.http.get(environment.apiUrl + "/chat/recent");
     }
 
+    sendFile(formData: FormData) {
+        return this.http.post(environment.apiUrl + "/chat/addFile", formData);
+    }
 }

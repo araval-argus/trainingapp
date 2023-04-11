@@ -18,7 +18,6 @@ export class ChatSidebarComponent implements OnInit {
   reloadRecent() {
     this.recentChats = [];
     this.chatService.recentChat().subscribe((data: any) => {
-      console.log(data.chats);
       data.chats.forEach(element => {
         this.recentChats.push({
           to: {

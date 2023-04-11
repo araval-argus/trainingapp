@@ -21,7 +21,6 @@ export class MessageComponent implements OnInit {
     if (this.message.replyToChat != -1) {
       this.repliedChatId = this.message.replyToChat;
     }
-    console.log(this.message);
   }
 
   replyTo(id: number) {

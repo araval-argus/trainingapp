@@ -10,5 +10,7 @@ namespace ChatApp.Business.ServiceInterfaces
         List<ChatDTO> GetAllChats(string from, string to);
 
         List<recentChatDTO> recent(string from);
+
+        bool addFile(string userName , ChatFileModel chatFile);
     }
 }
