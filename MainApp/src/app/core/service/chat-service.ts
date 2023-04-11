@@ -21,4 +21,5 @@ export class ChatService {
     recentChat() {
         return this.http.get(environment.apiUrl + "/chat/recent");
     }
+
 }

@@ -3,5 +3,6 @@ export interface loadChatModel {
     sent: boolean
     content: string,
     sentAt: Date,
-    replyToChat: number
+    replyToChat: number,
+    replyToContent: string
 }

@@ -15,8 +15,8 @@ export class ReplyMessageComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    if (this.message.content.length > 20) {
-      this.contentToDisplay = this.message.content.substring(0, 20) + "...";
+    if (this.message.content.length > 50) {
+      this.contentToDisplay = this.message.content.substring(0, 50) + "...";
     } else {
       this.contentToDisplay = this.message.content;
     }

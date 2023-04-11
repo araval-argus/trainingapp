@@ -18,7 +18,7 @@ export class RecentChatComponent implements OnInit {
     if (this.recentChat.to.imagePath != null) {
       this.thumbnail = this.accountService.fetchImage(this.recentChat.to.imagePath);
     }
-    if (this.recentChat.chatContent.content.length > 20) {
+    if (this.recentChat.chatContent.content.length > 50) {
       this.contentToDisplay = this.recentChat.chatContent.content.substring(0, 20) + "...";
     } else {
       this.contentToDisplay = this.recentChat.chatContent.content;

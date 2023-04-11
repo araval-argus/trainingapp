@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { loadChatModel } from 'src/app/core/models/loadingChat-model';
 import { ChatService } from 'src/app/core/service/chat-service';
 
@@ -26,4 +26,9 @@ export class MessageComponent implements OnInit {
   replyTo(id: number) {
     this.chatService.replyToChat.next(id);
   }
+
+  // goToMessage(event: Event) {
+  //   event.preventDefault();
+  //   this.chatService.scrollToChat.next(this.repliedChatId);
+  // }
 }

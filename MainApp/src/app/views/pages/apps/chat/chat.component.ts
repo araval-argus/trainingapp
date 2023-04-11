@@ -53,7 +53,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   private reloadNewInbox?: Subscription;
   private replyChatSub?: Subscription;
 
-  //
+  //resetting replying feature
   private resetReplySubject: Subject<void>;
 
 
@@ -109,7 +109,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       this.replytoMessage = null;
       this.replyingToChat = -1;
     })
-
   }
 
   //To navigate to bottom of the list
@@ -128,6 +127,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
         document.querySelector('.chat-content').classList.toggle('show');
       })
     });
+
+    //Chat service observer from message component to scroll to the message
+    // this.chatService.scrollToChat.subscribe(data => {
+    //   this.scrollToMessage(data);
+    // })
 
   }
 
@@ -194,6 +198,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   loadChat(data: any) {
     var sent = data.chats[0];
     var recieved = data.chats[1];
+    //We had to intialize replyToContent null cause chatsToLoad will only complete after all chats are initialize.
     if (sent != null && sent.chatList != null) {
       sent.chatList.forEach(element => {
         this.chatsToLoad.push({
@@ -201,7 +206,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           id: element.id,
           content: element.content,
           sentAt: new Date(element.sentAt),
-          replyToChat: element.replyToChat
+          replyToChat: element.replyToChat,
+          replyToContent: null
         })
       });
     }
@@ -212,11 +218,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           id: element.id,
           content: element.content,
           sentAt: new Date(element.sentAt),
-          replyToChat: element.replyToChat
-
+          replyToChat: element.replyToChat,
+          replyToContent: null
         })
       });
     }
+    //This will add content to all chat if it's reply of other chat
+    this.chatsToLoad.forEach(e => {
+      e.replyToContent = e.replyToChat != -1 ? this.chatsToLoad.find(el => el.id == e.replyToChat).content.substring(0, 30) : null
+    })
     this.chatsToLoad.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
   }
 
@@ -231,4 +241,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   resetReply() {
     this.resetReplySubject.next();
   }
+
+  // scrollToMessage(idOfMessage: number) {
+  //   var id = idOfMessage + "";
+  //   const element = document.getElementById(id);
+  //   element.scrollIntoView({ block: "start", inline: "nearest" });
+  // }
 }
