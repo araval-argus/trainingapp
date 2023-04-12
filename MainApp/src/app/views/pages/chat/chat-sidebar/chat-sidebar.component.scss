@@ -1,0 +1,9 @@
+// .unread-count-parent:hover .mark-as-read-button {
+//   display: block
+// }
+.chat-item:hover .mark-as-read-button{
+  display:inline-block;
+}
+.mark-as-read-button{
+  display:none;
+}

@@ -6,5 +6,6 @@ export interface FriendProfile {
   imageUrl: string;
   designation: string;
   lastMessage?: string;
-  lastMessageTimeStamp?: Date
+  lastMessageTimeStamp?: Date;
+  unreadMessageCount?: number;
 }

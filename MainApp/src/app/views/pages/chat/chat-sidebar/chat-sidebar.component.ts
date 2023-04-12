@@ -21,13 +21,21 @@ export class ChatSidebarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    //console.log("inside chat-sidebar oninit:- ", this.loggedInUser)
   }
 
   onClickUser(friend){
+    friend.unreadMessageCount = 0;
     this.chatService.friendSelected.emit(friend);
     this.chatService.fetchMessages(this.authService.getLoggedInUserInfo().sub, friend.userName).subscribe((data)=>{
       this.chatService.messagesRecieved.emit(data);
     });
+  }
+
+  markAsRead(event: Event, friend: FriendProfile){
+    event.preventDefault();
+    event.stopPropagation();
+    this.chatService.markMsgAsRead(this.loggedInUser.sub, friend.userName).subscribe(msg=>{
+      friend.unreadMessageCount = 0;
+    })
   }
 }

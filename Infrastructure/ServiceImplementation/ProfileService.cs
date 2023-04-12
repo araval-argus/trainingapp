@@ -11,13 +11,14 @@ using System.Collections;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
     public class ProfileService : IProfileService
     {
         private readonly ChatAppContext context;
-        private IWebHostEnvironment _webHostEnvironment;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
         public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
         {
@@ -142,6 +143,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return friendsProfiles
                 .Select(
                 profile => {
+                    
+                     //for counting of unread messages:-
+                    
 
                     MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => m.SenderID == profile.Id || m.RecieverID == profile.Id);
 
@@ -152,14 +156,21 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         Email = profile.Email,
                         FirstName = profile.FirstName,
                         LastName = profile.LastName,
-                        imageUrl = profile.ImageUrl,
+                        ImageUrl = profile.ImageUrl,
                         LastMessage = lastMessage.Message,
-                        LastMessageTimeStamp = lastMessage.CreatedAt
+                        LastMessageTimeStamp = lastMessage.CreatedAt,
+                        UnreadMessageCount = UnreadMessageCount(profile.Id, userId)
                     };
                 })
                 .OrderByDescending(profile => profile.LastMessageTimeStamp);
         }
 
+        public int UnreadMessageCount(int senderID, int recieverID)
+        {
+            return this.context.Messages.Where(message =>
+                        (message.SenderID == senderID && message.RecieverID == recieverID && !message.IsSeen)
+                     ).Count();
+        }
     }
 }
 

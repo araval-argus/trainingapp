@@ -29,7 +29,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Email = profile.Email,
                     UserName = profile.UserName,
                     Designation = Business.Helpers.Designation.getDesignationType(profile.Designation),
-                    imageUrl = profile.ImageUrl,
+                    ImageUrl = profile.ImageUrl,
                 }); ;
         }
 
@@ -64,6 +64,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 result = this.context.Messages.FirstOrDefault(m => m.Id == id).Message;
             }
             return result;
+        }
+
+
+        public void MarkMsgsAsSeen(IEnumerable<MessageEntity> messages)
+        {
+            this.context.Messages.UpdateRange(messages);
+            this.context.SaveChanges();
         }
     }
 }

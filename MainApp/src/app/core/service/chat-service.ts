@@ -27,13 +27,19 @@ export class ChatService {
     });
   }
 
-  fetchAll(username: string){
+  fetchAll(loggedInUsername: string){
     return this.http.get(environment.apiUrl+ "/chat/fetchAll",{
-      params: new HttpParams().append("username", username)
+      params: new HttpParams().append("loggedInUsername", loggedInUsername)
     });
   }
 
   sendMessage(messageModel: MessageModel){
     this.http.post(environment.apiUrl + "/chat/addMessage", messageModel).subscribe();
+  }
+
+  markMsgAsRead(loggedInUserName: string, friendUserName: string){
+    return this.http.get(environment.apiUrl + "/chat/markAsRead", {
+      params: new HttpParams().append("loggedInUserName", loggedInUserName).append("friendUserName", friendUserName)
+    })
   }
 }

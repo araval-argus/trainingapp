@@ -1,4 +1,4 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterContentChecked, AfterContentInit, AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FriendProfile } from 'src/app/core/models/friend-profile-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
@@ -10,7 +10,7 @@ import { ChatService } from 'src/app/core/service/chat-service';
   templateUrl: './chat-content-body.component.html',
   styleUrls: ['./chat-content-body.component.scss']
 })
-export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
+export class ChatContentBodyComponent implements OnInit {
 
   @Input() selectedFriend: FriendProfile
   @Output() replyButtonClicked = new EventEmitter<MessageModel>();
@@ -25,24 +25,23 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
 
 
 
-  ngAfterViewChecked(){
-     try{
-      const element = this.scrollbar.nativeElement;
-      element.scrollTop = element.scrollHeight - element.clientHeight;
-    }catch(e){}
-  }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.chatService.messagesRecieved.subscribe(data => {
       this.messages = data.messages;
-      console.log("messages",this.messages);
-      console.log("logged in user", this.loggedInUser);
+      //console.log(this.messages)
     });
+    setTimeout( () => {
+      try{
+      const element = this.scrollbar.nativeElement;
+      element.scrollTop = element.scrollHeight - element.clientHeight;
+    }catch(e){}
+    },300)
+
   }
 
   replyToThisMessage(message){
-    //console.log("reply button clicked")
     this.replyButtonClicked.emit(message);
   }
 }

@@ -35,7 +35,7 @@
 
 
 
-     <!-- dropdown to show friends list -->
+    <!-- dropdown to show friends list -->
     <app-friends-dropdown></app-friends-dropdown>
 
 
@@ -82,7 +82,15 @@
                         <!-- last message time -->
                         <p class="text-muted tx-13 mb-1">{{friend.lastMessageTimeStamp | date: "shortTime"}} </p>
                         <!-- unread message count -->
-                        <div class="badge badge-pill badge-primary ml-auto">5</div>
+                        <div *ngIf="friend.unreadMessageCount>0" class="unread-count-parent">
+                          <div class="badge badge-pill badge-primary ml-auto">
+                            {{ friend.unreadMessageCount }}
+
+                          </div>
+                          <div class="mark-as-read-button ml-1" ngbTooltip="Mark As Read" placement="left" (click)="markAsRead($event, friend)">
+                            <i class="pi pi-check"></i>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </a>

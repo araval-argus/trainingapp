@@ -11,11 +11,13 @@ namespace ChatApp.Models
 
         public string Email { get; set; }
 
-        public string imageUrl { get; set; }
+        public string ImageUrl { get; set; }
         public string Designation { get; set; }
 
         public string? LastMessage { get; set; } = null;
 
         public DateTime? LastMessageTimeStamp { get; set; } = null;
+
+        public int UnreadMessageCount { get; set; }
     }
 }

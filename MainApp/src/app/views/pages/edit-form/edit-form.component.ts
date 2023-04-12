@@ -34,6 +34,9 @@ export class EditFormComponent implements OnInit {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.loggedInUser.userName = this.loggedInUser.sub;
     this.imgUrl = this.loggedInUser.imageUrl;
+    console.log(this.loggedInUser)
+    this.loggedInUser.designation = this.setDesignation(this.loggedInUser.designation)
+    console.log(this.loggedInUser);
   }
 
   onUpdate(e: Event) {
@@ -63,7 +66,7 @@ export class EditFormComponent implements OnInit {
             console.log("navigating to dashboard after updating....");
             this.loggedInUserChanged.emit();
             this.router.navigate(["/"]);
-          }, 3000);
+          }, 800);
         });
       },
       (err) => {
@@ -118,12 +121,20 @@ export class EditFormComponent implements OnInit {
     }
   }
 
-  //  const formData = new FormData();
-  //     formData.append('imageData', );
-  //     console.log(formData.get('imageData'));
-  //     this.accountService.dummyRequest(formData).subscribe(data =>{
-  //       console.log(data);
-  //     },error => {
-  //       console.log(error);
-  //     })
+  setDesignation(id: string) {
+    switch (id) {
+      case "2":
+        return "Programmer Analyst";
+      case "3":
+        return "Solution Analyst";
+      case "4":
+        return "Lead Solution Analyst";
+      case "5":
+        return "Intern";
+      case "6":
+        return "Probationer";
+      case "7":
+        return "Quality Analyst";
+    }
+  }
 }

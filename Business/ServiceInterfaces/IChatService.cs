@@ -13,5 +13,7 @@ namespace ChatApp.Business.ServiceInterfaces
         IEnumerable<MessageEntity> FetchMessages(int senderID, int recieverID);
 
         string FetchMessageFromId(int id);
+
+        void MarkMsgsAsSeen(IEnumerable<MessageEntity> messages);
     }
 }

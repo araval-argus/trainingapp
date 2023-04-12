@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 
 namespace ChatApp.Controllers
 {
@@ -26,20 +25,15 @@ namespace ChatApp.Controllers
             this.profileService = profileService;
         }
 
-        [HttpGet("fetchFriends")]       
+
+        //this is for searching the users starting their firstname with searchTerm
+        [HttpGet("fetchFriends")]
         public IActionResult FetchFriends(string searchTerm)
         {
-            //IEnumerable<FriendProfileModel> en = this.chatService.FetchFriendsProfiles(searchTerm);
-            //Console.WriteLine("inside FetchFriends of chat controller");
-            //foreach(var profile in en)
-            //{
-
-            //    Console.WriteLine(profile.FirstName);
-            //}
 
             Console.WriteLine(searchTerm);
             IEnumerable<FriendProfileModel> en = this.chatService.FetchFriendsProfiles(searchTerm);
-            foreach(FriendProfileModel profile in en)
+            foreach (FriendProfileModel profile in en)
             {
                 Console.WriteLine(profile.FirstName);
             }
@@ -47,7 +41,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("addMessage")]
-       
         public IActionResult AddMessage([FromBody] MessageModelToSendMessage message)
         {
             MessageModel messageModel = new()
@@ -62,12 +55,28 @@ namespace ChatApp.Controllers
         }
 
         [HttpGet("fetchMessages")]
-     
-        public IActionResult FetchMessages(string loggedInUserName, string friendUserName )
+        public IActionResult FetchMessages(string loggedInUserName, string friendUserName)
         {
             int loggedInUserId = FetchIdFromUserName(loggedInUserName);
             int friendId = FetchIdFromUserName(friendUserName);
             IEnumerable<MessageEntity> messages = this.chatService.FetchMessages(loggedInUserId, friendId).OrderBy(m => m.CreatedAt);
+            
+            // for marking each message as seen
+            foreach(var message in messages)
+            {
+                if(message.SenderID == friendId && message.RecieverID == loggedInUserId)
+                {
+                    message.IsSeen = true;
+                }
+            }
+
+            /*
+                method to update all the messages
+           
+             */
+
+            this.chatService.MarkMsgsAsSeen(messages);
+
             IEnumerable messagesToBeSent = messages.Select(
                 m => new
                 {
@@ -80,18 +89,49 @@ namespace ChatApp.Controllers
                     repliedToMsg = FetchMessageFromId(m.RepliedToMsg),
                 }
                 ); ;
-            return Ok(new {messages = messagesToBeSent });
+            return Ok(new { messages = messagesToBeSent });
         }
+
 
         [HttpGet("fetchAll")]
- 
-        public IActionResult FetchAllUsers(string username)
+        public IActionResult FetchAllUsers(string loggedInUsername)
         {
-            int id = FetchIdFromUserName(username);
+            int id = FetchIdFromUserName(loggedInUsername);
+
+            //list of friends that have interacted with logged in user before
             IEnumerable<FriendProfileModel> friends = this.profileService.FetchAllUsers(id);
-            return Ok(new {data = friends});
+            return Ok(new { data = friends });
         }
 
+
+        [HttpGet("markAsRead")]
+        public IActionResult MarkMsgs(string loggedInUserName, string friendUserName)
+        {
+            int loggedInUserId = FetchIdFromUserName(loggedInUserName);
+            int friendId = FetchIdFromUserName(friendUserName);
+            IEnumerable<MessageEntity> messages = this.chatService.FetchMessages(loggedInUserId, friendId).OrderBy(m => m.CreatedAt);
+
+            // for marking each message as seen
+            foreach (var message in messages)
+            {
+                if (message.SenderID == friendId && message.RecieverID == loggedInUserId)
+                {
+                    message.IsSeen = true;
+                }
+            }
+
+            /*
+                method to update all the messages
+           
+             */
+
+            this.chatService.MarkMsgsAsSeen(messages);
+
+            return Ok(new { messages= "message read"});
+        }
+
+
+        #region helpermethods
         int FetchIdFromUserName(string userName)
         {
             return this.profileService.FetchIdFromUserName(userName);
@@ -104,9 +144,10 @@ namespace ChatApp.Controllers
 
         string? FetchMessageFromId(int id)
         {
-           return this.chatService.FetchMessageFromId(id);
-             
+            return this.chatService.FetchMessageFromId(id);
         }
+        #endregion
+
     }
-    
+
 }
