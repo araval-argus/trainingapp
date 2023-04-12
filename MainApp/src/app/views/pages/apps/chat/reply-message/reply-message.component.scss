@@ -1,9 +1,13 @@
 .replying{
     background: #f1f2fe;
-    margin: auto;
+    margin: 0 auto;
     padding: 5px;
     border: 2px solid ;
     width: 90%;
+    position: absolute;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
 }
 .center{
     margin: auto;

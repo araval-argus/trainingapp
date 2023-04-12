@@ -32,7 +32,7 @@ import { ReplyMessageComponent } from './chat/reply-message/reply-message.compon
 import { FileModalComponent } from './chat/file-modal/file-modal.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-  suppressScrollX: true
+  suppressScrollX: true,
 };
 
 FullCalendarModule.registerPlugins([

@@ -71,7 +71,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public List<recentChatDTO> recent(string user)
         {
             var id = context.Profiles.AsNoTracking().FirstOrDefault(p => p.UserName == user).Id;
-            IEnumerable<Chat> sentChats = context.Chats.AsNoTracking().AsNoTracking().Where(e => e.From == id || e.To == id ).ToList();
+            IEnumerable<Chat> sentChats = context.Chats.AsNoTracking().Where(e => e.From == id || e.To == id ).ToList();
             IEnumerable<IGrouping<int, Chat>> recentChatsGroups = sentChats.GroupBy(chat => chat.From == id ? chat.To : chat.From);
             IDictionary<int, int> unreadCountDictionary = new Dictionary<int, int>();
             foreach(var group in recentChatsGroups)
@@ -141,6 +141,24 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     context.SaveChanges();
                     return true;
                 }
+            }
+            return false;
+        }
+
+        public bool markAsRead(string user, string markAsRead)
+        {
+            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user);
+            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == markAsRead);
+            if (sender != null && receiver != null)
+            {
+                IEnumerable<Chat> chatsToMarkRead = context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id);
+                foreach (Chat chat in chatsToMarkRead)
+                {
+                    chat.isRead = 1;
+                }
+                context.Chats.UpdateRange(chatsToMarkRead);
+                context.SaveChanges();
+                return true;
             }
             return false;
         }

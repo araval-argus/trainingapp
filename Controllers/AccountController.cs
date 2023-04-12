@@ -1,6 +1,7 @@
 ﻿    using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using ChatApp.Business.Helpers;
@@ -81,10 +82,20 @@ namespace ChatApp.Controllers
 
         [HttpGet("getprofiles")]
         [Authorize]
-        public IActionResult getprofiles([FromQuery]string s)
+        public IActionResult getprofiles([FromQuery]string s, [FromHeader]string authorization)
         {
-            List<profileDTO> profiles = _profileService.GetProfileDTOs(s);
-            return Ok(profiles);
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            List<profileDTO> profiles = new List<profileDTO>();
+            if (claim != null)
+            {
+                profiles = _profileService.GetProfileDTOs(s, claim.Value);
+                return Ok(profiles);
+
+            }
+            return response;
         }
 
         [HttpGet("getAll")]

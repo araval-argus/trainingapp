@@ -12,5 +12,6 @@ namespace ChatApp.Business.ServiceInterfaces
         List<recentChatDTO> recent(string from);
 
         bool addFile(string userName , ChatFileModel chatFile);
+        bool markAsRead(string value, string user);
     }
 }

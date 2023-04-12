@@ -27,8 +27,17 @@ export class RecentChatComponent implements OnInit {
     }
   }
 
-  sendUser(item: any) {
+  openChat(item: any) {
     this.chatService.reloadInbox.next(item);
   }
 
+
+  markAsRead(event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    console.log(this.recentChat.to.userName);
+    this.chatService.markAsRead(this.recentChat.to.userName).subscribe(data => {
+      console.log(data);
+    })
+  }
 }

@@ -6,7 +6,6 @@
     </a>
   </div>
   <ul class="list-unstyled chat-list px-1 py-1">
-    <app-recent-chat *ngFor="let recentChat of recentChats" [recentChat]="recentChat"></app-recent-chat>
-    <!-- <app-recent-chat></app-recent-chat> -->
+    <app-recent-chat *ngFor="let recentChat of recentChats" [recentChat]="recentChat" class="align-items-between"></app-recent-chat>
   </ul>
 </div>

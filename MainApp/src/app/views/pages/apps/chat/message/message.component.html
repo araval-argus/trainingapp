@@ -13,7 +13,7 @@
         </div>
         <span *ngIf="message.isRead == 0 && me"><i class="feather icon-eye-off"></i></span>
         <span *ngIf="message.isRead == 1 && me"><i class="feather icon-eye"></i></span>
-        <span>{{message.sentAt | date:'shortTime'}}</span>
+        <span>{{message.sentAt | date:'short'}}</span>
       </div>
     </div>
 </li>

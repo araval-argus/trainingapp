@@ -126,9 +126,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return context.Profiles.FirstOrDefault(x => x.Id == userId);
         }
 
-        public List<profileDTO> GetProfileDTOs(string s)
+        public List<profileDTO> GetProfileDTOs(string s, string user)
         {
-            List<Profile> profiles = context.Profiles.Where(e => e.FirstName.Contains(s) || e.LastName.Contains(s)).ToList();
+            List<Profile> profiles = context.Profiles.Where(e => (e.FirstName.Contains(s) || e.LastName.Contains(s)) && e.UserName != user ).ToList();
             List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
         }

@@ -95,5 +95,21 @@ namespace ChatApp.Controllers
             }
             return response;
         }
+
+        [HttpGet("markAsRead")]
+        [Authorize]
+        public IActionResult markAsRead([FromQuery] string s, [FromHeader] string authorization)
+        {
+            IActionResult response = Unauthorized(new { message = "Something Went Wrong" });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var chats = _chatService.markAsRead(claim.Value, s);
+                response = Ok(new { chats });
+            }
+            return response;
+        }
     }
 }

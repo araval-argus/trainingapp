@@ -1,18 +1,23 @@
-<li class="chat-item pr-1 py-2">
-    <a (click)="sendUser(recentChat.to)" class="d-flex align-items-center">
+<li class="chat-item pr-1 border-bottom">
+    <a (click)="openChat(recentChat.to)" class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;">
       <div class="mb-0 mr-2">
         <img [src]="thumbnail" class="img-xs rounded-circle" alt="user">
         <div class="status online"></div>
       </div>
-      <div class="d-flex justify-content-between flex-grow border-bottom">
+      <div class="d-flex justify-content-between flex-grow ">
         <div>
           <p class="text-body font-weight-bold">{{recentChat.to.firstName}} {{recentChat.to.lastName}}</p>
           <p class="text-muted tx-13">{{contentToDisplay}}</p>
         </div>
         <div class="d-flex flex-column align-items-end">
-          <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'shortTime'}}</p>
-          <div class="badge badge-pill badge-primary ml-auto" *ngIf="recentChat.unreadCount > 0">{{recentChat.unreadCount}}</div>
+          <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'short'}}</p>
+          <div *ngIf="recentChat.unreadCount > 0">
+            <a (click)="markAsRead($event)">
+              <i  class="feather icon-eye icon-md text-muted mr-3" ngbTooltip="Mark as Read"></i>
+            </a>
+            <div class="badge badge-pill badge-primary ml-auto">{{recentChat.unreadCount}}</div>
+          </div>
         </div>
       </div>
     </a>
-  </li>
+</li>

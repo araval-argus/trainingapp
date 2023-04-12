@@ -33,4 +33,8 @@ export class ChatService {
     getFile(fileName: string) {
         return environment.api + "/files/" + fileName;
     }
+
+    markAsRead(user: string) {
+        return this.http.get(environment.apiUrl + "/chat/markAsRead?s=" + user);
+    }
 }
