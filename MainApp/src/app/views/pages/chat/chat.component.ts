@@ -174,7 +174,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   }
 
   // Purpose of not to set sender here is security, intruder can change the sender username in request
-  sendChat() {
+  sendChat(event: Event) {
+    event.preventDefault();
     const chat = this.chatContent.nativeElement.value;
     this.chatContent.nativeElement.value = "";
     this.chat = {
@@ -182,10 +183,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       to: this.selectedUser.userName,
       content: chat,
     }
-    this.chatService.addChat(this.chat).subscribe(() => {
-      this.reloadChat();
-    })
     this.replyingToChat = -1;
+    this.chatService.addChat(this.chat).subscribe(() => {
+    })
+    this.resetReply();
   }
 
 
@@ -265,7 +266,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       this.uploadFile = files[0];
     }
     console.log("uploadedFile called");
-
     this.chatService.displayModal.next(this.uploadFile);
   }
 

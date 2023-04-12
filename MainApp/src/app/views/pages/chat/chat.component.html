@@ -103,11 +103,11 @@
               </div>
               <form class="search-form flex-grow mr-2">
                 <div class="input-group">
-                  <input type="text" class="form-control rounded-pill" id="chatForm" #chatForm placeholder="Type a message" (keydown.enter)="sendChat()">
+                  <input type="text" class="form-control rounded-pill" id="chatForm" #chatForm placeholder="Type a message" (keydown.enter)="sendChat($event)">
                 </div>
               </form>
               <div>
-                <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="sendChat()">
+                <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="sendChat($event)">
                   <i class="feather icon-send"></i>
                 </button>
               </div>

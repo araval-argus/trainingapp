@@ -15,7 +15,7 @@ import { SimplemdeModule, SIMPLEMDE_CONFIG } from 'ng2-simplemde'
 
 import { AppsComponent } from './apps.component';
 import { CalendarComponent } from './calendar/calendar.component';
-import { ChatComponent } from './chat/chat.component';
+import { ChatComponent } from '../chat/chat.component';
 import { EmailComponent } from './email/email.component';
 import { InboxComponent } from './email/inbox/inbox.component';
 import { ReadComponent } from './email/read/read.component';
@@ -24,12 +24,6 @@ import { ComposeComponent } from './email/compose/compose.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
-import { SearchDropdownComponent } from './chat/chat-sidebar/search-dropdown/search-dropdown.component';
-import { MessageComponent } from './chat/message/message.component';
-import { ChatSidebarComponent } from './chat/chat-sidebar/chat-sidebar.component';
-import { RecentChatComponent } from './chat/chat-sidebar/recent-chat/recent-chat.component';
-import { ReplyMessageComponent } from './chat/reply-message/reply-message.component';
-import { FileModalComponent } from './chat/file-modal/file-modal.component';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -76,10 +70,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'chat',
-        component: ChatComponent
-      },
-      {
         path: 'calendar',
         component: CalendarComponent
       },
@@ -88,7 +78,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [EmailComponent, ChatComponent, CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent, SearchDropdownComponent, MessageComponent, ChatSidebarComponent, RecentChatComponent, ReplyMessageComponent, FileModalComponent],
+  declarations: [EmailComponent, CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

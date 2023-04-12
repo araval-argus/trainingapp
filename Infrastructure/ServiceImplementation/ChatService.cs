@@ -151,14 +151,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == markAsRead);
             if (sender != null && receiver != null)
             {
-                IEnumerable<Chat> chatsToMarkRead = context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id);
-                foreach (Chat chat in chatsToMarkRead)
+                IEnumerable<Chat> chatsToMarkRead = context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id && e.isRead == 0);
+                if(chatsToMarkRead.Count() > 0)
                 {
-                    chat.isRead = 1;
+                    foreach (Chat chat in chatsToMarkRead)
+                    {
+                        chat.isRead = 1;
+                    }
+                    context.Chats.UpdateRange(chatsToMarkRead);
+                    context.SaveChanges();
+                    return true;
                 }
-                context.Chats.UpdateRange(chatsToMarkRead);
-                context.SaveChanges();
-                return true;
             }
             return false;
         }

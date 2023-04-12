@@ -15,6 +15,7 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
+import { ChatModule } from './views/pages/chat/chat.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { AuthService } from './core/service/auth-service';
     LayoutModule,
     HttpClientModule,
     FormsModule,
+    ChatModule,
     ReactiveFormsModule
   ],
   providers: [

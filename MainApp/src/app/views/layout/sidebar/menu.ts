@@ -31,6 +31,6 @@ export const MENU: MenuItem[] = [
   {
     label: 'Messages',
     icon: 'inbox',
-    link: '/app/chat'
+    link: '/chat'
   }
 ];
