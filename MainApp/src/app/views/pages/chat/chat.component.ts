@@ -52,7 +52,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   @ViewChild('chatForm', { static: false }) chatContent: ElementRef;
   @ViewChild('searchBar', { static: false }) searchBar: ElementRef;
-  @ViewChild('scrollMe') scrollMe: ElementRef
 
   // To convert user input to the observable
   private readonly searchProfile = new Subject<string | undefined>();
@@ -117,10 +116,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   //To navigate to bottom of the list
   ngAfterViewChecked(): void {
-    try {
-      this.scrollMe.nativeElement.scrollTop =
-        this.scrollMe.nativeElement.scrollHeight;
-    } catch (err) { }
+
   }
 
 
@@ -132,10 +128,10 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       })
     });
 
-    //Chat service observer from message component to scroll to the message
-    // this.chatService.scrollToChat.subscribe(data => {
-    //   this.scrollToMessage(data);
-    // })
+    // Chat service observer from message component to scroll to the message
+    this.chatService.scrollToChat.subscribe(data => {
+      this.scrollToMessage(data);
+    })
 
   }
 
@@ -252,11 +248,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.resetReplySubject.next();
   }
 
-  // scrollToMessage(idOfMessage: number) {
-  //   var id = idOfMessage + "";
-  //   const element = document.getElementById(id);
-  //   element.scrollIntoView({ block: "start", inline: "nearest" });
-  // }
+  scrollToMessage(idOfMessage: number) {
+    var id = idOfMessage + "";
+    const element = document.getElementById(id);
+    element.scrollIntoView({ block: "start", inline: "nearest" });
+  }
 
 
   //TO manage File

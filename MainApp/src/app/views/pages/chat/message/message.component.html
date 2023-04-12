@@ -2,10 +2,12 @@
     <div class="content">
       <div class="message">
         <div class="bubble">
-          <span *ngIf="message.replyToChat != -1">
-              {{message.replyToContent}}
-              <hr>
-          </span>
+          <a (click)="goToMessage($event)">
+            <span *ngIf="message.replyToChat != -1">
+                {{message.replyToContent}}
+                <hr>
+            </span>
+          </a>
           <p *ngIf="message.type === 'text'">{{message.content}}</p>
           <img [src]="url" *ngIf="format==='image' && url" height="200">
           <video [src]="url" *ngIf="format==='video' && url" height="200" controls></video>

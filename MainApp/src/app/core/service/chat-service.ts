@@ -12,6 +12,7 @@ export class ChatService {
     public readonly replyToChat = new Subject<number>();
     public readonly displayModal = new Subject<File>();
     public readonly sendFileSub = new Subject<number>();
+    public readonly scrollToChat = new Subject<number>();
 
     constructor(private http: HttpClient) { }
     addChat(chat: ChatModel) {
