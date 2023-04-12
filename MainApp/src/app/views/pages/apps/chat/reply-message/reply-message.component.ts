@@ -15,10 +15,20 @@ export class ReplyMessageComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
-    if (this.message.content.length > 50) {
-      this.contentToDisplay = this.message.content.substring(0, 50) + "...";
+    if (this.message.type == 'text') {
+      if (this.message.content.length > 50) {
+        this.contentToDisplay = this.message.content.substring(0, 50) + "...";
+      } else {
+        this.contentToDisplay = this.message.content;
+      }
     } else {
-      this.contentToDisplay = this.message.content;
+      if (this.message.type.indexOf('image') > -1) {
+        this.contentToDisplay = 'Replying to Image File';
+      } else if (this.message.type.indexOf('video') > -1) {
+        this.contentToDisplay = 'Replying to Video File';
+      } else if (this.message.type.indexOf('audio') > -1) {
+        this.contentToDisplay = 'Replying to Audio File';
+      }
     }
   }
 

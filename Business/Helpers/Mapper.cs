@@ -69,6 +69,7 @@ namespace ChatApp.Business.Helpers
                         sentAt = chat.sentAt,
                         replyToChat = chat.replyToChat,
                         isRead= chat.isRead,
+                        type = chat.type,
                     });
                 }
                 sentChats.chatList = temp;
@@ -86,6 +87,7 @@ namespace ChatApp.Business.Helpers
                         sentAt = chat.sentAt,
                         replyToChat = chat.replyToChat,
                         isRead = chat.isRead,
+                        type = chat.type
                     });
                 }
                 receivedChat.chatList = temp;

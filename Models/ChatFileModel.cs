@@ -6,5 +6,6 @@ namespace ChatApp.Models
     {
         public string to { get; set; }
         public IFormFile file { get; set; }
+        public string replyToChat { get; set; }
     }
 }

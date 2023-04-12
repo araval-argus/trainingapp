@@ -20,6 +20,8 @@ export class RecentChatComponent implements OnInit {
     }
     if (this.recentChat.chatContent.content.length > 50) {
       this.contentToDisplay = this.recentChat.chatContent.content.substring(0, 20) + "...";
+    } else if (this.recentChat.chatContent.type != "text") {
+      this.contentToDisplay = this.recentChat.chatContent.type;
     } else {
       this.contentToDisplay = this.recentChat.chatContent.content;
     }

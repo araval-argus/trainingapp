@@ -29,7 +29,8 @@ export class ChatSidebarComponent implements OnInit {
           },
           chatContent: {
             content: element.chatContent.content,
-            sentAt: new Date(element.chatContent.sentAt)
+            sentAt: new Date(element.chatContent.sentAt),
+            type: element.chatContent.type
           },
           unreadCount: element.unreadCount
         })

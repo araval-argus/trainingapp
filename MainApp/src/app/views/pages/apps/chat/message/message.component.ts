@@ -11,16 +11,24 @@ export class MessageComponent implements OnInit {
 
   @Input() message: loadChatModel
   me: boolean = false;
-  repliedChatId: number = -1;
+  url;
+  unsafeUrl;
+  format;
+  replyingToChatContent;
+
   constructor(private chatService: ChatService) { }
 
   ngOnInit(): void {
-    if (this.message.sent) {
-      this.me = true;
+    this.me = this.message.sent;
+    if (this.message.type.indexOf('image') > -1) {
+      this.format = 'image';
+    } else if (this.message.type.indexOf('video') > -1) {
+      this.format = 'video';
+    } else if (this.message.type.indexOf('audio') > -1) {
+      this.format = 'audio';
     }
-    if (this.message.replyToChat != -1) {
-      this.repliedChatId = this.message.replyToChat;
-    }
+    this.url = this.chatService.getFile(this.message.content);
+
   }
 
   replyTo(id: number) {

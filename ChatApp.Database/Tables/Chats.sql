@@ -5,7 +5,7 @@
     [To] INT NOT NULL, 
     [Content] NVARCHAR(MAX) NOT NULL, 
     [sentAt] DATETIME NOT NULL, 
-    [replyToChat] INT NULL, 
+    [replyToChat] INT NOT NULL DEFAULT -1, 
     [isRead] INT NOT NULL DEFAULT 0, 
     [type] NVARCHAR(50) NOT NULL DEFAULT 'text', 
     CONSTRAINT [PK_Chats] PRIMARY KEY ([Id]), 

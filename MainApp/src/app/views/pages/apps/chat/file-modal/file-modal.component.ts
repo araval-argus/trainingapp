@@ -19,7 +19,6 @@ export class FileModalComponent implements OnInit {
 
   ngOnInit(): void {
     this.chatService.displayModal.subscribe(data => {
-      console.log(data);
       this.file = data;
       this.convertFile();
       this.displayModal();
@@ -40,7 +39,6 @@ export class FileModalComponent implements OnInit {
       this.unsafeUrl = (<FileReader>event.target).result;
       this.url = this.domSanitizer.bypassSecurityTrustResourceUrl(this.unsafeUrl);
     }
-
   }
 
   displayModal() {

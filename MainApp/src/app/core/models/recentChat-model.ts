@@ -4,7 +4,8 @@ export interface recentChat {
     to: any,
     chatContent: {
         content: string,
-        sentAt: Date
+        sentAt: Date,
+        type: string
     }
     unreadCount: number
 }

@@ -5,5 +5,6 @@ export interface loadChatModel {
     sentAt: Date,
     replyToChat: number,
     replyToContent: string,
-    isRead: number
+    isRead: number,
+    type: string
 }

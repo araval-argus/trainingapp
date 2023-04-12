@@ -11,7 +11,7 @@ export class ChatService {
     public readonly reloadInbox = new Subject<Event>();
     public readonly replyToChat = new Subject<number>();
     public readonly displayModal = new Subject<File>();
-    public readonly sendFileSub = new Subject<File>();
+    public readonly sendFileSub = new Subject<number>();
 
     constructor(private http: HttpClient) { }
     addChat(chat: ChatModel) {
@@ -27,5 +27,10 @@ export class ChatService {
 
     sendFile(formData: FormData) {
         return this.http.post(environment.apiUrl + "/chat/addFile", formData);
+    }
+
+
+    getFile(fileName: string) {
+        return environment.api + "/files/" + fileName;
     }
 }

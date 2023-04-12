@@ -2,11 +2,14 @@
     <div class="content">
       <div class="message">
         <div class="bubble">
-          <span *ngIf="repliedChatId != -1">
+          <span *ngIf="message.replyToChat != -1">
               {{message.replyToContent}}
               <hr>
           </span>
-          <p>{{message.content}}</p>
+          <p *ngIf="message.type === 'text'">{{message.content}}</p>
+          <img [src]="url" *ngIf="format==='image' && url" height="200">
+          <video [src]="url" *ngIf="format==='video' && url" height="200" controls></video>
+          <audio [src]="url" *ngIf="format==='audio' && url" controls></audio>    
         </div>
         <span *ngIf="message.isRead == 0 && me"><i class="feather icon-eye-off"></i></span>
         <span *ngIf="message.isRead == 1 && me"><i class="feather icon-eye"></i></span>

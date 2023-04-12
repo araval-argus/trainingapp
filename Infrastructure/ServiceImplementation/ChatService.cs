@@ -40,7 +40,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 To = receiver.Id,
                 content = chatModel.content,
                 sentAt = DateTime.Now,
-                replyToChat = chatModel.replyToChat
+                replyToChat = chatModel.replyToChat,
+                type = "text"
             };
             context.Chats.Add(chat);
             context.SaveChanges();
@@ -97,7 +98,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         content = chat.content,
                         sentAt = chat.sentAt,
                         replyToChat = chat.replyToChat,
-                        isRead = chat.isRead
+                        isRead = chat.isRead,
+                        type = chat.type,
                     },
                     unreadCount = unreadCountDictionary[receiver.Id]
                 });
@@ -124,13 +126,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     {
                         file.CopyTo(fileStreams);
                     }
+                    //In case user provide invalid replyToChat Id
+                    var parse = int.TryParse(chatFile.replyToChat, out int replyToChat);
                     Chat chat = new()
                     {
                         From = sender.Id,
                         To = receiver.Id,
                         content = fullFile,
                         sentAt = DateTime.Now,
-                        type = file.ContentType
+                        type = file.ContentType,
+                        replyToChat = parse ? replyToChat : -1 
                     };
                     context.Chats.Add(chat);
                     context.SaveChanges();

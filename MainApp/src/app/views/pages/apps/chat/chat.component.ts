@@ -33,14 +33,6 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
   profiles: Profile[]
   recentChatProfile: recentChat[] = [];
-  newRecentChatProfile: recentChat = {
-    to: null,
-    chatContent: {
-      content: null,
-      sentAt: null
-    },
-    unreadCount: 0
-  }
   defaultNavActiveId = 1;
   chatsToLoad = new Array<loadChatModel>();
   //To store message to be replied
@@ -220,7 +212,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           sentAt: new Date(element.sentAt),
           replyToChat: element.replyToChat,
           replyToContent: null,
-          isRead: element.isRead
+          isRead: element.isRead,
+          type: element.type
         })
       });
     }
@@ -233,14 +226,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
           sentAt: new Date(element.sentAt),
           replyToChat: element.replyToChat,
           replyToContent: null,
-          isRead: element.isRead
+          isRead: element.isRead,
+          type: element.type
         })
 
       });
     }
     //This will add content to all chat if it's reply of other chat && user can't find chats that not belongs to him
     this.chatsToLoad.forEach(e => {
-      e.replyToContent = e.replyToChat != -1 ? this.chatsToLoad.find(el => el.id == e.replyToChat).content.substring(0, 30) : null
+      e.replyToContent = e.replyToChat != -1 ? this.chatsToLoad.find(el => el.id == e.replyToChat).content.substring(0, 50) : null;
     })
     this.chatsToLoad.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
   }
@@ -281,9 +275,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     const formData: FormData = new FormData();
     formData.append('file', this.uploadFile);
     formData.append('to', this.selectedUser.userName);
+    formData.append('replyToChat', this.replyingToChat.toString())
     this.chatService.sendFile(formData).subscribe(data => {
       console.log(data);
-
     })
   }
 
