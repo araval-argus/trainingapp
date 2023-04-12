@@ -9,8 +9,10 @@ namespace ChatApp.Business.Helpers
     {
         public const string FirstNameClaim = "firstName";
         public const string LastNameClaim = "lastName";
+        public const string ImagePathClaim = "ImagePath";
+        public const string DesignationClaim = "Designation";
 
-    }
+	}
     public enum ProfileType
     {
         User = 1,

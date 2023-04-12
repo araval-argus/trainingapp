@@ -3,20 +3,17 @@
     <i class="feather icon-menu"></i>
   </a>
   <div class="navbar-content">
-    
+
     <ul class="navbar-nav">
-      
-      
-      
-      
       <li class="nav-item nav-profile" ngbDropdown>
         <a class="nav-link" ngbDropdownToggle id="profileDropdown">
-          <img src="https://via.placeholder.com/30x30" alt="profile">
+          <img src="https://via.placeholder.com/\30x30" alt="profile" *ngIf="loggedInUser.ImagePath == null">
+          <img [src]="ImageSource" *ngIf="loggedInUser.ImagePath != null">
         </a>
         <div ngbDropdownMenu aria-labelledby="profileDropdown">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">
-              <img src="https://via.placeholder.com/80x80" alt="">
+              <img [src]="ImageSource" class="img-rounded" height="80" width="80" alt="">
             </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">{{loggedInUser.firstName}} {{loggedInUser.lastName}}</p>
@@ -25,14 +22,14 @@
           </div>
           <div class="dropdown-body">
             <ul class="profile-nav p-0 pt-3">
-              
+
               <li class="nav-item">
-                <a href="" (click)="false" class="nav-link">
+                <a href="" (click)="false" class="nav-link" routerLink="update-profile">
                   <i class="feather icon-edit"></i>
                   <span>Edit Profile</span>
                 </a>
               </li>
-             
+
               <li class="nav-item">
                 <a href="" (click)="onLogout($event)" class="nav-link">
                   <i class="feather icon-log-out"></i>

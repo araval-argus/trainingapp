@@ -1,0 +1,42 @@
+<div class="card">
+  <div class="card-body">
+    <h4 class="card-title">Update Profile</h4>
+    <form enctype="multipart/form-data" (ngSubmit)="onSubmit()">
+
+      <div class="mb-3">
+        <label for="username" class="form-label">UserName</label>
+        <input type="text" class="form-control" id="exampleInputDisabled1" readonly [(ngModel)]="loggedInUser.UserName" name="username" >
+      </div>
+
+      <div class="mb-3">
+        <label for="fname" class="form-label">First Name</label>
+        <input type="text" class="form-control" id="fname" [(ngModel)]="loggedInUser.firstName" name="fname" placeholder="Enter First Name" #fname="ngModel" required>
+      </div>
+      <span *ngIf="fname.invalid && fname.touched" class="text-danger"><p>This is a Required Field</p></span>
+
+      <div class="mb-3">
+        <label for="lname" class="form-label">Last Name</label>
+        <input type="text" class="form-control" id="lname"  [(ngModel)]="loggedInUser.lastName" name="lname" placeholder="Enter Last Name" #lname="ngModel">
+      </div>
+
+      <div class="mb-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email"  [(ngModel)]="loggedInUser.email" name="email" placeholder="Enter Email" #email="ngModel" required email>
+      </div>
+      <span *ngIf="email.invalid && email.touched" class="text-danger"><p>Enter a Valid Email</p></span>
+
+      <div class="mb-3">
+        <label for="designation" class="form-label">Designation</label>
+        <input type="text" class="form-control" id="designation"  [(ngModel)]="loggedInUser.Designation" name="designation" placeholder="Enter Designation" #designation="ngModel" required >
+      </div>
+      <span *ngIf="designation.invalid && designation.touched" class="text-danger"><p>Enter a Valid Designation</p></span>
+
+      <div class="mb-3">
+        <label class="form-label" for="formFile">Profile Image Upload</label>
+        <input class="form-control" type="file" id="profileImage" (change)="onFileSelected($event)" name="profileImage">
+      </div>
+
+      <button class="btn btn-primary" type="submit">Submit form</button>
+    </form>
+  </div>
+</div>

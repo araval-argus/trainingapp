@@ -1,27 +1,36 @@
-import { Component, OnInit, ViewChild, ElementRef, Inject, Renderer2 } from '@angular/core';
+import { Component, OnInit , Inject, Renderer2 } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/service/auth-service';
 import Swal from 'sweetalert2'
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-navbar',
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss']
 })
+
 export class NavbarComponent implements OnInit {
-  loggedInUser: LoggedInUser
+
+  loggedInUser: LoggedInUser;
+  ImageSource : String;
+
   constructor(
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
   ) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    console.log(this.loggedInUser);
+    this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.authService.UserProfileChanged.subscribe(()=>{
+      this.loggedInUser = this.authService.getLoggedInUserInfo();
+      this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    })
   }
 
   /**

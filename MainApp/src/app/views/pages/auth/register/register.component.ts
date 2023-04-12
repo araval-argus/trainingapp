@@ -13,7 +13,7 @@ import Swal from 'sweetalert2'
 export class RegisterComponent implements OnInit {
   regModel: RegistrationModel;
   disableRegButtton: boolean = false;
-  constructor(private router: Router, 
+  constructor(private router: Router,
     private accountService: AccountService,
     private authService: AuthService) { }
 
@@ -30,7 +30,7 @@ export class RegisterComponent implements OnInit {
   onRegister(e) {
     e.preventDefault();
     console.log(this.regModel);
-    this.disableRegButtton = true; 
+    this.disableRegButtton = true;
     this.accountService.register(this.regModel)
       .subscribe((data: any) => {
         this.authService.login(data.token, ()=>{
@@ -43,13 +43,12 @@ export class RegisterComponent implements OnInit {
           });
           setTimeout(() => {
             this.router.navigate(["/"]);
-            this.disableRegButtton = false; 
-
+            this.disableRegButtton = false;
           }, (3000));
         })
 
       }, (err) => {
-        this.disableRegButtton = false; 
+        this.disableRegButtton = false;
         Swal.fire({
           title: 'Error!',
           text: err.error.message,

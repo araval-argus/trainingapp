@@ -1,0 +1,7 @@
+export interface MessageDisplayModel{
+  id : number,
+  content : string,
+  messageFrom : string,
+  messageTo : string,
+  createdAt : Date
+}

@@ -13,14 +13,16 @@
             <h5 class="text-muted font-weight-normal mb-4">Welcome back! Log in to your account.</h5>
               <div class="form-group">
                 <label for="exampleInputEmail1">UserName / Email address</label>
-                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" [(ngModel)]="loginModel.emailAddress">
+                <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" [(ngModel)]="loginModel.emailAddress" name="logincred" #logincred="ngModel" required>
               </div>
+              <span *ngIf="logincred.invalid && logincred.touched" class="text-danger"><p>This is a Required Field</p></span>
               <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="loginModel.password">
+                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="loginModel.password" name="password" #password="ngModel" required minlength="8">
               </div>
+              <span *ngIf="password.invalid && password.touched" class="text-danger"><p>password must have minimum 8 letters</p></span>
               <div class="mt-3">
-                <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" (click)="onLoggedin($event)">Login</button>
+                <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" [disabled]="logincred.invalid && password.invalid" (click)="onLoggedin($event)">Login</button>
               </div>
               <a routerLink="/auth/register" class="d-block mt-3 text-muted">Not a user? Sign up</a>
           </div>
@@ -29,3 +31,4 @@
     </div>
   </div>
 </div>
+

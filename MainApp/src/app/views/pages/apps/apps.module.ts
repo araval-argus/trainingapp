@@ -15,7 +15,6 @@ import { SimplemdeModule, SIMPLEMDE_CONFIG } from 'ng2-simplemde'
 
 import { AppsComponent } from './apps.component';
 import { CalendarComponent } from './calendar/calendar.component';
-import { ChatComponent } from './chat/chat.component';
 import { EmailComponent } from './email/email.component';
 import { InboxComponent } from './email/inbox/inbox.component';
 import { ReadComponent } from './email/read/read.component';
@@ -70,10 +69,6 @@ const routes: Routes = [
         ]
       },
       {
-        path: 'chat',
-        component: ChatComponent
-      },
-      {
         path: 'calendar',
         component: CalendarComponent
       },
@@ -82,7 +77,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [EmailComponent, ChatComponent, CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent],
+  declarations: [EmailComponent ,CalendarComponent, AppsComponent, InboxComponent, ReadComponent, ComposeComponent,],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),

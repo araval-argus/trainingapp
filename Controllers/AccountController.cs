@@ -10,12 +10,13 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace ChatApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
     public class AccountController : ControllerBase
     {
         private IConfiguration _config;
@@ -29,7 +30,7 @@ namespace ChatApp.Controllers
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
-            IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
+            IActionResult response = Unauthorized(new { Message = "Invalid Credentials." });
             var user = _profileService.CheckPassword(loginModel);
 
             if (user != null)
@@ -53,6 +54,42 @@ namespace ChatApp.Controllers
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
         }
 
+        [Authorize]
+        [HttpPost("update-profile")]
+        public IActionResult UpdateProfile([FromForm] UpdateModel updatemodel, [FromHeader] string Authorization)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            string auth = Authorization.Split(' ')[1];
+            var decodedToken = handler.ReadJwtToken(auth);
+
+            string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+
+            if (updatemodel.UserName == username)
+            {    //Method to update User Profile
+                var user = _profileService.UpdateUser(updatemodel, username);
+                {
+                    var tokenString = GenerateJSONWebToken(user);
+                    return Ok(new { token = tokenString, user = user });
+                }
+            }
+            return BadRequest(new { Message = " Cannot Update User " });
+        }
+
+        [HttpGet("{username}")]
+        public IActionResult GetUser(string username)
+        
+        {
+            Profile user = _profileService.GetUser(profile => profile.UserName == username);
+            ColleagueModel model = new ColleagueModel();
+            model.UserName = user.UserName;
+            model.FirstName = user.FirstName;
+            model.LastName = user.LastName;
+            model.Email = user.Email;
+            model.ImagePath = user.ImagePath;
+            model.Designation = user.Designation;
+            return Ok(model);
+        }
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -63,9 +100,10 @@ namespace ChatApp.Controllers
                     new Claim(JwtRegisteredClaimNames.Email, profileInfo.Email),
                     new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                    };
-
+                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+                    new Claim(ClaimsConstant.ImagePathClaim, profileInfo.ImagePath),
+                    new Claim(ClaimsConstant.DesignationClaim,profileInfo.Designation)
+		    };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
             _config["Jwt:Issuer"],
             claims,

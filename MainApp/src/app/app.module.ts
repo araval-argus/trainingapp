@@ -15,11 +15,15 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
+import { UpdateComponent } from './views/pages/update/update.component';
+import { ViewprofileComponent } from './views/pages/viewprofile/viewprofile.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
+    UpdateComponent,
+    ViewprofileComponent,
   ],
   imports: [
     BrowserModule,
@@ -28,7 +32,7 @@ import { AuthService } from './core/service/auth-service';
     LayoutModule,
     HttpClientModule,
     FormsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
   ],
   providers: [
     AuthGuard,

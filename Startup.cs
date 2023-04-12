@@ -1,3 +1,4 @@
+using AutoMapper;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Infrastructure.ServiceImplementation;
@@ -45,10 +46,21 @@ namespace ChatApp
                  };
              });
 
-            services.AddControllersWithViews();
+			services.AddControllersWithViews();
 
-            // Register the Swagger generator, defining 1 or more Swagger documents
-            services.AddSwaggerGen(c =>
+			services.AddCors(options =>
+				{
+					options.AddDefaultPolicy(
+						builder =>
+						{
+							builder.WithOrigins("https://localhost:44382", "http://localhost:4200")
+												.AllowAnyHeader()
+												.AllowAnyMethod();
+						});
+			});
+
+			// Register the Swagger generator, defining 1 or more Swagger documents
+			services.AddSwaggerGen(c =>
             {
                 c.AddSecurityRequirement(new OpenApiSecurityRequirement()
                 {
@@ -82,6 +94,7 @@ namespace ChatApp
 
             // Service Registration
             services.AddScoped<IProfileService, ProfileService>();
+            services.AddScoped<IChatService, ChatService>();
 
             // In production, the Angular files will be served from this directory
 
@@ -119,7 +132,14 @@ namespace ChatApp
             {
                 app.UseSpaStaticFiles();
             }
-            app.UseAuthentication();
+			app.UseCors(builder =>
+			{
+				builder
+				.AllowAnyOrigin()
+				.AllowAnyMethod()
+				.AllowAnyHeader();
+			});
+			app.UseAuthentication();
             app.UseRouting();
             app.UseAuthorization();
             app.UseEndpoints(endpoints =>
