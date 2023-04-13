@@ -6,5 +6,5 @@ export interface RegistrationModel
     userName: string,
     password:string,
     imageUrl?:string,
-    designation: number
+    designationID: number
 }

@@ -1,5 +1,5 @@
 import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
-import { FriendProfile } from 'src/app/core/models/friend-profile-model';
+import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { environment } from 'src/environments/environment';
@@ -13,9 +13,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   defaultNavActiveId = 1;
 
-  selectedFriend: FriendProfile;
+  selectedFriend: FriendProfileModel;
 
-  friends: FriendProfile[] = [];
+  friends: FriendProfileModel[] = [];
 
 
 

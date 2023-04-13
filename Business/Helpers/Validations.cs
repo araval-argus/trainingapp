@@ -5,12 +5,8 @@ namespace ChatApp.Business.Helpers
 {
     public  class Validations
     {
-        
-
         public bool ValidateRegistrationField(RegisterModel registerModel)
         {
-           
-
             // check email pattern and password length
             if(!IsValidEmail(registerModel.Email) || (registerModel.Password.Length > 16 && registerModel.Password.Length < 8))
             {
@@ -28,9 +24,6 @@ namespace ChatApp.Business.Helpers
             Regex re = new Regex(emailRegEx);
 
             return re.IsMatch(email);
-        }
-
-
-        
+        }        
     }
 }

@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
-import { FriendProfile } from 'src/app/core/models/friend-profile-model';
-import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
+import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
@@ -12,10 +12,10 @@ import { ChatService } from 'src/app/core/service/chat-service';
 })
 export class ChatContentFooterComponent implements OnInit {
 
-  @Input() selectedFriend: FriendProfile;
+  @Input() selectedFriend: FriendProfileModel;
   @Input() messageToBeReplied: MessageModel;
 
-  loggedInUser : LoggedInUser = this.authService.getLoggedInUserInfo();
+  LoggedInUserModel : LoggedInUserModel = this.authService.getLoggedInUserInfo();
 
 
 
@@ -28,7 +28,7 @@ export class ChatContentFooterComponent implements OnInit {
 
   sendMessage(){
     const messageModel: MessageModel = {
-      sender: this.loggedInUser.sub,
+      sender: this.LoggedInUserModel.sub,
       reciever: this.selectedFriend.userName,
       message: this.messageInput.nativeElement.value,
       repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"

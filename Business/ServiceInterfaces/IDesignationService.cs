@@ -4,6 +4,6 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IDesignationService
     {
-        Designation AddDesignation(string name);
+        DesignationEntity AddDesignation(string name);
     }
 }

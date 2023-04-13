@@ -1,6 +1,6 @@
 import { EventEmitter, Injectable } from "@angular/core";
 import { JwtHelper } from "../helper/jwt-helper";
-import { LoggedInUser } from "../models/loggedin-user";
+import { LoggedInUserModel } from "../models/loggedin-user";
 import { environment } from "src/environments/environment";
 
 @Injectable({
@@ -9,7 +9,7 @@ import { environment } from "src/environments/environment";
 export class AuthService {
   constructor(private jwtHelper: JwtHelper) {}
 
-  loggedInUserChanged = new EventEmitter();
+  LoggedInUserChanged = new EventEmitter();
 
   login(token, callback) {
     localStorage.setItem("isLoggedin", "true");
@@ -18,7 +18,7 @@ export class AuthService {
     if (callback) {
       callback();
     }
-    this.loggedInUserChanged.emit();
+    this.LoggedInUserChanged.emit();
   }
   logout(callback) {
     localStorage.removeItem("isLoggedin");
@@ -30,11 +30,11 @@ export class AuthService {
 
   getLoggedInUserInfo() {
     let token = localStorage.getItem("USERTOKEN");
-    var user: LoggedInUser = this.jwtHelper.decodeToken(token);
+    var user: LoggedInUserModel = this.jwtHelper.decodeToken(token);
     user.imageUrl = environment.apiUrl + "/../Images/Users/" + user.imageUrl
     //console.log(user);
     //user.designation = this.setDesignation(user.designation)
-    //console.log("user inside getLoggedInUserInfo:- ", user)
+    //console.log("user inside getLoggedInUserModelInfo:- ", user)
     return user;
   }
 
@@ -42,20 +42,5 @@ export class AuthService {
     return localStorage.getItem("USERTOKEN");
   }
 
-  setDesignation(id: string) {
-    switch (id) {
-      case "2":
-        return "Programmer Analyst";
-      case "3":
-        return "Solution Analyst";
-      case "4":
-        return "Lead Solution Analyst";
-      case "5":
-        return "Intern";
-      case "6":
-        return "Probationer";
-      case "7":
-        return "Quality Analyst";
-    }
-  }
+
 }

@@ -38,22 +38,27 @@
                 <span class="text-danger" *ngIf="emailInput.invalid && emailInput.touched ">*Enter valid email</span>
               </div>
               <div class="form-group">
-                <label for="exampleInputPassword1">Designation</label>
-                <select class="form-control" [(ngModel)]="regModel.designation" name="designationInput">
-                  <option value="5" selected>Intern</option>
-                  <option value="4">Lead Solution Analyst</option>
-                  <option value="6">Probationer</option>
-                  <option value="2">Programmer Analyst</option>
-                  <option value="7">Quality Analyst</option>
-                  <option value="3">Solution Analyst</option>
+                <label>Designation</label>
+                <select class="form-control" [(ngModel)]="regModel.designationID" name="designationInput">
+                  <option *ngFor="let designationModel of designations" value="{{designationModel.id}}">
+                    {{ designationModel.designation }}
+                  </option>
                 </select>
               </div>
               <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
                 <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password"
                   placeholder="Password" [(ngModel)]="regModel.password" #passwordInput="ngModel" name="passwordInput" required
-                  minlength="6">
-                <span class="text-danger" *ngIf="passwordInput.invalid && passwordInput.touched ">*Password length should be greater than 6</span>
+                  pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,16}$">
+                  <div *ngIf="passwordInput.invalid && passwordInput.touched" class="text-danger">
+                    <span class="text-danger">*Password must satistfy following conditions</span>
+                    <p>1. must have atleast one number</p>
+                    <p>2. must have atleast one lower case character</p>
+                    <p>3. must have atleast one upper case character</p>
+                    <p>4. must have atleast one special charater</p>
+                    <p>5. password length between 8 and 16</p>
+                  </div>
+
               </div>
               <div class="mt-3">
                 <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" [disabled]="formVar.invalid"

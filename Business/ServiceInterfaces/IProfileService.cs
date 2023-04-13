@@ -26,5 +26,9 @@ namespace ChatApp.Business.ServiceInterfaces
 
         IEnumerable<FriendProfileModel> FetchAllUsers(int id);
 
+        IEnumerable<DesignationEntity> FetchAllDesignations();
+
+        bool ChangePassword(PasswordModel passwordModel);
+
     }
 }

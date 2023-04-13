@@ -1,6 +1,7 @@
 ﻿using ChatApp.Business.Helpers;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,9 +22,12 @@ namespace ChatApp.Context.EntityClasses
         public DateTime? LastUpdatedAt { get; set; }
         public int? LastUpdatedBy { get; set; }
         public string? ImageUrl { get; set; }
-        
-        public int Designation { get; set; }
-        
+
+        [Display(Name ="Designation")]
+        public int DesignationID { get; set; }
+
+        [ForeignKey("DesignationID")]
+        public virtual DesignationEntity Designation { get; set; }
 
     }
 }

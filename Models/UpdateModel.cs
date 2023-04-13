@@ -18,5 +18,6 @@ namespace ChatApp.Models
         public string UserName { get; set; }
 
         public IFormFile ImageFile { get; set; }
+
     }
 }

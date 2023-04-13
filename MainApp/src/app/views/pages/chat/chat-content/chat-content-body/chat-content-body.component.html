@@ -1,4 +1,4 @@
-<div class="chat-body" [perfectScrollbar] #scrollbar>
+<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 50;">
   <ul class="messages">
 
     <div *ngFor="let message of messages">
@@ -48,8 +48,16 @@
     </div>
 
   </ul>
-</div>
 
+</div>
+<div class="reply-message-box mx-2 p-3 d-flex flex-row" *ngIf="messageToBeReplied" style="z-index: 100;">
+  <div class="flex-grow-1">
+    Reply to this message: <b>{{messageToBeReplied.message}}</b>
+  </div>
+  <div class="">
+    <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
+  </div>
+</div>
 
 
 <!-- check below code for reference -->

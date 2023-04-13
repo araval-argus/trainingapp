@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { environment } from "src/environments/environment";
 import { RegistrationModel } from "../models/registration-model";
 import { LoginModel } from "../models/login-model";
-import { LoggedInUser } from "../models/loggedin-user";
+import { PasswordModel } from '../models/password-model';
 
 @Injectable({
     providedIn: 'root'
@@ -31,5 +31,20 @@ export class AccountService {
       });
     }
 
+    fetchDesignations(){
+      return this.http.get(environment.apiUrl+ "/account/fetchDesignations");
+    }
 
+    checkCurrPassword(username: string, currPassword: string){
+      let loginModel: LoginModel = {
+        userName : username,
+        password: currPassword,
+        emailAddress: username
+      }
+      return this.http.post(environment.apiUrl + "/account/checkPassword", loginModel);
+    }
+
+    changePassword(passwordModel: PasswordModel){
+      return this.http.post(environment.apiUrl + "/account/changePassword",passwordModel);
+    }
 }

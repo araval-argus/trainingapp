@@ -3,7 +3,7 @@ import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/service/auth-service';
 import Swal from 'sweetalert2'
-import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -12,7 +12,7 @@ import { environment } from 'src/environments/environment';
   styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent implements OnInit {
-  loggedInUser: LoggedInUser;
+  loggedInUser: LoggedInUserModel;
   apiUrl : string = environment.apiUrl;
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -23,8 +23,8 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-   // console.log('details of loggedin user from ngoninit of navbar component' ,this.loggedInUser);
-    this.authService.loggedInUserChanged.subscribe( () => {
+   // console.log('details of loggedin user from ngoninit of navbar component' ,this.LoggedInUserModel);
+    this.authService.LoggedInUserChanged.subscribe( () => {
       this.loggedInUser = this.authService.getLoggedInUserInfo();
     });
   }

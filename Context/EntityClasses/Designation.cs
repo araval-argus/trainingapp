@@ -1,9 +1,9 @@
 ﻿namespace ChatApp.Context.EntityClasses
 {
-    public class Designation
+    public class DesignationEntity
     {
         public int Id { get; set; }
 
-        public string designation { get; set; }
+        public string Designation { get; set; }
     }
 }

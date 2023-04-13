@@ -21,6 +21,6 @@ namespace ChatApp.Models
 
         public string imageUrl { get; set; }
 
-        public int Designation { get; set; }
+        public int DesignationID { get; set; }
     }
 }

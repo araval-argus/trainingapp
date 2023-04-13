@@ -28,7 +28,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     LastName = profile.LastName,
                     Email = profile.Email,
                     UserName = profile.UserName,
-                    Designation = Business.Helpers.Designation.getDesignationType(profile.Designation),
+                    Designation = Business.Helpers.Designation.getDesignationType(profile.DesignationID),
                     ImageUrl = profile.ImageUrl,
                 }); ;
         }

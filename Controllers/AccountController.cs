@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
@@ -15,6 +16,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using DesignationEntity = ChatApp.Context.EntityClasses.DesignationEntity;
 
 namespace ChatApp.Controllers
 {
@@ -71,6 +73,7 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("Update")]
+        [Authorize]
         public IActionResult UpdateUserDetails([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
 
@@ -101,6 +104,38 @@ namespace ChatApp.Controllers
             return Ok(new { usernameExists = _profileService.CheckUserNameExists(username) });
         }
 
+
+        [HttpGet("fetchDesignations")]
+        public IActionResult FetchDesignations()
+        {
+            IEnumerable<DesignationEntity> designations = this._profileService.FetchAllDesignations();
+            return Ok(new { designations = designations });
+        }
+
+        [HttpPost("checkPassword")]
+        [Authorize]
+        public IActionResult CheckPassword([FromBody] LoginModel loginModel)
+        {
+            if (this._profileService.CheckPassword(loginModel) != null)
+            {
+                return Ok(new {passwordMatched = true});
+            }
+
+            return Ok(new { passwordMatched = false });
+        }
+
+        [HttpPost("changePassword")]
+        [Authorize]
+        public IActionResult ChangePassword(PasswordModel passwordModel)
+        {
+            if(this._profileService.ChangePassword(passwordModel))
+                return Ok(new { message = "password changed"});
+
+            return BadRequest(new { message = "password incorrect" });
+        }
+
+        #region HelperMethods
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -112,7 +147,7 @@ namespace ChatApp.Controllers
                     new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
                     new Claim(ClaimsConstant.ImageUrlClaim, profileInfo.ImageUrl),
-                    new Claim(ClaimsConstant.DesignationClaim, profileInfo.Designation.ToString()),
+                    new Claim(ClaimsConstant.DesignationClaim, profileInfo.Designation.Designation),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
@@ -158,5 +193,6 @@ namespace ChatApp.Controllers
                 System.IO.File.Delete(location);
             }
         }
+        #endregion
     }
 }

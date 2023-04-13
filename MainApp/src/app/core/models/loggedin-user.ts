@@ -1,4 +1,4 @@
-export interface LoggedInUser
+export interface LoggedInUserModel
 {
     firstName?: string,
     lastName?: string,

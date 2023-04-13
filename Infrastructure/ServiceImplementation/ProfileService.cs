@@ -12,6 +12,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using DesignationEntity = ChatApp.Context.EntityClasses.DesignationEntity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -29,7 +32,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         // this method checks (username and password) or (email and password)
         public Profile CheckPassword(LoginModel model)
         {
-            return this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
+            return this.context.Profiles.Include("Designation").FirstOrDefault(x => model.Password == x.Password
             && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()));
         }
 
@@ -48,7 +51,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     CreatedAt = DateTime.UtcNow,
                     ProfileType = ProfileType.User,
                     ImageUrl = SetDefaultImage(),
-                    Designation = regModel.Designation
+                    DesignationID = regModel.DesignationID
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
@@ -152,7 +155,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     return new FriendProfileModel()
                     {
                         UserName = profile.UserName,
-                        Designation = Business.Helpers.Designation.getDesignationType(profile.Designation),
+                        Designation = Business.Helpers.Designation.getDesignationType(profile.DesignationID),
                         Email = profile.Email,
                         FirstName = profile.FirstName,
                         LastName = profile.LastName,
@@ -170,6 +173,25 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return this.context.Messages.Where(message =>
                         (message.SenderID == senderID && message.RecieverID == recieverID && !message.IsSeen)
                      ).Count();
+        }
+
+        public IEnumerable<DesignationEntity> FetchAllDesignations()
+        {
+            return this.context.Designations.AsEnumerable<DesignationEntity>();
+        }
+
+
+        public bool ChangePassword(PasswordModel passwordModel)
+        {
+            Profile profile = this.context.Profiles.FirstOrDefault(p => p.UserName == passwordModel.UserName && p.Password == passwordModel.OldPassword);
+            if(profile != null)
+            {
+                profile.Password = passwordModel.NewPassword;
+                this.context.Profiles.Update(profile);
+                this.context.SaveChanges();
+                return true;
+            }
+            return false;
         }
     }
 }

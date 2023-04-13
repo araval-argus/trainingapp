@@ -19,7 +19,7 @@ import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChatComponent } from './views/pages/chat/chat.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -31,6 +31,8 @@ import { ChatContentComponent } from './views/pages/chat/chat-content/chat-conte
 import { ChatContentBodyComponent } from './views/pages/chat/chat-content/chat-content-body/chat-content-body.component';
 import { ChatContentFooterComponent } from './views/pages/chat/chat-content/chat-content-footer/chat-content-footer.component';
 import { ChatContentHeaderComponent } from './views/pages/chat/chat-content/chat-content-header/chat-content-header.component';
+
+import { ModalComponent } from 'src/app/views/pages/ui-components/modal/modal.component';
 
 
 @NgModule({
@@ -46,6 +48,7 @@ import { ChatContentHeaderComponent } from './views/pages/chat/chat-content/chat
     ChatContentHeaderComponent,
     ChatContentBodyComponent,
     ChatContentFooterComponent,
+    ModalComponent
   ],
   schemas:[CUSTOM_ELEMENTS_SCHEMA],
   imports: [

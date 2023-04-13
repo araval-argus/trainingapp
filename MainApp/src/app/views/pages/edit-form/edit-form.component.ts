@@ -1,11 +1,12 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JwtHelper } from 'src/app/core/helper/jwt-helper';
-import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
+import { PasswordModel } from 'src/app/core/models/password-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import Swal from 'sweetalert2'
-import { environment } from 'src/environments/environment';
 
 @Component({
   selector: "app-edit-form",
@@ -13,30 +14,35 @@ import { environment } from 'src/environments/environment';
   styleUrls: ["./edit-form.component.scss"],
 })
 export class EditFormComponent implements OnInit {
-  constructor(
-    private authService: AuthService,
-    private accountService: AccountService,
-    private router: Router,
-    private jwtHelper: JwtHelper
-  ) {}
 
-  loggedInUserChanged = new EventEmitter();
+  LoggedInUserModelChanged = new EventEmitter();
 
-  loggedInUser: LoggedInUser;
+  loggedInUser: LoggedInUserModel;
   usernameExists: boolean = false;
   imgFile: File;
-  timeOutId;
-
+  timeOutIdForUsername;
+  timeOutIdForPassword;
+  passwordModel?: PasswordModel;
+  passwordMatched: boolean = false;
   //for displaying image
   imgUrl: any;
+
+
+  constructor(
+      private authService: AuthService,
+      private accountService: AccountService,
+      private router: Router,
+      private jwtHelper: JwtHelper,
+      private modalService: NgbModal
+    ) {}
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.loggedInUser.userName = this.loggedInUser.sub;
     this.imgUrl = this.loggedInUser.imageUrl;
-    console.log(this.loggedInUser)
-    this.loggedInUser.designation = this.setDesignation(this.loggedInUser.designation)
     console.log(this.loggedInUser);
+    this.passwordModel = new PasswordModel();
+    this.passwordModel.username = this.loggedInUser.userName;
   }
 
   onUpdate(e: Event) {
@@ -64,7 +70,7 @@ export class EditFormComponent implements OnInit {
           });
           setTimeout(() => {
             console.log("navigating to dashboard after updating....");
-            this.loggedInUserChanged.emit();
+            this.LoggedInUserModelChanged.emit();
             this.router.navigate(["/"]);
           }, 800);
         });
@@ -80,17 +86,16 @@ export class EditFormComponent implements OnInit {
     const value = (event.target as HTMLInputElement).value;
 
 
-    console.log("at the begining : ", this.timeOutId)
-    if (this.timeOutId) {
-      clearTimeout(this.timeOutId);
+    if (this.timeOutIdForUsername) {
+      clearTimeout(this.timeOutIdForUsername);
     }
 
-    this.timeOutId =  setTimeout(() => {
+    this.timeOutIdForUsername =  setTimeout(() => {
       //compare the username stored in token with new edited username
       const token = this.authService.getUserToken();
       const decodedToken = this.jwtHelper.decodeToken(token);
 
-      //console.log("timeout in username change")
+      console.log("timeout in username change")
 
       //dont send a request if both are equal
       if (value !== decodedToken.sub) {
@@ -102,7 +107,6 @@ export class EditFormComponent implements OnInit {
       }
     }, 1000);
 
-    console.log("at the end : "+ this.timeOutId)
   }
 
   onFileChange(event: Event) {
@@ -121,20 +125,38 @@ export class EditFormComponent implements OnInit {
     }
   }
 
-  setDesignation(id: string) {
-    switch (id) {
-      case "2":
-        return "Programmer Analyst";
-      case "3":
-        return "Solution Analyst";
-      case "4":
-        return "Lead Solution Analyst";
-      case "5":
-        return "Intern";
-      case "6":
-        return "Probationer";
-      case "7":
-        return "Quality Analyst";
+  openVerticalCenteredModal(content) {
+    this.modalService.open(content, {centered: true}).result.then((result) => {
+      console.log("Modal closed" + result);
+      this.passwordModel.oldPassword = "";
+      this.passwordModel.newPassword = "";
+    }).catch((res) => {});
+  }
+
+  checkPassword(currPassword: string){
+    if(this.timeOutIdForPassword){
+      clearTimeout(this.timeOutIdForPassword)
     }
+
+    this.timeOutIdForPassword = setTimeout( () => {
+      this.accountService.checkCurrPassword(this.loggedInUser.userName, currPassword).subscribe((data: any) =>{
+        this.passwordMatched = data.passwordMatched;
+      });
+    }, 400);
+  }
+
+  onPasswordChange(){
+    console.log("onPasswordChange");
+    this.accountService.changePassword(this.passwordModel).subscribe( data => {
+      console.log(data)
+    }, err => {
+      console.log(err)
+      Swal.fire({
+        icon: 'error',
+        title: 'Password Incorrect',
+        text: 'You have entered wrong current password',
+        footer: '<a href="">Why do I have this issue?</a>'
+      })
+    });
   }
 }

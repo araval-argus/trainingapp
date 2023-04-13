@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { DesignationModel } from 'src/app/core/models/designation-model';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -13,23 +14,26 @@ import Swal from 'sweetalert2'
 export class RegisterComponent implements OnInit {
   regModel: RegistrationModel;
   disableRegButtton: boolean = true;
-
+  designations: DesignationModel[];
 
   constructor(private router: Router,
     private accountService: AccountService,
     private authService: AuthService) { }
 
   ngOnInit(): void {
-
-
     this.regModel = {
       firstName: '',
       lastName: '',
       userName: '',
       email: '',
       password: '',
-      designation: 2
+      designationID: 2
     }
+
+    this.accountService.fetchDesignations().subscribe((data:any) => {
+      this.designations = data.designations;
+      //console.log(this.designations)
+    })
   }
 
   onRegister(e) {

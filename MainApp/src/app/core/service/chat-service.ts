@@ -1,7 +1,7 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { EventEmitter, Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
-import { FriendProfile } from "../models/friend-profile-model";
+import { FriendProfileModel } from "../models/friend-profile-model";
 import { AuthService } from "./auth-service";
 import { MessageModel } from "../models/message-model";
 
@@ -12,7 +12,7 @@ export class ChatService {
 
   constructor(private http : HttpClient, private authService : AuthService){}
 
-  friendSelected = new EventEmitter<FriendProfile>();
+  friendSelected = new EventEmitter<FriendProfileModel>();
   messagesRecieved = new EventEmitter<MessageModel[]>();
 
   fetchFriendsName(searchTerm: string) {

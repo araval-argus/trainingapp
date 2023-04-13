@@ -13,11 +13,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             _context = context;
         }
 
-        public Designation AddDesignation(string name)
+        public DesignationEntity AddDesignation(string name)
         {
-            Designation designation = new()
+            DesignationEntity designation = new()
             {
-                designation = name
+                Designation = name
             };
             _context.Designations.Add(designation);
             _context.SaveChanges();
