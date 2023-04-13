@@ -39,6 +39,15 @@ export class ChatLoadComponent implements OnInit {
     this.route.params.subscribe(
       (params : Params) =>{
         this.username = params['username'];
+
+        this.chatService.GetUser(this.username).subscribe((data:ColleagueModel)=>{
+          this.selUser = data;
+          this.selUserImage = environment.ImageUrl + data.imagePath;
+
+          this.chatService.FetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
+            this.displayMsgList = data;
+          })
+        })
       });
 
     this.loggedInUser = this.authService.getLoggedInUserInfo();

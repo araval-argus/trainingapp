@@ -77,7 +77,6 @@ namespace ChatApp.Controllers
 
         [HttpGet("{username}")]
         public IActionResult GetUser(string username)
-        
         {
             Profile user = _profileService.GetUser(profile => profile.UserName == username);
             ColleagueModel model = new ColleagueModel();

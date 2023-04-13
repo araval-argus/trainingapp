@@ -1,11 +1,12 @@
-﻿using AutoMapper;
-using ChatApp.Business.Helpers;
+﻿using ChatApp.Business.Helpers;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Any;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -49,7 +50,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 		public int GetIdFromUserName(string username)
 		{
-			Context.EntityClasses.Profile user = context.Profiles.FirstOrDefault(profile => profile.UserName == username);
+			Profile user = context.Profiles.FirstOrDefault(profile => profile.UserName == username);
 			return user.Id;
 		}
 
@@ -97,6 +98,37 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				returnList.Add(newObj);
 			}
 			return returnList;
+		}
+
+		public IEnumerable<RecentChatModel> GetRecentUsers(string username)
+		{
+			var CurUserId = GetIdFromUserName(username);
+			// Get Id of Users The Logged In person Talked To
+			var UserTalkedWith = context.Messages
+				.Where(m => (m.MessageFrom == CurUserId || m.MessageTo == CurUserId))
+				.Select(m => m.MessageFrom == CurUserId ? m.MessageTo : m.MessageFrom)
+				.Distinct();
+
+			var RecentChatList = new List<RecentChatModel>();
+			var SortedMessages = context.Messages.OrderByDescending(m => m.CreatedAt);
+
+			foreach (var userId in UserTalkedWith)
+			{
+				Profile userTalked = context.Profiles.FirstOrDefault(profile => profile.Id == userId);
+				var msg = SortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
+				var newObj = new RecentChatModel
+				{
+					Content = msg.Content,
+					CreatedAt = (DateTime)msg.CreatedAt,
+					FirstName = userTalked.FirstName,
+					LastName = userTalked.LastName,
+					ImagePath = userTalked.ImagePath,
+					UserName = userTalked.UserName,
+				};
+				RecentChatList.Add(newObj);
+			}
+			var OrderedRecentChatList = RecentChatList.OrderByDescending(m => m.CreatedAt);
+			return OrderedRecentChatList;
 		}
 	}
 }

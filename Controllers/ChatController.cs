@@ -41,6 +41,22 @@ namespace ChatApp.Controllers
 		}
 
 		#region API CALLS
+		[HttpGet("RecentChat")]
+		public IActionResult RecentChat([FromHeader] string Authorization)
+		{
+			var handler = new JwtSecurityTokenHandler();
+			string auth = Authorization.Split(' ')[1];
+			var decodedToken = handler.ReadJwtToken(auth);
+
+			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+
+			IEnumerable<RecentChatModel> recentChats =  _chatService.GetRecentUsers(username);
+			if (recentChats != null)
+			{
+				return Ok(recentChats);
+			}
+			return BadRequest();
+		}
 
 		[HttpGet("MsgList{seluserusername}")]
 		public IActionResult GetMessage(string seluserusername , [FromHeader] string Authorization)

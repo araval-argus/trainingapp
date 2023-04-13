@@ -2,6 +2,7 @@ import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { RecentChatModel } from 'src/app/core/models/recent-chat-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { environment } from 'src/environments/environment';
@@ -17,6 +18,7 @@ export class ChatSidebarComponent implements OnInit {
   loggedInUser : LoggedInUser;
   ImageSource : string;
   colleagues : ColleagueModel [] = [] ;
+  RecentChatList : RecentChatModel[] =[];
   ImageStartUrl = environment.ImageUrl;
 
   constructor(private authService : AuthService ,private router : Router ,
@@ -25,6 +27,10 @@ export class ChatSidebarComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+
+    this.chatService.LoadRecentChat().subscribe((data:RecentChatModel[])=>{
+      this.RecentChatList = data;
+    })
   }
 
   onColleagueSelected(selUser : ColleagueModel){

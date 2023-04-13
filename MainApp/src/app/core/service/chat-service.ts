@@ -30,4 +30,8 @@ export class ChatService{
     return this.http.get(environment.apiUrl + "/Chat/MsgList" + seluserusername);
   }
 
+  LoadRecentChat(){
+    return this.http.get(environment.apiUrl + "/Chat/RecentChat")
+  }
+
 }

@@ -2,6 +2,7 @@
 using ChatApp.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
@@ -11,6 +12,7 @@ namespace ChatApp.Business.ServiceInterfaces
 		string GetUsername(string authorization);
 		MessageSendModel DoMessage(MessageModel message);
 		int GetIdFromUserName(string username);
-		public IEnumerable<MessageSendModel> GetMsg(string username, string selUserName);
+		 IEnumerable<MessageSendModel> GetMsg(string username, string selUserName);
+		IEnumerable<RecentChatModel> GetRecentUsers(string username);
 	}
 }
