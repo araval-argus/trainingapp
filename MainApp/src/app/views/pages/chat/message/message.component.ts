@@ -35,8 +35,8 @@ export class MessageComponent implements OnInit {
     this.chatService.replyToChat.next(id);
   }
 
-  goToMessage(event: Event) {
-    event.preventDefault();
-    this.chatService.scrollToChat.next(this.message.replyToChat);
-  }
+  // goToMessage(event: Event) {
+  //   event.preventDefault();
+  //   this.chatService.scrollToChat.next(this.message.replyToChat);
+  // }
 }

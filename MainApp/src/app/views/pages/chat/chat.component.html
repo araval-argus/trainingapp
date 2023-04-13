@@ -62,13 +62,13 @@
                     <p class="text-muted tx-13">{{selectedUser.userName}}</p>
                   </div>
                 </div>
-                <div class="d-flex align-items-center mr-n1">
-                  <a (click)="scrollMe.scrollTop = 0">
+                <div class="d-flex align-items-center mr-n1">        
+                  <!-- <a (click)="scrollMe.scrollTop = 0">
                     <i class="feather icon-arrow-up-circle icon-md text-muted mr-3" ngbTooltip="Go To Start"></i>
                   </a>
                   <a (click)="scrollMe.scrollTop = scrollMe.scrollHeight">
                     <i class="feather icon-arrow-down-circle icon-md text-muted mr-3" ngbTooltip="Go To End"></i>
-                  </a>                  
+                  </a>        -->
                   <a (click)="reloadChat()">
                     <i class="feather icon-refresh-ccw icon-md text-muted mr-3" ngbTooltip="Reload Chat"></i>
                   </a>                  
@@ -84,9 +84,13 @@
                 </div>
               </div>
             </div>
-            <div class="chat-body" [perfectScrollbar] #scrollMe [scrollTop]="scrollMe.scrollHeight">
+            <div class="chat-body" [perfectScrollbar] #scrollMe>
               <ul class="messages" >
-                <app-message *ngFor="let message of chatsToLoad" [message]="message"></app-message>
+                <app-message *ngFor="let message of chatsToLoad; let i = index" [message]="message" class="align-items-center">
+                  <div class="date-container" *ngIf="i == 0 || (message.sentAt | date : 'mediumDate') !== (chatsToLoad[i-1].sentAt | date : 'mediumDate')">
+                    <span class="date">{{message.sentAt | date : 'mediumDate'}}</span>
+                  </div>
+                </app-message>
               </ul>
             </div>
             <app-reply-message [message]="replytoMessage" *ngIf="replytoMessage != null" (cancelReplying)="resetReply()"></app-reply-message>

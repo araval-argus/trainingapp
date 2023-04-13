@@ -1,8 +1,9 @@
+<ng-content></ng-content>
 <li class="message-item" [class.friend]="!me" [class.me]="me" (dblclick)="replyTo(message.id)" [id]="message.id">
     <div class="content">
       <div class="message">
         <div class="bubble">
-          <a (click)="goToMessage($event)">
+          <a (click)="false">
             <span *ngIf="message.replyToChat != -1">
                 {{message.replyToContent}}
                 <hr>

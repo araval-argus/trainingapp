@@ -7,3 +7,17 @@
 .fullScreen{
     height: 100%;
 }
+.date-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 3rem;
+}
+.date{
+    text-align: center;
+    margin: 0 auto; 
+    background-color:darkgray;
+    border-radius: 15%;
+    margin: 1rem;
+    padding: 0.5rem;
+}

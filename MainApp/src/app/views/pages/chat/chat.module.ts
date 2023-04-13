@@ -15,6 +15,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
+  swipeEasing: true
 };
 
 const routes = [

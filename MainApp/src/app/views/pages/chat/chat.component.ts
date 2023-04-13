@@ -1,4 +1,5 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, ViewChild, ElementRef, AfterViewChecked, ChangeDetectorRef } from '@angular/core';
+import { PerfectScrollbarDirective } from 'ngx-perfect-scrollbar';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, switchMap } from 'rxjs/operators';
 import { ChatModel } from 'src/app/core/models/chat-model';
@@ -42,12 +43,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   replyingToChat: number = -1;
 
   //Manages subscription to be unsubscribe on destroy
-  private searchSubscription?: Subscription;
   private reloadNewInbox?: Subscription;
   private replyChatSub?: Subscription;
 
   //resetting replying feature
-  private resetReplySubject: Subject<void>;
+  private resetReplySubject: Subject<void> = new Subject();
 
 
   @ViewChild('chatForm', { static: false }) chatContent: ElementRef;
@@ -61,18 +61,24 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   uploadFile: File;
   private sendFileSubscription?: Subscription;
 
+  //Scroll To bottom
+  @ViewChild('scrollMe') scrollMe: ElementRef
 
   constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) {
-    this.resetReplySubject = new Subject();
   }
 
   ngOnInit(): void {
+    // To load loggedIn User's data
     this.loggedInUser = this.authService.getLoggedInUserInfo();
+    //When logged In Fetch the image that has been saved while logging in
     this.imageURL = localStorage.getItem('imagePath');
     if (this.imageURL == null) {
+      //If image is not saved than replace it with thumbnail
       this.imageURL = "https://via.placeholder.com/37x37";
     }
-    this.searchSubscription = this.searchProfile.pipe(
+
+    //We have used user Defined Subject to adding Pipe and manipulating query
+    this.searchProfile.pipe(
       debounceTime(1000),//operator waits for 1000 milliseconds
       switchMap((searchQuery) => this.accountService.searchProfiles(searchQuery)),//operator will cancel any ongoing search request if a new search query is emitted, and only the latest search request will be sent to the server.
     ).subscribe(data => {
@@ -80,7 +86,8 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     });
 
 
-    // This will update User every time new user selected
+    // This will update selected User every time new user selected
+    // Since search Result and side bar (Recent Chat) is in other component we have used subscription
     this.reloadNewInbox = this.chatService.reloadInbox.subscribe((event: any) => {
       this.selectedUser.firstName = event.firstName;
       this.selectedUser.lastName = event.lastName;
@@ -91,17 +98,24 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       } else {
         this.selectedUserImagePath = "https://via.placeholder.com/43x43";
       }
+      //Hide search result on selecting one user
       this.removeResult = true;
+      //Hide side box which was placed in begin when no user was selected
       this.hideRightBox = false;
+      //Displaying Chat based On selected User
       this.reloadChat();
     })
 
     //Replying to chat
+    //Since messages has its own component --> Subscription
+    //Setting reply message and it's id
     this.replyChatSub = this.chatService.replyToChat.subscribe((data => {
       this.replyingToChat = data;
       this.replyToChat();
     }))
 
+
+    //In case user cancel the replying to chat
     this.resetReplySubject.subscribe(() => {
       this.replytoMessage = null;
       this.replyingToChat = -1;
@@ -112,15 +126,19 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.sendFileSubscription = this.chatService.sendFileSub.subscribe(() => {
       this.sendFile();
     })
+
   }
 
   //To navigate to bottom of the list
   ngAfterViewChecked(): void {
-
+    try {
+      this.scrollMe.nativeElement.scrollTop = this.scrollMe.nativeElement.scrollHeight;
+    } catch {
+    }
   }
 
-
   ngAfterViewInit(): void {
+
     // Show chat-content when clicking on chat-item for tablet and mobile devices
     document.querySelectorAll('.chat-list .chat-item').forEach(item => {
       item.addEventListener('click', () => {
@@ -129,18 +147,17 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     });
 
     // Chat service observer from message component to scroll to the message
-    this.chatService.scrollToChat.subscribe(data => {
-      this.scrollToMessage(data);
-    })
+    // this.chatService.scrollToChat.subscribe(data => {
+    //   this.scrollToMessage(data);
+    // })
 
   }
 
 
   ngOnDestroy(): void {
-    this.searchSubscription.unsubscribe();
     this.reloadNewInbox.unsubscribe();
-    this.resetReplySubject.unsubscribe();
     this.replyChatSub.unsubscribe();
+    this.sendFileSubscription.unsubscribe();
   }
 
   // back to chat-list for tablet and mobile devices
@@ -167,6 +184,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   loadInbox(event) {
     this.chatService.reloadInbox.next(event);
     (this.searchBar.nativeElement as HTMLInputElement).value = "";
+
   }
 
   // Purpose of not to set sender here is security, intruder can change the sender username in request
@@ -248,11 +266,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     this.resetReplySubject.next();
   }
 
-  scrollToMessage(idOfMessage: number) {
-    var id = idOfMessage + "";
-    const element = document.getElementById(id);
-    element.scrollIntoView({ block: "start", inline: "nearest" });
-  }
+  // scrollToMessage(idOfMessage: number) {
+  //   var id = idOfMessage + "";
+  //   const element = document.getElementById(id);
+  //   element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+  // }
 
 
   //TO manage File
@@ -261,7 +279,7 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
     if (files[0] != null) {
       this.uploadFile = files[0];
     }
-    console.log("uploadedFile called");
+    console.log("uploaded File called");
     this.chatService.displayModal.next(this.uploadFile);
   }
 
@@ -276,5 +294,4 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
       console.log(data);
     })
   }
-
 }
