@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ScrollToBottomDirective } from 'src/app/core/helper/scroll-to-bottom.directive';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
@@ -23,6 +24,9 @@ export class ChatLoadComponent implements OnInit {
   ImageSource : string;
   msg : MessageModel ;
   displayMsgList : MessageDisplayModel[] = [];
+  IsReplying : Boolean = false;
+  RplyMsg : string ;
+  RplyMsgId: number;
   //To Scroll to Bottom
   @ViewChild(ScrollToBottomDirective)
   scroll: ScrollToBottomDirective;
@@ -34,6 +38,7 @@ export class ChatLoadComponent implements OnInit {
       Content: '',
       MessageFrom: '',
       MessageTo: '',
+      RepliedTo:-1,
     };
 
     this.route.params.subscribe(
@@ -46,6 +51,7 @@ export class ChatLoadComponent implements OnInit {
 
           this.chatService.FetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
             this.displayMsgList = data;
+           // console.log(this.displayMsgList);
           })
         })
       });
@@ -63,13 +69,34 @@ export class ChatLoadComponent implements OnInit {
     })
   }
 
-  onMessage(message:string){
-    this.msg.Content = message;
+  onMessage(message:HTMLInputElement){
+    this.msg.Content = message.value;
     this.msg.MessageFrom = this.loggedInUser.UserName;
     this.msg.MessageTo = this.selUser.userName;
+    if(this.IsReplying)
+    {
+      this.msg.RepliedTo = this.RplyMsgId;
+    }
+    else{
+      this.msg.RepliedTo = -1;
+    }
     this.chatService.doMessage(this.msg).subscribe((data:MessageDisplayModel)=>{
       this.displayMsgList.push(data);
+      this.chatService.DidAMessage.next();
     });
+    message.value = null;
+    this.CloseRplyMsg();
+  }
+
+  ToggleReplyMsg(popupmessage:MessageDisplayModel){
+    this.IsReplying = true;
+    this.RplyMsg = popupmessage.content;
+    this.RplyMsgId = popupmessage.id;
+  }
+
+  CloseRplyMsg(){
+    this.IsReplying = false;
+    this.RplyMsg = '';
   }
 
 }

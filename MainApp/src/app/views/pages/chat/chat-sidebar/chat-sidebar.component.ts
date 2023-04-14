@@ -27,7 +27,13 @@ export class ChatSidebarComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.FetchRecentChat();
+    this.chatService.DidAMessage.subscribe(()=>{
+      this.FetchRecentChat();
+    });
+  }
 
+  FetchRecentChat(){
     this.chatService.LoadRecentChat().subscribe((data:RecentChatModel[])=>{
       this.RecentChatList = data;
     })

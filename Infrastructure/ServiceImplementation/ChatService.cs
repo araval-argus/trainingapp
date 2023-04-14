@@ -58,22 +58,34 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 		{
 			Message newMessage = null;
 			MessageSendModel response = null;
+			string ReplyMessage;
 			newMessage = new Message
 			{
 				Content = message.Content,
 				CreatedAt = DateTime.Now,
 				MessageFrom = GetIdFromUserName(message.MessageFrom),
 				MessageTo = GetIdFromUserName(message.MessageTo),
+				RepliedTo = message.RepliedTo,
 			};
 			context.Messages.Add(newMessage);
 			context.SaveChanges();
+			if (message.RepliedTo == -1)
+			{
+				ReplyMessage = null;
+			}
+			else
+			{
+				var msg = context.Messages.FirstOrDefault(msg => msg.Id == message.RepliedTo);
+				ReplyMessage = msg.Content;
+			}
 			response = new MessageSendModel
 			{
 				Id = newMessage.Id,
 				Content = newMessage.Content,
 				CreatedAt = newMessage.CreatedAt,
 				MessageFrom = message.MessageFrom,
-				MessageTo = message.MessageTo
+				MessageTo = message.MessageTo,
+				RepliedTo = ReplyMessage
 			};
 			return response;
 		}
@@ -85,6 +97,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			var list =  context.Messages
 			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId )||( msg.MessageFrom == selUserId && msg.MessageTo == userId));
 			var returnList = new List<MessageSendModel>();
+
 			foreach (var msg in list )
 			{
 				var newObj = new MessageSendModel
@@ -93,8 +106,19 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					Content = msg.Content,
 					CreatedAt = msg.CreatedAt,
 					MessageFrom = (msg.MessageFrom == userId) ? username : selUserName,
-					MessageTo = (msg.MessageTo == userId) ? username : selUserName
+					MessageTo = (msg.MessageTo == userId) ? username : selUserName,
 				};
+
+				if (msg.RepliedTo != -1)
+				{
+					var curmsg = context.Messages.FirstOrDefault(e => e.Id == msg.RepliedTo);
+					newObj.RepliedTo = curmsg.Content;
+				}
+				else
+				{
+					newObj.RepliedTo = null;	
+				}
+
 				returnList.Add(newObj);
 			}
 			return returnList;

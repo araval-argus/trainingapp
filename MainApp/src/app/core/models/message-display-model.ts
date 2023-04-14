@@ -3,5 +3,6 @@ export interface MessageDisplayModel{
   content : string,
   messageFrom : string,
   messageTo : string,
-  createdAt : Date
+  createdAt : Date,
+  repliedTo : string
 }

@@ -10,5 +10,6 @@ namespace ChatApp.Context.EntityClasses
 		public int MessageFrom { get; set; }
 		public int MessageTo { get; set; }
 		public DateTime? CreatedAt { get; set; }
+		public int RepliedTo { get; set; }
 	}
 }

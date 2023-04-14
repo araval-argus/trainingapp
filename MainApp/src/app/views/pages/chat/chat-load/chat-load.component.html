@@ -1,6 +1,6 @@
 <div class="chat-header border-bottom pb-2">
   <div *ngIf="selUser!=null" class="d-flex justify-content-between">
-    <div class="d-flex align-items-center">
+    <div class="d-flex align-items-center ">
       <i class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
       <figure class="mb-0 mr-2">
         <img [src]="selUserImage" class="img-sm rounded-circle" alt="image">
@@ -29,10 +29,11 @@
   <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
     <li *ngIf="msg.messageFrom == selUser.userName" class="message-item friend">
       <img [src]="selUserImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content">
+      <div class="content" (dblclick)="ToggleReplyMsg(msg)">
         <div class="message">
           <div class="bubble">
-            <p>{{msg.content}}</p>
+            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
+            <div class="overflowrap">{{msg.content}}</div>
           </div>
           <span>{{msg.createdAt | date:'shortTime'}}</span>
         </div>
@@ -40,10 +41,11 @@
     </li>
     <li *ngIf="msg.messageFrom == this.loggedInUser.UserName" class="message-item me">
       <img [src]="ImageSource" class="img-xs rounded-circle" alt="avatar">
-      <div class="content">
+      <div class="content" (dblclick)="ToggleReplyMsg(msg)">
         <div class="message">
           <div class="bubble">
-            <p>{{msg.content}}</p>
+            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
+            <div class="overflowrap">{{msg.content}}</div>
           </div>
         </div>
           <span>{{msg.createdAt | date:'shortTime'}}</span>
@@ -52,6 +54,16 @@
   </ul>
 
 </div>
+<!-- Reply To A SPECIFIC MESSAGE -->
+<div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!IsReplying">
+  <div class="input-group">
+    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>  {{RplyMsg}}</p>
+    <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="CloseRplyMsg()" >
+      <span aria-hidden="true">&times;</span>
+    </span>
+  </div>
+</div>
+
 <div class="chat-footer d-flex">
   <div>
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">
@@ -70,11 +82,11 @@
   </div>
   <div class="search-form flex-grow mr-2">
     <div class="input-group">
-      <input type="text" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" (keydown.enter)="onMessage(message.value)" #message>
+      <input type="text" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" (keydown.enter)="onMessage(message)" #message >
     </div>
   </div>
   <div>
-    <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="onMessage(message.value)">
+    <button type="button" class="btn btn-primary btn-icon rounded-circle" (click)="onMessage(message)">
       <i class="feather icon-send"></i>
     </button>
   </div>

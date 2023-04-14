@@ -2,5 +2,6 @@ export interface MessageModel
 {
   Content:string,
   MessageFrom:string,
-  MessageTo:string
+  MessageTo:string,
+  RepliedTo:number
 }
