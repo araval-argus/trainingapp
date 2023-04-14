@@ -4,7 +4,7 @@ import { Routes, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { FeahterIconModule } from 'src/app/core/feather-icon/feather-icon.module';
-import { NgbDropdownModule, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbDatepickerModule, NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 // Ng-ApexCharts
 import { NgApexchartsModule } from "ng-apexcharts";
@@ -13,6 +13,7 @@ import { NgApexchartsModule } from "ng-apexcharts";
 import { ChartsModule } from 'ng2-charts';
 
 import { DashboardComponent } from './dashboard.component';
+import { SharedModule } from 'src/app/core/helper/shared-module';
 
 const routes: Routes = [
   {

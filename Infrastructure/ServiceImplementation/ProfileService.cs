@@ -150,7 +150,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                      //for counting of unread messages:-
                     
 
-                    MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => m.SenderID == profile.Id || m.RecieverID == profile.Id);
+                    MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => (m.SenderID == profile.Id && m.RecieverID == userId) || (m.RecieverID == profile.Id && m.SenderID == userId));
 
                     return new FriendProfileModel()
                     {
@@ -193,6 +193,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             }
             return false;
         }
+
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ChatApp.Business.Helpers;
+using System;
 
 namespace ChatApp.Context.EntityClasses
 {
@@ -17,5 +18,7 @@ namespace ChatApp.Context.EntityClasses
         public bool IsSeen { get; set; } = false;
 
         public int RepliedToMsg { get; set; } = -1;
+
+        public MessageType MessageType { get; set; }
     }
 }

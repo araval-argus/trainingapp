@@ -1,4 +1,20 @@
 
+<ng-template #basicModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Selected File</h5>
+    <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{fileInput.files[0].name}}</p>
+  </div>
+  <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+      <button type="button" class="btn btn-primary" (click)="modal.close('by: save button'); sendFile()">Send</button>
+  </div>
+</ng-template>
+
 <div class="chat-footer d-flex mt-auto">
   <div>
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">
@@ -6,18 +22,19 @@
     </button>
   </div>
   <div class="d-none d-md-block">
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files" (click)="fileInput.click() ">
       <i class="feather icon-paperclip text-muted"></i>
     </button>
   </div>
-  <div class="d-none d-md-block">
+  <!-- <div class="d-none d-md-block">
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">
       <i class="feather icon-mic text-muted"></i>
     </button>
-  </div>
+  </div> -->
 
   <form class="search-form flex-grow" ngForm (ngSubmit)="sendMessage()">
     <div class="input-group">
+      <input type="file" id="fileInput" #fileInput accept="image/*, audio/*, video/*" (change)="onFileSelected()" hidden>
       <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput required>
       <button type="submit" class="btn btn-primary btn-icon rounded-circle">
         <i class="feather icon-send"></i>

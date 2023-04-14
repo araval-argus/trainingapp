@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ChatApp.Business.Helpers;
+using System.ComponentModel.DataAnnotations;
 
 namespace ChatApp.Models
 {
@@ -13,8 +14,10 @@ namespace ChatApp.Models
         [Required]
         public int RecieverID { get; set; }
 
-        [Required]
-        public int RepliedToMsg {  get; set; }
+
+        public int RepliedToMsg { get; set; }
+
+        public MessageType MessageType { get; set; }
 
     }
 }

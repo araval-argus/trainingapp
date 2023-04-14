@@ -33,6 +33,7 @@ import { ChatContentFooterComponent } from './views/pages/chat/chat-content/chat
 import { ChatContentHeaderComponent } from './views/pages/chat/chat-content/chat-content-header/chat-content-header.component';
 
 import { ModalComponent } from 'src/app/views/pages/ui-components/modal/modal.component';
+import { SharedModule } from './core/helper/shared-module';
 
 
 @NgModule({

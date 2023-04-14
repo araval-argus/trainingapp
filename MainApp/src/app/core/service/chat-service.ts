@@ -42,4 +42,8 @@ export class ChatService {
       params: new HttpParams().append("loggedInUserName", loggedInUserName).append("friendUserName", friendUserName)
     })
   }
+
+  sendFile(formData: FormData){
+    return this.http.post(environment.apiUrl + "/chat/addFile", formData);
+  }
 }

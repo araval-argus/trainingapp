@@ -7,6 +7,7 @@
     [CreatedAt] DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
     [IsSeen] BIT NOT NULL DEFAULT 0,
     [RepliedToMsg] INT NOT NULL DEFAULT -1, 
+    [MessageType] INT NOT NULL DEFAULT 1, 
     FOREIGN KEY(SenderID) REFERENCES [Profiles]([Id]),
     FOREIGN KEY(RecieverID) REFERENCES [Profiles]([Id])
 )

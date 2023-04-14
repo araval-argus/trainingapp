@@ -41,6 +41,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 SenderID = messageModel.SenderID,
                 RecieverID = messageModel.RecieverID,
                 RepliedToMsg= messageModel.RepliedToMsg,
+                MessageType = messageModel.MessageType
             };
             this.context.Messages.Add(messageEntity);
             this.context.SaveChanges();
