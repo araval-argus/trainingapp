@@ -13,11 +13,25 @@
   cursor: pointer;
 }
 
+.colorchange{
+  background-color:rgb(173, 248, 198);
+}
+
 .replymsg{
-  background-color: rgb(60,179,113);
+  background-color: white;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  border-left: .2rem solid darkgreen;
+}
+
+div.before.changecolorbefore::before{
+  background-color:rgb(173, 248, 198); ;
 }
 
 .overflowrap{
   overflow-wrap: anywhere;
 }
 
+.align-rightt{
+  text-align: right;
+}

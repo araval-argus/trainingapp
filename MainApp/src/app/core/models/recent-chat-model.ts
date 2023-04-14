@@ -5,5 +5,6 @@ export interface RecentChatModel
 		firstName : string ,
 		lastName : string ,
 	  imagePath : string ,
-    userName : string
+    userName : string,
+    seen : number
 }

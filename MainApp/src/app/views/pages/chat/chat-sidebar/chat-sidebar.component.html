@@ -60,7 +60,10 @@
         </a>
         <ng-template ngbNavContent>
           <div class="ps" [perfectScrollbar]>
-            <p class="text-muted mb-1">Recent chats</p>
+            <div style="display: flex; justify-content: space-between;">
+              <p class="text-muted mb-1">Recent chats</p>
+              <p class="text-muted mb-1 mdi mdi-checkbox-multiple-marked-outline"  title="Mark all as read" (click)="MarkAllAsRead()"></p>
+            </div>
             <ul class="list-unstyled chat-list px-1" >
               <li class="chat-item pr-1" *ngFor="let recent of RecentChatList , let i = index" [routerLink]="[recent.userName]">
                 <a  class="d-flex align-items-center">
@@ -74,8 +77,11 @@
                       <p class="text-muted tx-13">{{recent.content}}</p>
                     </div>
                     <div class="d-flex flex-column align-items-end">
-                      <p class="text-muted tx-13 mb-1">{{recent.createdAt | date:'shortTime'}}</p>
-                      <div class="badge badge-pill badge-primary ml-auto">5</div>
+                      <div style="display: flex;">
+                        <p class="text-muted tx-13 mb-1  mdi mdi-checkbox-marked-outline"  title="Mark as read" (click)="MarkAsRead($event ,recent.userName)"></p>
+                       <p class="text-muted tx-13 mb-1">{{recent.createdAt | date:'shortTime'}}</p>
+                      </div>
+                    <div class="badge badge-pill badge-primary ml-auto" *ngIf="recent.seen > 0">{{recent.seen}}</div>
                     </div>
                   </div>
                 </a>

@@ -69,10 +69,10 @@
       position: relative;
       max-height: calc(100vh - 340px);
       @media(max-width: 767px) {
-        max-height: calc(100vh - 315px);        
+        max-height: calc(100vh - 315px);
       }
       @media(max-width: 991px) {
-        max-height: calc(100vh - 342px);        
+        max-height: calc(100vh - 342px);
       }
       margin-top: 20px;
       margin-bottom: 20px;
@@ -118,9 +118,9 @@
                   left: -10px;
                   top: 0;
                   border-top: 5px solid rgba(theme-color(primary), .1);
-                  border-bottom: 5px solid transparent; 
-                  border-left: 5px solid transparent; 
-                  border-right:5px solid rgba(theme-color(primary), .1); 
+                  border-bottom: 5px solid transparent;
+                  border-left: 5px solid transparent;
+                  border-right:5px solid rgba(theme-color(primary), .1);
                 }
               }
             }
@@ -146,9 +146,9 @@
                   right: -10px;
                   top: 0;
                   border-top: 5px solid rgba(theme-color(info), .1);
-                  border-bottom: 5px solid transparent; 
-                  border-left: 5px solid rgba(theme-color(info), .1); 
-                  border-right:5px solid transparent; 
+                  border-bottom: 5px solid transparent;
+                  border-left: 5px solid rgba(theme-color(info), .1);
+                  border-right:5px solid transparent;
                 }
               }
               span {
@@ -216,8 +216,9 @@
                   &::before {
                     left: auto;
                     right: -10px;
-                    border-right: 5px solid transparent; 
-                    border-left:5px solid rgba(theme-color(primary), .1); 
+                    border-right: 5px solid transparent;
+                    border-left:5px solid rgba(theme-color(primary), .1);
+
                   }
                 }
               }
@@ -237,8 +238,8 @@
                   &::before {
                     right: auto;
                     left: -10px;
-                    border-right: 5px solid rgba(theme-color(info), .1); 
-                    border-left:5px solid transparent; 
+                    border-right: 5px solid rgba(theme-color(info), .1);
+                    border-left:5px solid transparent;
                   }
                 }
                 span {

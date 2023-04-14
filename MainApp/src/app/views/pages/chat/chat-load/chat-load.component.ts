@@ -1,6 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { ScrollToBottomDirective } from 'src/app/core/helper/scroll-to-bottom.directive';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
@@ -39,6 +38,7 @@ export class ChatLoadComponent implements OnInit {
       MessageFrom: '',
       MessageTo: '',
       RepliedTo:-1,
+      Seen :0,
     };
 
     this.route.params.subscribe(
@@ -64,12 +64,16 @@ export class ChatLoadComponent implements OnInit {
       this.selUserImage = environment.ImageUrl + data.imagePath;
 
       this.chatService.FetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
+        console.log(data);
         this.displayMsgList = data;
+        console.log(this.displayMsgList);
       })
     })
   }
 
   onMessage(message:HTMLInputElement){
+    if(message.value.trim()==''){}
+    else{
     this.msg.Content = message.value;
     this.msg.MessageFrom = this.loggedInUser.UserName;
     this.msg.MessageTo = this.selUser.userName;
@@ -80,12 +84,14 @@ export class ChatLoadComponent implements OnInit {
     else{
       this.msg.RepliedTo = -1;
     }
+    this.msg.Seen=0;
     this.chatService.doMessage(this.msg).subscribe((data:MessageDisplayModel)=>{
       this.displayMsgList.push(data);
       this.chatService.DidAMessage.next();
     });
     message.value = null;
     this.CloseRplyMsg();
+    }
   }
 
   ToggleReplyMsg(popupmessage:MessageDisplayModel){

@@ -21,6 +21,7 @@ export class ChatSidebarComponent implements OnInit {
   RecentChatList : RecentChatModel[] =[];
   ImageStartUrl = environment.ImageUrl;
 
+
   constructor(private authService : AuthService ,private router : Router ,
     private route : ActivatedRoute , private chatService : ChatService ) { }
 
@@ -28,6 +29,9 @@ export class ChatSidebarComponent implements OnInit {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
     this.FetchRecentChat();
+    this.chatService.MarkAsSeenChanged.subscribe(()=>{
+      this.FetchRecentChat();
+    })
     this.chatService.DidAMessage.subscribe(()=>{
       this.FetchRecentChat();
     });
@@ -61,6 +65,18 @@ export class ChatSidebarComponent implements OnInit {
     this.router.navigate(['../view-profile'],{relativeTo:this.route});
    }
 
+   MarkAllAsRead(){
+    this.chatService.MarkAsRead('All').subscribe();
+    this.chatService.MarkAsSeenChanged.next();
+   }
+
+   MarkAsRead(e:Event , username:string){
+    e.preventDefault();
+    e.stopPropagation();
+    this.chatService.MarkAsRead(username).subscribe();
+    this.chatService.MarkAsSeenChanged.next();
+   }
+
 
   ngAfterViewInit(): void {
     // Show chat-content when clicking on chat-item for tablet and mobile devices
@@ -78,7 +94,6 @@ export class ChatSidebarComponent implements OnInit {
 
   save() {
     console.log('passs');
-
   }
 
 }

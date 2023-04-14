@@ -6,7 +6,9 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.OpenApi.Any;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -66,6 +68,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				MessageFrom = GetIdFromUserName(message.MessageFrom),
 				MessageTo = GetIdFromUserName(message.MessageTo),
 				RepliedTo = message.RepliedTo,
+				Seen = 0
 			};
 			context.Messages.Add(newMessage);
 			context.SaveChanges();
@@ -85,7 +88,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				CreatedAt = newMessage.CreatedAt,
 				MessageFrom = message.MessageFrom,
 				MessageTo = message.MessageTo,
-				RepliedTo = ReplyMessage
+				RepliedTo = ReplyMessage,
+				Seen = 0,
 			};
 			return response;
 		}
@@ -107,6 +111,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					CreatedAt = msg.CreatedAt,
 					MessageFrom = (msg.MessageFrom == userId) ? username : selUserName,
 					MessageTo = (msg.MessageTo == userId) ? username : selUserName,
+					Seen = msg.Seen
 				};
 
 				if (msg.RepliedTo != -1)
@@ -118,7 +123,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				{
 					newObj.RepliedTo = null;	
 				}
-
 				returnList.Add(newObj);
 			}
 			return returnList;
@@ -140,6 +144,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			{
 				Profile userTalked = context.Profiles.FirstOrDefault(profile => profile.Id == userId);
 				var msg = SortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
+				var seenCount = SortedMessages.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == CurUserId && msg.Seen == 0)).Count();
 				var newObj = new RecentChatModel
 				{
 					Content = msg.Content,
@@ -148,11 +153,31 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					LastName = userTalked.LastName,
 					ImagePath = userTalked.ImagePath,
 					UserName = userTalked.UserName,
+					Seen = seenCount,
 				};
 				RecentChatList.Add(newObj);
 			}
 			var OrderedRecentChatList = RecentChatList.OrderByDescending(m => m.CreatedAt);
 			return OrderedRecentChatList;
+		}
+		public void MarkAsRead(string username , string selusername)
+		{
+			List<Message> msgs = null;
+			var CurUserId = GetIdFromUserName(username);
+			if (selusername == "All")
+			{
+				msgs = context.Messages.Where(m => m.MessageTo == CurUserId).ToList();
+			}
+			else
+			{
+				var SelUserId = GetIdFromUserName(selusername);
+				msgs = context.Messages.Where(m => m.MessageFrom==SelUserId && m.MessageTo==CurUserId).ToList();
+			}
+			foreach (var msg in msgs)
+			{
+				msg.Seen = 1;
+			}
+			context.SaveChanges();
 		}
 	}
 }

@@ -9,5 +9,6 @@ namespace ChatApp.Models
 		public string MessageTo { get; set; }
 		public DateTime CreatedAt { get; set; }
 		public int RepliedTo { get; set; }
+		public int Seen { get; set; }
 	}
 }

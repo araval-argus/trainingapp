@@ -35,35 +35,37 @@
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
           </div>
-          <span>{{msg.createdAt | date:'shortTime'}}</span>
+            <span>{{msg.createdAt | date:'shortTime'}}</span>
         </div>
       </div>
     </li>
     <li *ngIf="msg.messageFrom == this.loggedInUser.UserName" class="message-item me">
       <img [src]="ImageSource" class="img-xs rounded-circle" alt="avatar">
       <div class="content" (dblclick)="ToggleReplyMsg(msg)">
-        <div class="message">
-          <div class="bubble">
+        <div class="message colorchange">
+          <div class="bubble changecolorbefore">
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
           </div>
         </div>
-          <span>{{msg.createdAt | date:'shortTime'}}</span>
-        </div>
+          <div style="float:right;">
+            <span>{{msg.createdAt | date:'shortTime'}}</span>
+              <span *ngIf="msg.seen == 0" class="mdi mdi-check"></span>
+              <span *ngIf="msg.seen == 1" class="mdi mdi-check-all"></span>
+          </div>
+      </div>
     </li>
   </ul>
-
 </div>
 <!-- Reply To A SPECIFIC MESSAGE -->
 <div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!IsReplying">
   <div class="input-group">
-    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>  {{RplyMsg}}</p>
+    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{RplyMsg}}</p>
     <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="CloseRplyMsg()" >
       <span aria-hidden="true">&times;</span>
     </span>
   </div>
 </div>
-
 <div class="chat-footer d-flex">
   <div>
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">

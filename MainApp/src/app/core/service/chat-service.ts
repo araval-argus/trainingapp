@@ -13,6 +13,7 @@ export class ChatService{
 
   //To Reflect Change in Recent Chat on Message
   DidAMessage = new Subject<MessageDisplayModel>();
+  MarkAsSeenChanged = new Subject<string>();
 
   constructor(private http: HttpClient) { }
 
@@ -33,7 +34,11 @@ export class ChatService{
   }
 
   LoadRecentChat(){
-    return this.http.get(environment.apiUrl + "/Chat/RecentChat")
+    return this.http.get(environment.apiUrl + "/Chat/RecentChat");
+  }
+
+  MarkAsRead(seluserusername:string){
+    return this.http.post(environment.apiUrl + "/Chat/MarkAsRead" + seluserusername , null);
   }
 
 }

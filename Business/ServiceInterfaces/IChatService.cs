@@ -14,5 +14,6 @@ namespace ChatApp.Business.ServiceInterfaces
 		int GetIdFromUserName(string username);
 		 IEnumerable<MessageSendModel> GetMsg(string username, string selUserName);
 		IEnumerable<RecentChatModel> GetRecentUsers(string username);
+		public void MarkAsRead(string username, string selusername);
 	}
 }

@@ -40,7 +40,6 @@ namespace ChatApp.Controllers
 			return BadRequest();
 		}
 
-		#region API CALLS
 		[HttpGet("RecentChat")]
 		public IActionResult RecentChat([FromHeader] string Authorization)
 		{
@@ -74,6 +73,21 @@ namespace ChatApp.Controllers
 			}
 			return Ok();
 		}
-		#endregion
+
+		[HttpPost("MarkAsRead{seluserusername}")]
+		public IActionResult MarkAsRead(string seluserusername ,[FromHeader] string Authorization)
+		{
+			var handler = new JwtSecurityTokenHandler();
+			string auth = Authorization.Split(' ')[1];
+			var decodedToken = handler.ReadJwtToken(auth);
+
+			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+			if (username != null && seluserusername != null)
+			{
+				_chatService.MarkAsRead(username, seluserusername);
+				return Ok();
+			}
+			return BadRequest();
+		}
 	}
 }

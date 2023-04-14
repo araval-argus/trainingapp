@@ -3,5 +3,6 @@ export interface MessageModel
   Content:string,
   MessageFrom:string,
   MessageTo:string,
-  RepliedTo:number
+  RepliedTo:number,
+  Seen : number
 }
