@@ -5,5 +5,6 @@ export interface  MessageModel{
   reciever: string;
   createdAt?: Date;
   isSeen?: boolean;
-  repliedToMsg?: string
+  repliedToMsg?: string;
+  messageType?: number;
 }

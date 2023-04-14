@@ -41,7 +41,7 @@ export class ChatContentFooterComponent implements OnInit {
     };
     console.log(messageModel);
 
-    //this.chatService.sendMessage(messageModel);
+    this.chatService.sendMessage(messageModel);
     this.messageInput.nativeElement.value = "";
     this.messageToBeReplied = null;
   }

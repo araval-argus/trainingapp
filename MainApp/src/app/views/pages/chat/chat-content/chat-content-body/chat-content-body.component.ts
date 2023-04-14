@@ -4,6 +4,7 @@ import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-chat-content-body',
@@ -28,8 +29,21 @@ export class ChatContentBodyComponent implements OnInit {
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.chatService.messagesRecieved.subscribe(data => {
+
+      data.messages.forEach(element => {
+        if(element.messageType == 2){
+          element.message = environment.apiUrl + "/../SharedFiles/Audios/" + element.message
+        }
+        else if(element.messageType == 3){
+          element.message = environment.apiUrl + "/../SharedFiles/Images/" + element.message
+        }
+        else if(element.messageType == 4){
+          element.message = environment.apiUrl + "/../SharedFiles/Videos/" + element.message
+        }
+      });
+
       this.messages = data.messages;
-      //console.log(this.messages)
+      console.log(this.messages)
     });
     this.replyButtonClicked.subscribe(message => {
       this.messageToBeReplied = message

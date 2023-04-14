@@ -8,13 +8,31 @@
           <div class="content">
             <div class="message">
               <div class="bubble">
+
                 <p class="text-muted" *ngIf="message.repliedToMsg">
                   {{message.repliedToMsg}}<br>
                 </p>
 
-                <p class="d-flex justify-content-end">
+                <p class="d-flex justify-content-end" *ngIf="message.messageType == 1 ">
                   {{message.message}}
                 </p>
+
+                <div *ngIf="message.messageType == 2">
+                  <audio controls>
+                    <source [src]="message.message">
+                  </audio>
+                </div>
+
+                <div *ngIf="message.messageType == 3">
+                  <img [src]="message.message" alt="image not found" height="320px" width="480px">
+                </div>
+
+                <div *ngIf="message.messageType == 4">
+                  <video height="320" width="480" controls>
+                    <source [src]="message.message" type="video/mp4">
+                    your browser doesnot support videos
+                  </video>
+                </div>
               </div>
               <span>{{message.createdAt | date : "shortTime"}}</span>
             </div>
@@ -28,9 +46,26 @@
           <div class="content">
             <div class="message">
               <div class="bubble">
-                <p>
+                <p class="d-flex justify-content-end" *ngIf="message.messageType == 1 ">
                   {{message.message}}
                 </p>
+
+                <div *ngIf="message.messageType == 2">
+                  <audio controls>
+                    <source [src]="message.message">
+                  </audio>
+                </div>
+
+                <div *ngIf="message.messageType == 3">
+                  <img [src]="message.message" alt="image not found" height="320px" width="480px">
+                </div>
+
+                <div *ngIf="message.messageType == 4">
+                  <video height="320" width="480" controls>
+                    <source [src]="message.message" type="video/mp4">
+                    your browser doesnot support videos
+                  </video>
+                </div>
               </div>
               <span>
                 {{message.createdAt | date : "shortTime"}}
@@ -58,6 +93,10 @@
     <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
   </div>
 </div>
+
+
+
+
 
 
 <!-- check below code for reference -->

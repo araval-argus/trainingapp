@@ -54,7 +54,8 @@ namespace ChatApp.Controllers
                 Message = message.Message,
                 RecieverID = FetchIdFromUserName(message.Reciever),
                 SenderID = FetchIdFromUserName(message.Sender),
-                RepliedToMsg = Convert.ToInt32(message.RepliedToMsg)
+                RepliedToMsg = Convert.ToInt32(message.RepliedToMsg),
+                MessageType = MessageType.Text
             };
             var data = this.chatService.AddMessage(messageModel);
             return Ok(new { data = data });
@@ -93,6 +94,7 @@ namespace ChatApp.Controllers
                     createdAt = m.CreatedAt,
                     isSeen = m.IsSeen,
                     repliedToMsg = FetchMessageFromId(m.RepliedToMsg),
+                    messageType = m.MessageType
                 }
                 ); ;
             return Ok(new { messages = messagesToBeSent });
@@ -110,7 +112,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("addFile")]
-        [Authorize]
         public IActionResult AddFile([FromForm] FileMessageModel fileModel)
         {
 
