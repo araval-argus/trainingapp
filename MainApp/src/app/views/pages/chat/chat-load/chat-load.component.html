@@ -29,9 +29,18 @@
   <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
     <li *ngIf="msg.messageFrom == selUser.userName" class="message-item friend">
       <img [src]="selUserImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content" (dblclick)="ToggleReplyMsg(msg)">
-        <div class="message">
-          <div class="bubble">
+      <div class="content"(dblclick)="ToggleReplyMsg(msg)">
+        <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
+        <video controls *ngIf="msg.type === 'video'">
+          <source [src]="localPath + msg.content" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <audio controls *ngIf="msg.type === 'audio'">
+          <source [src]="localPath + msg.content" type="audio/mp3">
+          Your browser does not support the html audio tag.
+        </audio>
+        <div class="message" >
+          <div class="bubble" *ngIf="msg.type === null">
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
           </div>
@@ -42,8 +51,17 @@
     <li *ngIf="msg.messageFrom == this.loggedInUser.UserName" class="message-item me">
       <img [src]="ImageSource" class="img-xs rounded-circle" alt="avatar">
       <div class="content" (dblclick)="ToggleReplyMsg(msg)">
-        <div class="message colorchange">
-          <div class="bubble changecolorbefore">
+        <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
+        <video controls *ngIf="msg.type === 'video'">
+          <source [src]="localPath + msg.content" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <audio controls *ngIf="msg.type === 'audio'">
+          <source [src]="localPath + msg.content" type="audio/mp3">
+          Your browser does not support the html audio tag.
+        </audio>
+        <div class="message ">
+          <div class="bubble" *ngIf="msg.type==null">
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
           </div>
@@ -73,9 +91,27 @@
     </button>
   </div>
   <div class="d-none d-md-block">
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files">
+    <!-- To Trigger Modal -->
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files" (click)="openBasicModal(basicModal)">
       <i class="feather icon-paperclip text-muted"></i>
     </button>
+    <!-- MODAL -->
+    <ng-template #basicModal let-modal>
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Select File To Send</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <input type="file" class="file-upload" (change)="onFileSelected($event)" #File accept="audio/*,video/*,image/*">
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="UploadFile();modal.close()">Send</button>
+      </div>
+    </ng-template>
+    <!-- CLOSE -->
   </div>
   <div class="d-none d-md-block">
     <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">

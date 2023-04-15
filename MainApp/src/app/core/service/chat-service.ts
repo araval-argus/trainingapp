@@ -41,4 +41,8 @@ export class ChatService{
     return this.http.post(environment.apiUrl + "/Chat/MarkAsRead" + seluserusername , null);
   }
 
+  sendFileMessage( formdata : FormData ){
+    return this.http.post(environment.apiUrl + "/Chat/SendFileMessage" , formdata);
+}
+
 }

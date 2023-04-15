@@ -13,19 +13,11 @@
   cursor: pointer;
 }
 
-.colorchange{
-  background-color:rgb(173, 248, 198);
-}
-
 .replymsg{
   background-color: white;
   padding-left: 1vw;
   padding-right: 1vw;
   border-left: .2rem solid darkgreen;
-}
-
-div.before.changecolorbefore::before{
-  background-color:rgb(173, 248, 198); ;
 }
 
 .overflowrap{

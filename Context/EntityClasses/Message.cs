@@ -12,5 +12,6 @@ namespace ChatApp.Context.EntityClasses
 		public DateTime? CreatedAt { get; set; }
 		public int RepliedTo { get; set; }
 		public int Seen { get; set; }
+		public string Type { get; set; }
 	}
 }

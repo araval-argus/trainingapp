@@ -9,12 +9,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration.UserSecrets;
 using Microsoft.OpenApi.Any;
 using Microsoft.VisualBasic;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection.Metadata;
+using System.Security.Permissions;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -22,9 +25,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 	{
 
 		private readonly ChatAppContext context;
-		public ChatService(ChatAppContext context)
+		private readonly IWebHostEnvironment webHostEnvironment;
+		public ChatService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
 		{
 			this.context = context;
+			this.webHostEnvironment = webHostEnvironment;
 		}
 		public IEnumerable<ColleagueModel> SearchColleague(string name, string username)
 		{
@@ -67,8 +72,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				CreatedAt = DateTime.Now,
 				MessageFrom = GetIdFromUserName(message.MessageFrom),
 				MessageTo = GetIdFromUserName(message.MessageTo),
-				RepliedTo = message.RepliedTo,
-				Seen = 0
+				RepliedTo = (int)message.RepliedTo,
+				Seen = 0,
+				Type = null,
 			};
 			context.Messages.Add(newMessage);
 			context.SaveChanges();
@@ -90,20 +96,23 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				MessageTo = message.MessageTo,
 				RepliedTo = ReplyMessage,
 				Seen = 0,
+				Type = null,
 			};
 			return response;
 		}
 
 		public IEnumerable<MessageSendModel> GetMsg(string username, string selUserName)
 		{
+			
 			int userId = GetIdFromUserName(username);
 			int selUserId = GetIdFromUserName(selUserName);
-			var list =  context.Messages
-			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId )||( msg.MessageFrom == selUserId && msg.MessageTo == userId));
+			var list = context.Messages
+			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId) || (msg.MessageFrom == selUserId && msg.MessageTo == userId));
 			var returnList = new List<MessageSendModel>();
 
-			foreach (var msg in list )
+			foreach (var msg in list)
 			{
+				msg.Seen = 1;
 				var newObj = new MessageSendModel
 				{
 					Id = msg.Id,
@@ -111,7 +120,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					CreatedAt = msg.CreatedAt,
 					MessageFrom = (msg.MessageFrom == userId) ? username : selUserName,
 					MessageTo = (msg.MessageTo == userId) ? username : selUserName,
-					Seen = msg.Seen
+					Seen = 1,
+					Type = msg.Type,
 				};
 
 				if (msg.RepliedTo != -1)
@@ -121,10 +131,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				}
 				else
 				{
-					newObj.RepliedTo = null;	
+					newObj.RepliedTo = null;
 				}
 				returnList.Add(newObj);
 			}
+			context.SaveChanges();
 			return returnList;
 		}
 
@@ -154,13 +165,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					ImagePath = userTalked.ImagePath,
 					UserName = userTalked.UserName,
 					Seen = seenCount,
+					Type = msg.Type,
 				};
 				RecentChatList.Add(newObj);
 			}
 			var OrderedRecentChatList = RecentChatList.OrderByDescending(m => m.CreatedAt);
 			return OrderedRecentChatList;
 		}
-		public void MarkAsRead(string username , string selusername)
+		public void MarkAsRead(string username, string selusername)
 		{
 			List<Message> msgs = null;
 			var CurUserId = GetIdFromUserName(username);
@@ -171,13 +183,68 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			else
 			{
 				var SelUserId = GetIdFromUserName(selusername);
-				msgs = context.Messages.Where(m => m.MessageFrom==SelUserId && m.MessageTo==CurUserId).ToList();
+				msgs = context.Messages.Where(m => m.MessageFrom == SelUserId && m.MessageTo == CurUserId).ToList();
 			}
 			foreach (var msg in msgs)
 			{
 				msg.Seen = 1;
 			}
 			context.SaveChanges();
+		}
+
+		public MessageSendModel SendFileMessage(MessageModel msg)
+		{
+			var message = new Message();
+			var filename = Guid.NewGuid().ToString(); // new generated image file name
+			var extension = Path.GetExtension(msg.File.FileName);// Get Extension Of the File
+			var filetype = msg.File.ContentType.Split('/')[0];
+			string uploads;
+			if (filetype == "audio")
+			{
+				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/audio");
+				message.Content = "/chat/audio/" + filename + extension;
+				message.Type = "audio";
+			}
+			else if (filetype == "video")
+			{
+				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/videos");
+				message.Content = "/chat/videos/" + filename + extension;
+				message.Type = "video";
+			}
+			else
+			{
+				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/images");
+				message.Content = "/chat/images/" + filename + extension;
+				message.Type = "image";
+			}
+
+			using (var fileStreams = new FileStream(Path.Combine(uploads, filename + extension), FileMode.Create))
+			{
+				msg.File.CopyTo(fileStreams);
+			}			
+
+			message.MessageTo = GetIdFromUserName(msg.MessageTo);
+			message.MessageFrom = GetIdFromUserName(msg.MessageFrom);
+			message.RepliedTo = -1;
+			message.Seen = 0;
+			message.CreatedAt = DateTime.Now;
+
+			context.Messages.Add(message);
+			context.SaveChanges();
+
+			var response = new MessageSendModel()
+			{
+				Id = message.Id,
+				Content = message.Content,
+				CreatedAt = message.CreatedAt,
+				MessageFrom = msg.MessageFrom,
+				MessageTo = msg.MessageTo,
+				RepliedTo = null,
+				Seen = 0,
+				Type= extension,
+			};
+			return response;
+			
 		}
 	}
 }

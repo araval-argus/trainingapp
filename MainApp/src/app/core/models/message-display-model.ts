@@ -5,5 +5,6 @@ export interface MessageDisplayModel{
   messageTo : string,
   createdAt : Date,
   repliedTo : string,
-  seen : number
+  seen : number,
+  type : string
 }

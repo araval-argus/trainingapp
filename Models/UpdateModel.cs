@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace ChatApp.Models
@@ -14,5 +15,6 @@ namespace ChatApp.Models
 		public string Email { get; set; }
 		public string Designation { get; set; }
 		public IFormFile? ProfileImage { get; set; }
+		public DateTime? LastUpdatedAt { get; set; }
 	}
 }

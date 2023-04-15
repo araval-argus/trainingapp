@@ -11,5 +11,6 @@ namespace ChatApp.Models
 		public string ImagePath { get; set; }
 		public string UserName { get; set; }
 		public int Seen { get; set; }
+		public string? Type { get; set; }
 	}
 }

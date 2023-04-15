@@ -1,5 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ScrollToBottomDirective } from 'src/app/core/helper/scroll-to-bottom.directive';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
@@ -16,6 +17,8 @@ import { environment } from 'src/environments/environment';
 })
 export class ChatLoadComponent implements OnInit {
 
+  localPath : string = environment.ImageUrl;
+  basicModalCode: any;
   username : string;
   selUser: ColleagueModel;
   selUserImage : string;
@@ -26,11 +29,12 @@ export class ChatLoadComponent implements OnInit {
   IsReplying : Boolean = false;
   RplyMsg : string ;
   RplyMsgId: number;
+  ImageFile : File;
   //To Scroll to Bottom
   @ViewChild(ScrollToBottomDirective)
   scroll: ScrollToBottomDirective;
 
-  constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService) { }
+  constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService , private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.msg = {
@@ -39,6 +43,7 @@ export class ChatLoadComponent implements OnInit {
       MessageTo: '',
       RepliedTo:-1,
       Seen :0,
+      Type:''
     };
 
     this.route.params.subscribe(
@@ -85,6 +90,7 @@ export class ChatLoadComponent implements OnInit {
       this.msg.RepliedTo = -1;
     }
     this.msg.Seen=0;
+    this.msg.Type=null;
     this.chatService.doMessage(this.msg).subscribe((data:MessageDisplayModel)=>{
       this.displayMsgList.push(data);
       this.chatService.DidAMessage.next();
@@ -103,6 +109,31 @@ export class ChatLoadComponent implements OnInit {
   CloseRplyMsg(){
     this.IsReplying = false;
     this.RplyMsg = '';
+  }
+
+  openBasicModal(content) {
+    this.modalService.open(content, {}).result.then((result) => {
+    }).catch((res) => {});
+  }
+
+  onFileSelected(event){
+    if (event.target.files.length > 0) {
+      this.ImageFile = (event.target as HTMLInputElement).files[0];
+    }
+  }
+
+  UploadFile(){
+    console.log('Sending.....');
+    const formdata = new FormData();
+    formdata.append('File',this.ImageFile);
+    formdata.append('MessageFrom',this.loggedInUser.UserName),
+    formdata.append('MessageTo',this.selUser.userName),
+    this.chatService.sendFileMessage(formdata).subscribe((data:MessageDisplayModel)=>{
+      console.log(data);
+      this.displayMsgList.push(data);
+      console.log(this.displayMsgList);
+      this.chatService.DidAMessage.next();
+    })
   }
 
 }

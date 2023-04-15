@@ -26,8 +26,8 @@ namespace ChatApp.Controllers
 		[HttpGet("{Search}")]
 		public IActionResult Search(string Search, [FromHeader]string Authorization )
 		{
-			string username = _chatService.GetUsername(Authorization);
-			return Ok( _chatService.SearchColleague(Search , username));
+			string userName = _chatService.GetUsername(Authorization);
+			return Ok( _chatService.SearchColleague(Search , userName));
 		}
 
 		[HttpPost("Message")]
@@ -43,13 +43,9 @@ namespace ChatApp.Controllers
 		[HttpGet("RecentChat")]
 		public IActionResult RecentChat([FromHeader] string Authorization)
 		{
-			var handler = new JwtSecurityTokenHandler();
-			string auth = Authorization.Split(' ')[1];
-			var decodedToken = handler.ReadJwtToken(auth);
+			string userName = GetUsernameFromToken(Authorization);
 
-			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
-
-			IEnumerable<RecentChatModel> recentChats =  _chatService.GetRecentUsers(username);
+			IEnumerable<RecentChatModel> recentChats =  _chatService.GetRecentUsers(userName);
 			if (recentChats != null)
 			{
 				return Ok(recentChats);
@@ -60,13 +56,9 @@ namespace ChatApp.Controllers
 		[HttpGet("MsgList{seluserusername}")]
 		public IActionResult GetMessage(string seluserusername , [FromHeader] string Authorization)
 		{
-			var handler = new JwtSecurityTokenHandler();
-			string auth = Authorization.Split(' ')[1];
-			var decodedToken = handler.ReadJwtToken(auth);
+			string userName = GetUsernameFromToken(Authorization);
 
-			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
-
-			IEnumerable<MessageSendModel> msgList = _chatService.GetMsg(username, seluserusername);
+			IEnumerable<MessageSendModel> msgList = _chatService.GetMsg(userName, seluserusername);
 			if(msgList!=null)
 			{
 				return Ok(msgList);
@@ -77,17 +69,36 @@ namespace ChatApp.Controllers
 		[HttpPost("MarkAsRead{seluserusername}")]
 		public IActionResult MarkAsRead(string seluserusername ,[FromHeader] string Authorization)
 		{
+			string userName = GetUsernameFromToken(Authorization);
+
+			if (userName != null && seluserusername != null)
+			{
+				_chatService.MarkAsRead(userName, seluserusername);
+				return Ok();
+			}
+			return BadRequest();
+		}
+
+		[HttpPost("SendFileMessage")]
+		public IActionResult SaveFileMessage([FromForm] MessageModel msg)
+		{
+			string filetype = msg.File.ContentType.Split('/')[0];
+			if (filetype == "audio" || filetype == "image" || filetype == "video")
+			{
+				return Ok(_chatService.SendFileMessage(msg));
+				
+			}
+			return BadRequest();
+		}
+
+		private string GetUsernameFromToken(string Authorization)
+		{
 			var handler = new JwtSecurityTokenHandler();
 			string auth = Authorization.Split(' ')[1];
 			var decodedToken = handler.ReadJwtToken(auth);
 
 			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
-			if (username != null && seluserusername != null)
-			{
-				_chatService.MarkAsRead(username, seluserusername);
-				return Ok();
-			}
-			return BadRequest();
+			return username;
 		}
 	}
 }

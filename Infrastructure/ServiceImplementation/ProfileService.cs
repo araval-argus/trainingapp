@@ -105,6 +105,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			updateuser.LastName = updateModel.LastName;
 			updateuser.Email = updateModel.Email;
             updateuser.Designation = updateModel.Designation;
+            updateuser.LastUpdatedAt= DateTime.Now;
 
 			context.Profiles.Update(updateuser);
             context.SaveChanges();

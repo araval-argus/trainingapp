@@ -11,5 +11,6 @@ namespace ChatApp.Models
 		public DateTime? CreatedAt { get; set; }
 		public string RepliedTo { get; set; }
 		public int Seen { get; set; }
+		public string? Type { get; set; }
 	}
 }

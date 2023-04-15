@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule , CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { UiComponentsComponent } from './ui-components.component';
 import { AlertsComponent } from './alerts/alerts.component';
@@ -109,7 +109,7 @@ const routes: Routes = [
       {
         path: 'navbar',
         component: NavbarComponent
-      },      
+      },
       {
         path: 'pagination',
         component: PaginationComponent
@@ -165,6 +165,7 @@ const routes: Routes = [
       provide: PERFECT_SCROLLBAR_CONFIG,
       useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
     }
-  ]
+  ],
+  schemas:[ CUSTOM_ELEMENTS_SCHEMA ],
 })
 export class UiComponentsModule { }

@@ -6,5 +6,6 @@
     [MessageTo] INT NOT NULL,
     [CreatedAt] DATETIME2 NOT NULL, 
     [RepliedTo] INT NOT NULL DEFAULT -1, 
-    [Seen] INT NOT NULL DEFAULT 0,  
+    [Seen] INT NOT NULL DEFAULT 0, 
+    [Type] NVARCHAR(30) NULL ,  
 )

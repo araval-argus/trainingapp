@@ -44,7 +44,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\images\" />
+    <Folder Include="wwwroot\chat\images\" />
+    <Folder Include="wwwroot\chat\audio\" />
+    <Folder Include="wwwroot\chat\videos\" />
   </ItemGroup>
 
   

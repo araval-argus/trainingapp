@@ -4,5 +4,6 @@ export interface MessageModel
   MessageFrom:string,
   MessageTo:string,
   RepliedTo:number,
-  Seen : number
+  Seen : number,
+  Type : string
 }
