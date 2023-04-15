@@ -3,6 +3,7 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { LoginModel } from 'src/app/core/models/login-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
+import { SignalRService } from 'src/app/core/service/signalR-service';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -45,7 +46,7 @@ export class LoginComponent implements OnInit {
         });
         setTimeout(() => {
           this.router.navigate(["/"]);
-        }, (1000));
+        }, (500));
         this.router.navigate([this.returnUrl]);
       });
     }, (err) => {

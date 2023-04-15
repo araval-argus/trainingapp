@@ -65,6 +65,7 @@
     <Build Include="Tables\Profiles.sql" />
     <Build Include="Tables\Designations.sql" />
     <Build Include="Tables\Messages.sql" />
+    <Build Include="Tables\OnlineUsers.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatApp.local.publish.xml" />

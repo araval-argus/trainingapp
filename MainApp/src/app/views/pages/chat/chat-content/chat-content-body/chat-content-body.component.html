@@ -2,7 +2,7 @@
   <ul class="messages">
 
     <div *ngFor="let message of messages">
-      <div *ngIf="message.sender === loggedInUser.sub">
+      <div *ngIf="message.senderUserName === loggedInUser.sub">
         <li class="message-item me">
           <img [src]="loggedInUser.imageUrl" class="img-xs rounded-circle" alt="avatar">
           <div class="content">
@@ -40,7 +40,7 @@
         </li>
       </div>
 
-      <div *ngIf="message.sender !== loggedInUser.sub">
+      <div *ngIf="message.senderUserName !== loggedInUser.sub">
         <li class="message-item friend">
           <img [src]="selectedFriend.imageUrl" class="img-xs rounded-circle" alt="avatar">
           <div class="content">
@@ -62,7 +62,7 @@
 
                 <div *ngIf="message.messageType == 4">
                   <video height="320" width="480" controls>
-                    <source [src]="message.message" type="video/mp4">
+                    <source [src]="message.message">
                     your browser doesnot support videos
                   </video>
                 </div>

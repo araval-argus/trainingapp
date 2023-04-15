@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.Http;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using ChatApp.Business.Helpers;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.SignalR;
+using ChatApp.Hubs;
 
 namespace ChatApp.Controllers
 {
@@ -23,13 +26,22 @@ namespace ChatApp.Controllers
         private readonly IChatService chatService;
         private readonly IProfileService profileService;
         private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IHubContext<ChatHub> hubContext;
+        private readonly IOnlineUserService onlineUserService;
 
-        public ChatController(IChatService chatService, IProfileService profileService, IWebHostEnvironment webHostEnvironment)
+        public ChatController(IChatService chatService, 
+            IProfileService profileService, 
+            IWebHostEnvironment webHostEnvironment, 
+            IHubContext<ChatHub> hubContext,
+            IOnlineUserService onlineUserService)
         {
             this.chatService = chatService;
             this.profileService = profileService;
             this.webHostEnvironment = webHostEnvironment;
+            this.hubContext = hubContext;
+            this.onlineUserService = onlineUserService;
         }
+
 
         #region endpoints
         //this is for searching the users starting their firstname with searchTerm
@@ -44,21 +56,6 @@ namespace ChatApp.Controllers
                 Console.WriteLine(profile.FirstName);
             }
             return Ok(new { message = en });
-        }
-
-        [HttpPost("addMessage")]
-        public IActionResult AddMessage([FromBody] MessageModelToSendMessage message)
-        {
-            MessageModel messageModel = new()
-            {
-                Message = message.Message,
-                RecieverID = FetchIdFromUserName(message.Reciever),
-                SenderID = FetchIdFromUserName(message.Sender),
-                RepliedToMsg = Convert.ToInt32(message.RepliedToMsg),
-                MessageType = MessageType.Text
-            };
-            var data = this.chatService.AddMessage(messageModel);
-            return Ok(new { data = data });
         }
 
         [HttpGet("fetchMessages")]
@@ -77,24 +74,20 @@ namespace ChatApp.Controllers
                 }
             }
 
-            /*
-                method to update all the messages
-           
-             */
-
+            // method to update all the messages 
             this.chatService.MarkMsgsAsSeen(messages);
 
             IEnumerable messagesToBeSent = messages.Select(
-                m => new
+                m => new MessageModel()
                 {
-                    id = m.Id,
-                    message = m.Message,
-                    sender = FetchUserNameFromId(m.SenderID),
-                    reciever = FetchUserNameFromId(m.RecieverID),
-                    createdAt = m.CreatedAt,
-                    isSeen = m.IsSeen,
-                    repliedToMsg = FetchMessageFromId(m.RepliedToMsg),
-                    messageType = m.MessageType
+                    Id = m.Id,
+                    Message = m.Message,
+                    SenderUserName = FetchUserNameFromId(m.SenderID),
+                    RecieverUserName = FetchUserNameFromId(m.RecieverID),
+                    CreatedAt = m.CreatedAt,
+                    IsSeen = m.IsSeen,
+                    RepliedToMsg = FetchMessageFromId(m.RepliedToMsg),
+                    MessageType = m.MessageType
                 }
                 ); ;
             return Ok(new { messages = messagesToBeSent });
@@ -118,9 +111,9 @@ namespace ChatApp.Controllers
             IFormFile file = fileModel.File;
             MessageModel messageModel = new()
             {
-                RecieverID = FetchIdFromUserName(fileModel.Reciever),
-                SenderID = FetchIdFromUserName(fileModel.Sender),
-                RepliedToMsg = -1,
+                SenderUserName = fileModel.SenderUserName,
+                RecieverUserName = fileModel.RecieverUserName,
+                RepliedToMsg = "-1"
             };
 
             if (file.ContentType.StartsWith("image"))
@@ -143,8 +136,21 @@ namespace ChatApp.Controllers
                 return BadRequest(new { message = "only images, videos and audios can be shared" });
             }
 
-            this.chatService.AddMessage(messageModel);
+            MessageEntity messageEntity = this.chatService.AddMessage(messageModel);
 
+            messageModel = ConvertToMessageModel(messageEntity);
+
+            string senderConnectionId = this.onlineUserService.FetchOnlineUser(messageModel.SenderUserName).ConnectionId;
+            OnlineUserEntity reciever = this.onlineUserService.FetchOnlineUser(messageModel.RecieverUserName);
+            if (reciever != null)
+            {
+                this.hubContext.Clients.Clients(senderConnectionId, reciever.ConnectionId).SendAsync("AddMessageToTheList", messageModel);
+            }
+            else
+            {
+                this.hubContext.Clients.Client(senderConnectionId).SendAsync("AddMessageToTheList", messageModel);
+            }
+            
             return Ok(new {message = "file added"});
         }
 
@@ -203,6 +209,23 @@ namespace ChatApp.Controllers
                 file.CopyTo(fileStream);
             }
             return newFileName + extension;
+        }
+
+        MessageModel ConvertToMessageModel(MessageEntity messageEntity)
+        {
+            MessageModel messageModel = new MessageModel()
+            {
+                Id = messageEntity.Id,
+                MessageType = messageEntity.MessageType,
+                Message = messageEntity.Message,
+                CreatedAt = messageEntity.CreatedAt,
+                IsSeen = messageEntity.IsSeen,
+                RecieverUserName = FetchUserNameFromId(messageEntity.RecieverID),
+                SenderUserName = FetchUserNameFromId(messageEntity.SenderID),
+                RepliedToMsg = this.chatService.FetchMessageFromId(messageEntity.RepliedToMsg)
+            };
+
+            return messageModel;
         }
         #endregion
 

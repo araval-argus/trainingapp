@@ -4,6 +4,7 @@ using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -38,9 +39,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             MessageEntity messageEntity = new()
             {
                 Message = messageModel.Message,
-                SenderID = messageModel.SenderID,
-                RecieverID = messageModel.RecieverID,
-                RepliedToMsg= messageModel.RepliedToMsg,
+                SenderID = FetchProfileIdFromUserName(messageModel.SenderUserName),
+                RecieverID = FetchProfileIdFromUserName(messageModel.RecieverUserName),
                 MessageType = messageModel.MessageType
             };
             this.context.Messages.Add(messageEntity);
@@ -72,6 +72,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             this.context.Messages.UpdateRange(messages);
             this.context.SaveChanges();
+        }
+
+
+        int FetchProfileIdFromUserName(string userName)
+        {
+            return this.context.Profiles.FirstOrDefault(
+               profile => profile.UserName.Equals(userName)).Id;
         }
     }
 }

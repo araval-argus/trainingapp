@@ -1,11 +1,11 @@
-import { Component, ElementRef, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
-
+import { SignalRService } from 'src/app/core/service/signalR-service';
 
 @Component({
   selector: 'app-chat-content-footer',
@@ -19,29 +19,28 @@ export class ChatContentFooterComponent implements OnInit {
 
   LoggedInUserModel : LoggedInUserModel = this.authService.getLoggedInUserInfo();
 
-
-
   @ViewChild('messageInput') messageInput: ElementRef;
 
   @ViewChild('fileInput') fileInput: ElementRef;
 
   @ViewChild('basicModal') basicModal;
 
-  constructor(private chatService: ChatService, private authService : AuthService, private modalService: NgbModal) { }
+
+  constructor(private chatService: ChatService, private authService : AuthService, private modalService: NgbModal, private signalRService: SignalRService) { }
 
   ngOnInit(): void {
+
   }
 
   sendMessage(){
     const messageModel: MessageModel = {
-      sender: this.LoggedInUserModel.sub,
-      reciever: this.selectedFriend.userName,
+      senderUserName: this.LoggedInUserModel.sub,
+      recieverUserName: this.selectedFriend.userName,
       message: this.messageInput.nativeElement.value,
       repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"
     };
-    console.log(messageModel);
 
-    this.chatService.sendMessage(messageModel);
+    this.signalRService.sendMessage(messageModel);
     this.messageInput.nativeElement.value = "";
     this.messageToBeReplied = null;
   }
@@ -59,12 +58,15 @@ export class ChatContentFooterComponent implements OnInit {
 
     const formData = new FormData();
     formData.append("file",file);
-    formData.append("sender", this.LoggedInUserModel.sub);
-    formData.append("reciever", this.selectedFriend.userName);
+    formData.append("senderUserName", this.LoggedInUserModel.sub);
+    formData.append("recieverUserName", this.selectedFriend.userName);
 
     console.log(formData.get("file"));
+
+    //http request to add file
     this.chatService.sendFile(formData).subscribe(data => {
       console.log(data)
     })
   }
+
 }

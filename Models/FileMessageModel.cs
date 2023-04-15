@@ -9,10 +9,10 @@ namespace ChatApp.Models
         public IFormFile File { get; set; }
 
         [Required]
-        public string Sender { get; set; }
+        public string SenderUserName { get; set; }
 
         [Required]
-        public string Reciever { get; set; }
+        public string RecieverUserName { get; set; }
 
         
     }

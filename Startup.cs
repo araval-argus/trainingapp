@@ -1,5 +1,6 @@
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
+using ChatApp.Hubs;
 using ChatApp.Infrastructure.ServiceImplementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -96,6 +97,8 @@ namespace ChatApp
             services.AddScoped<IProfileService, ProfileService>();
             services.AddScoped<IDesignationService, DesignationService>();
             services.AddScoped<IChatService, ChatService>();
+            services.AddScoped<IOnlineUserService, OnlineUserService>();
+            services.AddSignalR();
 
             // In production, the Angular files will be served from this directory
 
@@ -140,22 +143,28 @@ namespace ChatApp
             app.UseCors(builder =>
             {
                 builder
-                .AllowAnyOrigin()
+                .WithOrigins("http://localhost:4200")
                 .AllowAnyMethod()
                 .AllowAnyHeader();
             });
 
             app.UseAuthorization();
+
+            
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapHub<ChatHub>("/hubs/chats");
                 endpoints.MapControllers();
             });
 
+            
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
+
+            
 
             //app.UseSpa(spa =>
             //{

@@ -49,6 +49,7 @@
   <ItemGroup>
     <Folder Include="wwwroot\SharedFiles\Images\" />
     <Folder Include="wwwroot\SharedFiles\Audios\" />
+    <Folder Include="wwwroot\SharedFiles\Others\" />
     <Folder Include="wwwroot\SharedFiles\Videos\" />
   </ItemGroup>
 

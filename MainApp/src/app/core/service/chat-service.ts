@@ -14,6 +14,7 @@ export class ChatService {
 
   friendSelected = new EventEmitter<FriendProfileModel>();
   messagesRecieved = new EventEmitter<MessageModel[]>();
+  messageSent = new EventEmitter<MessageModel>();
 
   fetchFriendsName(searchTerm: string) {
     return this.http.get(environment.apiUrl + "/chat/fetchFriends",{

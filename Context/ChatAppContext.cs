@@ -21,6 +21,7 @@ namespace ChatApp.Context
         public virtual DbSet<DesignationEntity> Designations { get; set; }
 
         public virtual DbSet<MessageEntity> Messages { get; set; }
+        public virtual DbSet<OnlineUserEntity> OnlineUsers { get; set; }
 
     }
 }

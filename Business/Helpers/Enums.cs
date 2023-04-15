@@ -24,7 +24,8 @@ namespace ChatApp.Business.Helpers
         Text = 1,
         Audio = 2,
         Image = 3,
-        Video = 4
+        Video = 4,
+        Other = 5
     }
     
 }

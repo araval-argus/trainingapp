@@ -30,5 +30,6 @@ namespace ChatApp.Business.ServiceInterfaces
 
         bool ChangePassword(PasswordModel passwordModel);
 
+
     }
 }
