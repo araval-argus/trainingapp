@@ -1,5 +1,6 @@
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
+using ChatApp.Hubs;
 using ChatApp.Infrastructure.ServiceImplementation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -33,7 +34,7 @@ namespace ChatApp
             //This service is added for allowing local host to send request
             services.AddCors(options =>
             {
-                options.AddPolicy("AllowedOrigin", builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
+                options.AddDefaultPolicy(builder => builder.WithOrigins("http://localhost:4200").AllowAnyHeader().AllowAnyMethod());
             });
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -98,6 +99,9 @@ namespace ChatApp
             });
 
 
+            //Adding signalR for live chat
+            services.AddSignalR(e => e.EnableDetailedErrors = true);
+
 
             // Uncomment this to enable template app.
             //services.AddSpaStaticFiles(configuration =>
@@ -122,7 +126,7 @@ namespace ChatApp
 
 
             //TO add CORS service which we have created
-            app.UseCors("AllowedOrigin");
+            app.UseCors();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
@@ -144,6 +148,12 @@ namespace ChatApp
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
+
+            //Set EndPoint for Hub
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapHub<ChatHub>("/chatHub");
+            });
             //app.UseSpa(spa =>
             //{
             //    spa.Options.SourcePath = "MainApp";

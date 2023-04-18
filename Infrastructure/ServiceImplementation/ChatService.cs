@@ -2,8 +2,10 @@
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
+using ChatApp.Hubs;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -18,21 +20,23 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         private readonly ChatAppContext context;
         private readonly IProfileService _profileService;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public ChatService(ChatAppContext context, IProfileService profileService, IWebHostEnvironment webHostEnvironment)
+        public ChatService(ChatAppContext context, IProfileService profileService, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext)
         {
             this.context = context;
             this._profileService = profileService;
             this._webHostEnvironment = webHostEnvironment;
+            this._hubContext = hubContext;
         }
 
-        public bool AddChat(ChatModel chatModel, string userName)
+        public chatFormat AddChat(ChatModel chatModel, string userName)
         {
             Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
             Profile receiver = context.Profiles.FirstOrDefault(p => p.UserName == chatModel.To);
             if(chatModel == null)
             {
-                return false;
+                return null;
             }
             Chat chat = new()
             {
@@ -45,7 +49,27 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             };
             context.Chats.Add(chat);
             context.SaveChanges();
-            return true;
+            Connections activeUser = context.Connections.AsNoTracking().FirstOrDefault(e => e.User == receiver.Id);
+            chatFormat chatContent = new()
+            {
+                id = chat.Id,
+                content = chat.content,
+                sentAt = chat.sentAt,
+                replyToChat = chat.replyToChat,
+                isRead = chat.isRead,
+                type = chat.type,
+            };
+            if (activeUser != null)
+            {
+                //Profile is sender's profile
+                recentChatDTO recentChatDTO = new()
+                {
+                    to = Mapper.profileMapper(profile),
+                    chatContent = chatContent
+                };
+                _hubContext.Clients.Client(activeUser.ConnectionId).SendAsync("receiveChat", recentChatDTO);
+            }
+            return chatContent;
         }
 
         public List<ChatDTO> GetAllChats(string userName, string to)
@@ -108,7 +132,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
 
-        public bool addFile(string userName, ChatFileModel chatFile)
+        public chatFormat addFile(string userName, ChatFileModel chatFile)
         {
             Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
             Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == chatFile.to);
@@ -139,10 +163,30 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     };
                     context.Chats.Add(chat);
                     context.SaveChanges();
-                    return true;
+                    Connections activeUser = context.Connections.AsNoTracking().FirstOrDefault(e => e.User == receiver.Id);
+                    chatFormat chatContent = new()
+                    {
+                        id = chat.Id,
+                        content = chat.content,
+                        sentAt = chat.sentAt,
+                        replyToChat = chat.replyToChat,
+                        isRead = chat.isRead,
+                        type = chat.type,
+                    };
+                    if (activeUser != null)
+                    {
+                        //Profile is sender's profile
+                        recentChatDTO recentChatDTO = new()
+                        {
+                            to = Mapper.profileMapper(sender),
+                            chatContent = chatContent
+                        };
+                        _hubContext.Clients.Client(activeUser.ConnectionId).SendAsync("receiveChat", recentChatDTO);
+                    }
+                    return chatContent;
                 }
             }
-            return false;
+            return null;
         }
 
         public bool markAsRead(string user, string markAsRead)

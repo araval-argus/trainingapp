@@ -10,6 +10,7 @@ import { recentChat } from 'src/app/core/models/recentChat-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
+import { HubService } from 'src/app/core/service/hub-service';
 
 @Component({
   selector: 'app-chat',
@@ -19,35 +20,23 @@ import { ChatService } from 'src/app/core/service/chat-service';
 export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterViewChecked {
 
   loggedInUser: LoggedInUser
-  selectedUser: Profile = {
-    firstName: '',
-    lastName: '',
-    userName: '',
-  }
 
   removeResult: boolean = false;
   hideRightBox: boolean = true;
 
   imageURL: string;
-  selectedUserImagePath: string = null;
   searchQuery: string;
 
   profiles: Profile[]
   recentChatProfile: recentChat[] = [];
   defaultNavActiveId = 1;
-  chatsToLoad = new Array<loadChatModel>();
   //To store message to be replied
-  replytoMessage: loadChatModel;
 
   chat: ChatModel;
-  replyingToChat: number = -1;
 
   //Manages subscription to be unsubscribe on destroy
   private reloadNewInbox?: Subscription;
-  private replyChatSub?: Subscription;
 
-  //resetting replying feature
-  private resetReplySubject: Subject<void> = new Subject();
 
 
   @ViewChild('chatForm', { static: false }) chatContent: ElementRef;
@@ -56,13 +45,9 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   // To convert user input to the observable
   private readonly searchProfile = new Subject<string | undefined>();
 
-
-  //To manage Uploaded File
-  uploadFile: File;
-  private sendFileSubscription?: Subscription;
-
-  //Scroll To bottom
-  @ViewChild('scrollMe') scrollMe: ElementRef
+  //To manage selected User
+  selectedUser: any = null;
+  removeRightBox: boolean = false;
 
   constructor(private authService: AuthService, private accountService: AccountService, private chatService: ChatService) {
   }
@@ -88,53 +73,16 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
 
     // This will update selected User every time new user selected
     // Since search Result and side bar (Recent Chat) is in other component we have used subscription
-    this.reloadNewInbox = this.chatService.reloadInbox.subscribe((event: any) => {
-      this.selectedUser.firstName = event.firstName;
-      this.selectedUser.lastName = event.lastName;
-      this.selectedUser.userName = event.userName;
-      this.selectedUser.imagePath = event.imagePath;
-      if (event.imagePath != null) {
-        this.selectedUserImagePath = this.accountService.fetchImage(this.selectedUser.imagePath);
-      } else {
-        this.selectedUserImagePath = "https://via.placeholder.com/43x43";
-      }
+
+    this.reloadNewInbox = this.chatService.reloadInbox.subscribe((data) => {
       //Hide search result on selecting one user
-      this.removeResult = true;
-      //Hide side box which was placed in begin when no user was selected
-      this.hideRightBox = false;
-      //Displaying Chat based On selected User
-      this.reloadChat();
+      this.profiles = [];
     })
-
-    //Replying to chat
-    //Since messages has its own component --> Subscription
-    //Setting reply message and it's id
-    this.replyChatSub = this.chatService.replyToChat.subscribe((data => {
-      this.replyingToChat = data;
-      this.replyToChat();
-    }))
-
-
-    //In case user cancel the replying to chat
-    this.resetReplySubject.subscribe(() => {
-      this.replytoMessage = null;
-      this.replyingToChat = -1;
-    })
-
-
-    //Sending File
-    this.sendFileSubscription = this.chatService.sendFileSub.subscribe(() => {
-      this.sendFile();
-    })
-
   }
 
   //To navigate to bottom of the list
   ngAfterViewChecked(): void {
-    try {
-      this.scrollMe.nativeElement.scrollTop = this.scrollMe.nativeElement.scrollHeight;
-    } catch {
-    }
+
   }
 
   ngAfterViewInit(): void {
@@ -145,19 +93,11 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
         document.querySelector('.chat-content').classList.toggle('show');
       })
     });
-
-    // Chat service observer from message component to scroll to the message
-    // this.chatService.scrollToChat.subscribe(data => {
-    //   this.scrollToMessage(data);
-    // })
-
   }
 
 
   ngOnDestroy(): void {
     this.reloadNewInbox.unsubscribe();
-    this.replyChatSub.unsubscribe();
-    this.sendFileSubscription.unsubscribe();
   }
 
   // back to chat-list for tablet and mobile devices
@@ -184,114 +124,5 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy, AfterVie
   loadInbox(event) {
     this.chatService.reloadInbox.next(event);
     (this.searchBar.nativeElement as HTMLInputElement).value = "";
-
-  }
-
-  // Purpose of not to set sender here is security, intruder can change the sender username in request
-  sendChat(event: Event) {
-    event.preventDefault();
-    const chat = this.chatContent.nativeElement.value;
-    this.chatContent.nativeElement.value = "";
-    this.chat = {
-      replyToChat: this.replyingToChat,
-      to: this.selectedUser.userName,
-      content: chat,
-    }
-    this.replyingToChat = -1;
-    this.chatService.addChat(this.chat).subscribe(() => {
-    })
-    this.resetReply();
-  }
-
-
-  //this will fetch the all the chats that goes on between user and selected user
-  reloadChat() {
-    this.chatsToLoad = [];
-    this.chatService.getChat(this.selectedUser.userName).subscribe((data: any) => {
-      this.loadChat(data);
-    })
-    this.resetReply();
-  }
-
-  // This Method will convert CHATDTO to chat model to render on screen.
-  loadChat(data: any) {
-    var sent = data.chats[0];
-    var recieved = data.chats[1];
-    //We had to intialize replyToContent null cause chatsToLoad will only complete after all chats are initialize.
-    if (sent != null && sent.chatList != null) {
-      sent.chatList.forEach(element => {
-        this.chatsToLoad.push({
-          sent: true,
-          id: element.id,
-          content: element.content,
-          sentAt: new Date(element.sentAt),
-          replyToChat: element.replyToChat,
-          replyToContent: null,
-          isRead: element.isRead,
-          type: element.type
-        })
-      });
-    }
-    if (recieved != null && recieved.chatList != null) {
-      recieved.chatList.forEach(element => {
-        this.chatsToLoad.push({
-          sent: false,
-          id: element.id,
-          content: element.content,
-          sentAt: new Date(element.sentAt),
-          replyToChat: element.replyToChat,
-          replyToContent: null,
-          isRead: element.isRead,
-          type: element.type
-        })
-
-      });
-    }
-    //This will add content to all chat if it's reply of other chat && user can't find chats that not belongs to him
-    this.chatsToLoad.forEach(e => {
-      e.replyToContent = e.replyToChat != -1 ? this.chatsToLoad.find(el => el.id == e.replyToChat).content.substring(0, 50) : null;
-    })
-    this.chatsToLoad.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
-  }
-
-
-  //Set message as replying to message
-  replyToChat() {
-    this.replytoMessage = this.chatsToLoad.find(c => c.id == this.replyingToChat);
-  }
-
-
-  //reset replying to message
-  resetReply() {
-    this.resetReplySubject.next();
-  }
-
-  // scrollToMessage(idOfMessage: number) {
-  //   var id = idOfMessage + "";
-  //   const element = document.getElementById(id);
-  //   element.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
-  // }
-
-
-  //TO manage File
-  uploadedFile(event: Event) {
-    var files = (event.target as HTMLInputElement).files;
-    if (files[0] != null) {
-      this.uploadFile = files[0];
-    }
-    console.log("uploaded File called");
-    this.chatService.displayModal.next(this.uploadFile);
-  }
-
-
-  //Will make formdata by using file and selected user's username
-  sendFile() {
-    const formData: FormData = new FormData();
-    formData.append('file', this.uploadFile);
-    formData.append('to', this.selectedUser.userName);
-    formData.append('replyToChat', this.replyingToChat.toString())
-    this.chatService.sendFile(formData).subscribe(data => {
-      console.log(data);
-    })
   }
 }

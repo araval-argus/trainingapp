@@ -1,0 +1,116 @@
+﻿using ChatApp.Context;
+using ChatApp.Context.EntityClasses;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
+using System.Net;
+using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+
+namespace ChatApp.Hubs
+{
+    public class ChatHub : Hub
+    {
+        public static int ActiveUser { get; set; } = 0;
+        private readonly ChatAppContext _context;
+        public ChatHub(ChatAppContext context) {
+            _context =context;
+        }
+
+        public override Task OnDisconnectedAsync(Exception? exception)
+        {
+            var conId = Context.ConnectionId;
+
+            var con = _context.Connections.FirstOrDefault(e => e.ConnectionId == conId);
+
+            if (con != null)
+            {
+                _context.Remove(con);
+                _context.SaveChanges();
+            }
+
+            return Task.CompletedTask;
+
+        }
+
+
+        public async Task saveConnection(string authorization)
+        {
+            //Getting username from client and save connection to the table
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(claim.Value));
+                if (profile == null) {
+                    return;
+                }
+                Connections con = _context.Connections.FirstOrDefault(e => e.User == profile.Id);
+                if(con != null)
+                {
+                    con.ConnectionId = Context.ConnectionId;
+                    con.loginTime = DateTime.Now;
+                    _context.Connections.Update(con);
+                }
+                else
+                {
+                    Connections connection = new()
+                    {
+                        ConnectionId = Context.ConnectionId,
+                        User = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == claim.Value).Id,
+                        loginTime = DateTime.Now,
+                    };
+                    _context.Connections.Add(connection);
+                }
+                _context.SaveChanges();
+                await Clients.Others.SendAsync("userIsOnline", profile.UserName);
+            }
+        }
+
+        public async Task deleteConnection(string authorization)
+        {
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                int Id = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == claim.Value).Id;
+                Connections connection = _context.Connections.FirstOrDefault(e => e.User == Id);
+                _context.Connections.Remove(connection);
+                _context.SaveChanges();
+                await Clients.All.SendAsync("updateStatus", claim.Value + " is Offline");
+            }
+        }
+
+        public bool sendChatToActive()
+        {
+            return true;
+        }
+
+        public async Task seenMessage(string senderUserName)
+        {
+            string connectionId = Context.ConnectionId;
+            //In this scenario receiver is just who have received the chat on the screen
+            Connections receiverConnection = _context.Connections.AsNoTracking().FirstOrDefault(e => e.ConnectionId == connectionId);
+            Profile receiver = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.Id == receiverConnection.User);
+            Profile sender = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName== senderUserName);
+            Connections sendersConnectiom = _context.Connections.AsNoTracking().FirstOrDefault(e => e.User == sender.Id);
+            IEnumerable<Chat> chats = _context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id && e.isRead == 0);
+            foreach (Chat chat in chats)
+            {
+                chat.isRead = 1;
+            }
+            _context.Chats.UpdateRange(chats);
+            _context.SaveChanges();
+
+            if(sendersConnectiom!= null)
+            {
+                await Clients.Client(sendersConnectiom.ConnectionId).SendAsync("seenMessageNotification", receiver.UserName);
+            }
+        }
+    }
+}

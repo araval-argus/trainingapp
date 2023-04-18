@@ -50,7 +50,7 @@ namespace ChatApp.Business.Helpers
             return profileDTO;
         }
 
-        //Mapper for 
+        //Mapper for multiple chat
         public static List<ChatDTO> chatMapper(List<Chat> sent, List<Chat> recieved)
         {
             List<ChatDTO> chatDTOs = new();
@@ -87,7 +87,7 @@ namespace ChatApp.Business.Helpers
                         sentAt = chat.sentAt,
                         replyToChat = chat.replyToChat,
                         isRead = chat.isRead,
-                        type = chat.type
+                        type = chat.type,
                     });
                 }
                 receivedChat.chatList = temp;
@@ -96,5 +96,8 @@ namespace ChatApp.Business.Helpers
             chatDTOs.Add(receivedChat);
             return chatDTOs;
         }
+
+        //Mapper for single Chat
+
     }
 }

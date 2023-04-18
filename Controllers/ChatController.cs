@@ -35,7 +35,7 @@ namespace ChatApp.Controllers
             if(claim != null)
             {
                 var savedChat = _chatService.AddChat(chatModel, claim.Value);
-                if (savedChat)
+                if (savedChat != null)
                 {
                     return Ok(new { savedChat });
                 }
@@ -90,8 +90,10 @@ namespace ChatApp.Controllers
             if(claim!= null)
             {
                 var chats = _chatService.addFile(claim.Value, chatFile);
-                response = Ok(new { chats });
-
+                if(chats != null)
+                {
+                    response = Ok(new { chats });
+                }
             }
             return response;
         }

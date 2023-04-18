@@ -2,23 +2,26 @@ import { Injectable } from "@angular/core";
 import { JwtHelper } from "../helper/jwt-helper";
 import { LoggedInUser } from "../models/loggedin-user";
 import { AccountService } from "./account-service";
+import { HubService } from "./hub-service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class AuthService {
-    constructor(private jwtHelper: JwtHelper, private accountService: AccountService) {
+    constructor(private jwtHelper: JwtHelper, private hubService: HubService) {
 
     }
     login(token, callback) {
         localStorage.setItem('isLoggedin', 'true');
         localStorage.setItem('USERTOKEN', token);
+        this.hubService.createConnection();
         if (callback) {
             callback();
         }
 
     }
     logout(callback) {
+        this.hubService.closeConnection();
         localStorage.removeItem('isLoggedin');
         localStorage.removeItem('USERTOKEN');
         localStorage.removeItem('imagePath');

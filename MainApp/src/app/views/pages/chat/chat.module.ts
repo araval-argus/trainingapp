@@ -5,13 +5,16 @@ import { SearchDropdownComponent } from './chat-sidebar/search-dropdown/search-d
 import { MessageComponent } from './message/message.component';
 import { ChatSidebarComponent } from './chat-sidebar/chat-sidebar.component';
 import { RecentChatComponent } from './chat-sidebar/recent-chat/recent-chat.component';
-import { ReplyMessageComponent } from './reply-message/reply-message.component';
-import { FileModalComponent } from './file-modal/file-modal.component';
+import { ReplyMessageComponent } from './message/reply-message/reply-message.component';
 import { PERFECT_SCROLLBAR_CONFIG, PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { RouterModule } from '@angular/router';
 import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
+
+
+
 
 const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
   suppressScrollX: true,
@@ -27,10 +30,9 @@ const routes = [
 ]
 
 @NgModule({
-  declarations: [ChatComponent, SearchDropdownComponent, MessageComponent, ChatSidebarComponent, RecentChatComponent, ReplyMessageComponent, FileModalComponent],
+  declarations: [ChatComponent, SearchDropdownComponent, MessageComponent, ChatSidebarComponent, RecentChatComponent, ReplyMessageComponent],
   imports: [
     CommonModule,
-    PerfectScrollbarModule,
     RouterModule.forChild(routes),
     NgbTooltipModule,
     PerfectScrollbarModule,
@@ -38,6 +40,7 @@ const routes = [
     NgbNavModule,
     NgbCollapseModule,
     NgSelectModule,
+    PickerModule
   ],
   providers: [
     {

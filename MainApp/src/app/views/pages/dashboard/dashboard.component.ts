@@ -11,6 +11,7 @@ import { Label, Color, SingleDataSet } from 'ng2-charts';
 // Progressbar.js
 import ProgressBar from 'progressbar.js';
 import { SampleService } from 'src/app/core/service/sample-service';
+import { HubService } from 'src/app/core/service/hub-service';
 
 export type apexChartOptions = {
   series: ApexAxisChartSeries;
@@ -45,7 +46,6 @@ export class DashboardComponent implements OnInit {
     this.sampleService.runSampleAPI().subscribe((result) => {
       console.log(result);
     }, (err) => {
-
     })
   }
 
