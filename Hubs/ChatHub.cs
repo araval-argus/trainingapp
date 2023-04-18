@@ -39,6 +39,12 @@ namespace ChatApp.Hubs
 
         public override Task OnDisconnectedAsync(Exception exception)
         {
+            string userConnectionId = Context.ConnectionId;
+            OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser( userConnectionId );
+            if (onlineUser != null)
+            {
+                this.onlineUserService.RemoveOnlineUser(onlineUser);
+            }
             if (exception != null)
             {
                 Console.WriteLine(exception.Message);
@@ -78,8 +84,13 @@ namespace ChatApp.Hubs
 
         }
 
+        public async Task LogoutUser(string userName)
+        {
+            OnlineUserEntity onlineUserEntity = this.onlineUserService.FetchOnlineUser(userName);
+            this.onlineUserService.RemoveOnlineUser(onlineUserEntity);
+        }
 
-        
+
         #region helpermethods
 
         MessageModel ConvertToMessageModel(MessageEntity messageEntity)

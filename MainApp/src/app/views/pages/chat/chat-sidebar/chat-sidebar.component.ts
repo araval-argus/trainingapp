@@ -1,5 +1,4 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -18,8 +17,7 @@ export class ChatSidebarComponent implements OnInit {
   @Input() friends: FriendProfileModel[];
 
   constructor(private authService: AuthService,
-    private chatService: ChatService,
-    private modalService: NgbModal) { }
+    private chatService: ChatService) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();

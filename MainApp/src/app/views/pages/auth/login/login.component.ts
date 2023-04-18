@@ -18,7 +18,8 @@ export class LoginComponent implements OnInit {
   constructor(private router: Router,
     private route: ActivatedRoute,
     private accountService: AccountService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private signalRService: SignalRService) { }
 
   ngOnInit(): void {
     // get return url from route parameters or default to '/'
@@ -36,7 +37,11 @@ export class LoginComponent implements OnInit {
 
     // Implementation of API.
     this.accountService.login(this.loginModel).subscribe((result: any) => {
+
+      this.signalRService.makeConnection();
+
       this.authService.login(result.token, () => {
+
         Swal.fire({
           title: 'Success!',
           text: 'User loggedin successfully.',
@@ -44,10 +49,13 @@ export class LoginComponent implements OnInit {
           timer: 2000,
          timerProgressBar: true,
         });
+
         setTimeout(() => {
           this.router.navigate(["/"]);
         }, (500));
+
         this.router.navigate([this.returnUrl]);
+
       });
     }, (err) => {
       Swal.fire({

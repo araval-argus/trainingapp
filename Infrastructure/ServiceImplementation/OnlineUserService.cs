@@ -36,5 +36,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             OnlineUserEntity onlineUser = this.context.OnlineUsers.FirstOrDefault(user => user.UserName == username);
             return onlineUser;
         }
+
+        public void RemoveOnlineUser(OnlineUserEntity onlineUserEntity)
+        {
+            this.context.Remove(onlineUserEntity);
+            this.context.SaveChanges();
+        }
     }
 }

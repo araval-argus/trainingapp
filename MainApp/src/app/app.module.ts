@@ -19,7 +19,7 @@ import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule, NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbCollapseModule, NgbDropdownModule, NgbNavModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChatComponent } from './views/pages/chat/chat.component';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
@@ -67,7 +67,8 @@ import { SharedModule } from './core/helper/shared-module';
     NgbNavModule,
     NgbCollapseModule,
     NgSelectModule,
-    PerfectScrollbarModule
+    PerfectScrollbarModule,
+    SharedModule
   ],
   providers: [
     AuthGuard,

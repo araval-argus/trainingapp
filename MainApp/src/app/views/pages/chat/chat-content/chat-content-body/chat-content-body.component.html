@@ -1,6 +1,7 @@
-<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 50;">
+<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 50;" style="position: 'relative'">
   <ul class="messages">
 
+    <!-- message of sender -->
     <div *ngFor="let message of messages">
       <div *ngIf="message.senderUserName === loggedInUser.sub">
         <li class="message-item me">
@@ -40,13 +41,19 @@
         </li>
       </div>
 
+      <!-- message of reciever -->
       <div *ngIf="message.senderUserName !== loggedInUser.sub">
         <li class="message-item friend">
           <img [src]="selectedFriend.imageUrl" class="img-xs rounded-circle" alt="avatar">
           <div class="content">
             <div class="message">
               <div class="bubble">
-                <p class="d-flex justify-content-end" *ngIf="message.messageType == 1 ">
+
+                <p class="text-muted" *ngIf="message.repliedToMsg">
+                  {{message.repliedToMsg}}<br>
+                </p>
+
+                <p *ngIf="message.messageType == 1 ">
                   {{message.message}}
                 </p>
 
@@ -85,14 +92,7 @@
   </ul>
 
 </div>
-<div class="reply-message-box mx-2 p-3 d-flex flex-grow" *ngIf="messageToBeReplied" style="z-index: 100; ">
-  <div class="flex-grow-1">
-    Reply to this message: <b>{{messageToBeReplied.message}}</b>
-  </div>
-  <div class="">
-    <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
-  </div>
-</div>
+
 
 
 

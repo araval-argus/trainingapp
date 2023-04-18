@@ -32,7 +32,8 @@ const routes: Routes = [
     NgbDropdownModule,
     NgbDatepickerModule,
     NgApexchartsModule,
-    ChartsModule
+    ChartsModule,
+    SharedModule
   ]
 })
 export class DashboardModule { }

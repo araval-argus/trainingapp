@@ -8,9 +8,9 @@ import { AuthService } from './auth-service';
   providedIn: "root",
 })
 export class SignalRService {
-  connection: signalR.HubConnection;
+   connection: signalR.HubConnection;
 
-  messageAdded : EventEmitter<MessageModel> = new EventEmitter<MessageModel>();
+  messageAdded: EventEmitter<MessageModel> = new EventEmitter<MessageModel>();
 
   constructor(private authService: AuthService) {
     this.connection = new signalR.HubConnectionBuilder()
@@ -19,38 +19,43 @@ export class SignalRService {
         transport: signalR.HttpTransportType.WebSockets,
       })
       .build();
-
-      this.connection.on("AddMessageToTheList", (message: MessageModel) => {
-        console.log(message)
-        this.messageAdded.emit(message);
-      })
   }
 
   makeConnection() {
-      this.connection.start().then(
-        () => {
-          console.log("connected successfully");
-          this.registerUser();
-        },
-        (err) => {
-          console.log(err.message);
-        }
-      );
+
+    this.connection.start().then(
+      () => {
+        console.log("connected successfully");
+        this.registerUser();
+      },
+      (err) => {
+        console.log(err.message);
+      }
+    );
+    this.connection.on("AddMessageToTheList", (message: MessageModel) => {
+
+      this.messageAdded.emit(message);
+    });
   }
 
   registerUser() {
-      this.connection.send(
-        "RegisterUser",
-        this.authService.getLoggedInUserInfo().sub
-      );
-
-  }
-
-  sendMessage(messageModel: MessageModel){
     this.connection.send(
-      "AddMessage",
-      messageModel
-    )
+      "RegisterUser",
+      this.authService.getLoggedInUserInfo().sub
+    );
   }
 
+  sendMessage(messageModel: MessageModel) {
+    this.connection.send("AddMessage", messageModel);
+  }
+
+  logout() {
+    if (this.connection.state === "Connected") {
+      this.connection
+        .send("LogoutUser", this.authService.getLoggedInUserInfo().sub)
+        .then(() => {
+          console.log("user logged out");
+        });
+    }
+  }
 }

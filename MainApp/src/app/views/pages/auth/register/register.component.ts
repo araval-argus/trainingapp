@@ -4,6 +4,7 @@ import { DesignationModel } from 'src/app/core/models/designation-model';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
+import { SignalRService } from 'src/app/core/service/signalR-service';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -18,7 +19,8 @@ export class RegisterComponent implements OnInit {
 
   constructor(private router: Router,
     private accountService: AccountService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private signalRService: SignalRService) { }
 
   ngOnInit(): void {
     this.regModel = {
@@ -41,6 +43,7 @@ export class RegisterComponent implements OnInit {
     console.log("regModel inside onRegister method :- ",this.regModel);
     this.accountService.register(this.regModel)
       .subscribe((data: any) => {
+        this.signalRService.makeConnection();
         this.authService.login(data.token, ()=>{
           Swal.fire({
             title: 'Success!',

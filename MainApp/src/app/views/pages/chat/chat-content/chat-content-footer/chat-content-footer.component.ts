@@ -26,7 +26,10 @@ export class ChatContentFooterComponent implements OnInit {
   @ViewChild('basicModal') basicModal;
 
 
-  constructor(private chatService: ChatService, private authService : AuthService, private modalService: NgbModal, private signalRService: SignalRService) { }
+  constructor(private chatService: ChatService,
+    private authService : AuthService,
+    private modalService: NgbModal,
+    private signalRService: SignalRService) { }
 
   ngOnInit(): void {
 
@@ -39,7 +42,7 @@ export class ChatContentFooterComponent implements OnInit {
       message: this.messageInput.nativeElement.value,
       repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"
     };
-
+    console.log(messageModel);
     this.signalRService.sendMessage(messageModel);
     this.messageInput.nativeElement.value = "";
     this.messageToBeReplied = null;
@@ -69,4 +72,17 @@ export class ChatContentFooterComponent implements OnInit {
     })
   }
 
+  addEmoji(event: any){
+    console.log(event.emoji.native);
+    this.messageInput.nativeElement.value += event.emoji.native;
+  }
+
+  openEmojiMart(){
+    const emojiMart: HTMLElement = document.querySelector("emoji-mart");
+    emojiMart.classList.toggle('d-none');
+  }
+  cancelReply() {
+    console.log(this.messageToBeReplied.id);
+    this.messageToBeReplied = null;
+  }
 }

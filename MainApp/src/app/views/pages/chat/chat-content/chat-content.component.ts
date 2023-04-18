@@ -4,7 +4,7 @@ import { MessageModel } from 'src/app/core/models/message-model';
 
 
 @Component({
-  selector: 'app-chat-body',
+  selector: 'app-chat-content',
   templateUrl: './chat-content.component.html',
   styleUrls: ['./chat-content.component.scss']
 })

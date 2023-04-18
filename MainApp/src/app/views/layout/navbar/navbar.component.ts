@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/core/service/auth-service';
 import Swal from 'sweetalert2'
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { environment } from 'src/environments/environment';
+import { SignalRService } from 'src/app/core/service/signalR-service';
 
 @Component({
   selector: 'app-navbar',
@@ -18,7 +19,8 @@ export class NavbarComponent implements OnInit {
     @Inject(DOCUMENT) private document: Document,
     private renderer: Renderer2,
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private signalRService : SignalRService
   ) { }
 
   ngOnInit(): void {
@@ -37,14 +39,14 @@ export class NavbarComponent implements OnInit {
     this.document.body.classList.toggle('sidebar-open');
   }
 
-
-
-
   /**
    * Logout
    */
   onLogout(e) {
     e.preventDefault();
+    if(this.signalRService.connection){
+      this.signalRService.logout();
+    }
     this.authService.logout(() => {
       Swal.fire({
         title: 'Success!',

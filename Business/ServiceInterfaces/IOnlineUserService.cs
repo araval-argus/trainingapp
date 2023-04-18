@@ -8,5 +8,7 @@ namespace ChatApp.Business.ServiceInterfaces
         void RegisterOnlineUser(OnlineUserEntity onlineUserEntity);
 
         OnlineUserEntity FetchOnlineUser(string username); 
+
+        void RemoveOnlineUser(OnlineUserEntity onlineUserEntity);
     }
 }

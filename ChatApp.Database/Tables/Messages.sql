@@ -1,7 +1,7 @@
 ﻿CREATE TABLE [dbo].[Messages]
 (
 	[Id] INT IDENTITY(1,1) PRIMARY KEY, 
-    [Message] VARCHAR(MAX) NOT NULL, 
+    [Message] NVARCHAR(MAX) NOT NULL, 
     [SenderID] INT NOT NULL, 
     [RecieverID] INT NOT NULL, 
     [CreatedAt] DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 

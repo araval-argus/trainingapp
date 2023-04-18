@@ -49,4 +49,7 @@ export class DashboardComponent implements OnInit {
     })
   }
 
+  addEmoji(event: PointerEvent){
+  }
+
 }

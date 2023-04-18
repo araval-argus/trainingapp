@@ -54,6 +54,7 @@ export class ChatContentBodyComponent
       message.message = this.setPath(message.messageType) + message.message;
       this.messages.push(message);
       this.scrollToTheBottom();
+      this.messageToBeReplied = null;
     });
   }
 
@@ -62,13 +63,11 @@ export class ChatContentBodyComponent
   }
 
   replyToThisMessage(message) {
+    console.log(message);
     this.replyButtonClicked.emit(message);
   }
 
-  cancelReply() {
-    console.log(this.messageToBeReplied.id);
-    this.messageToBeReplied = null;
-  }
+
 
   scrollToTheBottom() {
     const element = this.scrollbar.nativeElement;
