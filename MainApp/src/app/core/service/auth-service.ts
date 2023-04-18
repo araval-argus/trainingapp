@@ -30,7 +30,7 @@ export class AuthService {
     getLoggedInUserInfo() {
         let token = localStorage.getItem('USERTOKEN');
         var user: LoggedInUser = this.jwtHelper.decodeToken(token);
-        user.UserName = user.sub;
+        user.userName = user.sub;
         return user;
 
     }

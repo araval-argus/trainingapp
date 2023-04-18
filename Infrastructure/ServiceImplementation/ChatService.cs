@@ -55,9 +55,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			return decodedToken.Claims.First(claim => claim.Type == "sub").Value;
 		}
 
-		public int GetIdFromUserName(string username)
+		public int GetIdFromUserName(string userName)
 		{
-			Profile user = context.Profiles.FirstOrDefault(profile => profile.UserName == username);
+			Profile user = context.Profiles.FirstOrDefault(profile => profile.UserName == userName);
 			return user.Id;
 		}
 
@@ -65,7 +65,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 		{
 			Message newMessage = null;
 			MessageSendModel response = null;
-			string ReplyMessage;
+			string replyMessage;
 			newMessage = new Message
 			{
 				Content = message.Content,
@@ -80,12 +80,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			context.SaveChanges();
 			if (message.RepliedTo == -1)
 			{
-				ReplyMessage = null;
+				replyMessage = null;
 			}
 			else
 			{
 				var msg = context.Messages.FirstOrDefault(msg => msg.Id == message.RepliedTo);
-				ReplyMessage = msg.Content;
+				replyMessage = msg.Content;
 			}
 			response = new MessageSendModel
 			{
@@ -94,17 +94,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				CreatedAt = newMessage.CreatedAt,
 				MessageFrom = message.MessageFrom,
 				MessageTo = message.MessageTo,
-				RepliedTo = ReplyMessage,
+				RepliedTo = replyMessage,
 				Seen = 0,
 				Type = null,
 			};
 			return response;
 		}
 
-		public IEnumerable<MessageSendModel> GetMsg(string username, string selUserName)
+		public IEnumerable<MessageSendModel> GetMsg(string userName, string selUserName)
 		{
 			
-			int userId = GetIdFromUserName(username);
+			int userId = GetIdFromUserName(userName);
 			int selUserId = GetIdFromUserName(selUserName);
 			var list = context.Messages
 			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId) || (msg.MessageFrom == selUserId && msg.MessageTo == userId));
@@ -112,18 +112,24 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 			foreach (var msg in list)
 			{
-				msg.Seen = 1;
 				var newObj = new MessageSendModel
 				{
 					Id = msg.Id,
 					Content = msg.Content,
 					CreatedAt = msg.CreatedAt,
-					MessageFrom = (msg.MessageFrom == userId) ? username : selUserName,
-					MessageTo = (msg.MessageTo == userId) ? username : selUserName,
-					Seen = 1,
+					MessageFrom = (msg.MessageFrom == userId) ? userName : selUserName,
+					MessageTo = (msg.MessageTo == userId) ? userName : selUserName,
 					Type = msg.Type,
 				};
-
+				if(msg.MessageFrom == selUserId && msg.MessageTo == userId)
+				{
+					newObj.Seen = 1;
+					msg.Seen = 1;
+				}
+				else
+				{
+					newObj.Seen = msg.Seen;
+				}
 				if (msg.RepliedTo != -1)
 				{
 					var curmsg = context.Messages.FirstOrDefault(e => e.Id == msg.RepliedTo);
@@ -139,23 +145,23 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			return returnList;
 		}
 
-		public IEnumerable<RecentChatModel> GetRecentUsers(string username)
+		public IEnumerable<RecentChatModel> GetRecentUsers(string userName)
 		{
-			var CurUserId = GetIdFromUserName(username);
+			var curUserId = GetIdFromUserName(userName);
 			// Get Id of Users The Logged In person Talked To
-			var UserTalkedWith = context.Messages
-				.Where(m => (m.MessageFrom == CurUserId || m.MessageTo == CurUserId))
-				.Select(m => m.MessageFrom == CurUserId ? m.MessageTo : m.MessageFrom)
+			var userTalkedWith = context.Messages
+				.Where(m => (m.MessageFrom == curUserId || m.MessageTo == curUserId))
+				.Select(m => m.MessageFrom == curUserId ? m.MessageTo : m.MessageFrom)
 				.Distinct();
 
-			var RecentChatList = new List<RecentChatModel>();
-			var SortedMessages = context.Messages.OrderByDescending(m => m.CreatedAt);
+			var recentChatList = new List<RecentChatModel>();
+			var sortedMessages = context.Messages.OrderByDescending(m => m.CreatedAt);
 
-			foreach (var userId in UserTalkedWith)
+			foreach (var userId in userTalkedWith)
 			{
 				Profile userTalked = context.Profiles.FirstOrDefault(profile => profile.Id == userId);
-				var msg = SortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
-				var seenCount = SortedMessages.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == CurUserId && msg.Seen == 0)).Count();
+				var msg = sortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
+				var seenCount = sortedMessages.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == curUserId && msg.Seen == 0)).Count();
 				var newObj = new RecentChatModel
 				{
 					Content = msg.Content,
@@ -167,22 +173,22 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					Seen = seenCount,
 					Type = msg.Type,
 				};
-				RecentChatList.Add(newObj);
+				recentChatList.Add(newObj);
 			}
-			var OrderedRecentChatList = RecentChatList.OrderByDescending(m => m.CreatedAt);
-			return OrderedRecentChatList;
+			var orderedRecentChatList = recentChatList.OrderByDescending(m => m.CreatedAt);
+			return orderedRecentChatList;
 		}
-		public void MarkAsRead(string username, string selusername)
+		public void MarkAsRead(string userName, string selUserName)
 		{
 			List<Message> msgs = null;
-			var CurUserId = GetIdFromUserName(username);
-			if (selusername == "All")
+			var CurUserId = GetIdFromUserName(userName);
+			if (selUserName == "All")
 			{
 				msgs = context.Messages.Where(m => m.MessageTo == CurUserId).ToList();
 			}
 			else
 			{
-				var SelUserId = GetIdFromUserName(selusername);
+				var SelUserId = GetIdFromUserName(selUserName);
 				msgs = context.Messages.Where(m => m.MessageFrom == SelUserId && m.MessageTo == CurUserId).ToList();
 			}
 			foreach (var msg in msgs)
@@ -241,7 +247,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				MessageTo = msg.MessageTo,
 				RepliedTo = null,
 				Seen = 0,
-				Type= extension,
+				Type= message.Type,
 			};
 			return response;
 			

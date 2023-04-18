@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Subject } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { environment } from "src/environments/environment";
 import { MessageModel } from "../models/message-model";
 import { MessageDisplayModel } from "../models/message-display-model";
@@ -13,7 +13,6 @@ export class ChatService{
 
   //To Reflect Change in Recent Chat on Message
   DidAMessage = new Subject<MessageDisplayModel>();
-  MarkAsSeenChanged = new Subject<string>();
 
   constructor(private http: HttpClient) { }
 
@@ -21,24 +20,24 @@ export class ChatService{
     return this.http.get(environment.apiUrl + "/Chat/" + searchvalue );
   }
 
-  GetUser(username : string){
-    return this.http.get(environment.apiUrl+ "/account/" + username);
+  getUser(userName : string){
+    return this.http.get(environment.apiUrl+ "/account/" + userName);
   }
 
   doMessage(msg : MessageModel){
     return this.http.post(environment.apiUrl + "/Chat/Message" , msg);
   }
 
-  FetchMessages(seluserusername:string){
-    return this.http.get(environment.apiUrl + "/Chat/MsgList" + seluserusername);
+  fetchMessages(selUserUserName:string){
+    return this.http.get(environment.apiUrl + "/Chat/MsgList" + selUserUserName);
   }
 
-  LoadRecentChat(){
+  loadRecentChat(){
     return this.http.get(environment.apiUrl + "/Chat/RecentChat");
   }
 
-  MarkAsRead(seluserusername:string){
-    return this.http.post(environment.apiUrl + "/Chat/MarkAsRead" + seluserusername , null);
+  markAsRead(selUserUserName:string){
+    return this.http.post(environment.apiUrl + "/Chat/MarkAsRead" + selUserUserName , null);
   }
 
   sendFileMessage( formdata : FormData ){

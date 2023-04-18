@@ -25,11 +25,11 @@
     </div>
   </div>
 </div>
-<div class="chat-body" [perfectScrollbar] #scrollMe [scrollTop]="scrollMe.scrollHeight">
+<div class="chat-body" [perfectScrollbar] #scrollMe>
   <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
     <li *ngIf="msg.messageFrom == selUser.userName" class="message-item friend">
       <img [src]="selUserImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content"(dblclick)="ToggleReplyMsg(msg)">
+      <div class="content"(dblclick)="toggleReplyMsg(msg)">
         <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
         <video controls *ngIf="msg.type === 'video'">
           <source [src]="localPath + msg.content" type="video/mp4">
@@ -48,11 +48,11 @@
         </div>
       </div>
     </li>
-    <li *ngIf="msg.messageFrom == this.loggedInUser.UserName" class="message-item me">
-      <img [src]="ImageSource" class="img-xs rounded-circle" alt="avatar">
-      <div class="content" (dblclick)="ToggleReplyMsg(msg)">
+    <li *ngIf="msg.messageFrom == this.loggedInUser.userName" class="message-item me">
+      <img [src]="imageSource" class="img-xs rounded-circle" alt="avatar">
+      <div class="content" (dblclick)="toggleReplyMsg(msg)">
         <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
-        <video controls *ngIf="msg.type === 'video'">
+        <video controls *ngIf="msg.type === 'video'" width="350px" height="200px">
           <source [src]="localPath + msg.content" type="video/mp4">
           Your browser does not support the video tag.
         </video>
@@ -76,10 +76,10 @@
   </ul>
 </div>
 <!-- Reply To A SPECIFIC MESSAGE -->
-<div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!IsReplying">
+<div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!isReplying">
   <div class="input-group">
-    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{RplyMsg}}</p>
-    <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="CloseRplyMsg()" >
+    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsgLen<60?'':'...'}}</p>
+    <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="closeRplyMsg()" >
       <span aria-hidden="true">&times;</span>
     </span>
   </div>
@@ -108,7 +108,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
-        <button type="button" class="btn btn-primary" (click)="UploadFile();modal.close()">Send</button>
+        <button type="button" class="btn btn-primary" (click)="uploadFile();modal.close()">Send</button>
       </div>
     </ng-template>
     <!-- CLOSE -->

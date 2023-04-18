@@ -5,7 +5,7 @@ export interface LoggedInUser
     email?:string,
     //Username is stored in sub
     sub?: string,
-    UserName?:string,
-    Designation? : string
-    ImagePath?:string
+    userName?:string,
+    designation? : string
+    imagePath?:string
 }

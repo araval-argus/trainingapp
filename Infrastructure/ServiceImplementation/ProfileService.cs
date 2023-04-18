@@ -65,14 +65,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return newUser;
         }
 
-		public Profile UpdateUser(UpdateModel updateModel, string username)
+		public Profile UpdateUser(UpdateModel updateModel, string userName)
 		{
-            Profile updateuser = GetUser(u => u.UserName == username);
-            if (updateuser == null)
+            Profile updateUser = GetUser(u => u.UserName == userName);
+            if (updateUser == null)
             {
                 return null;
             }
-			if(updateuser.Email == context.Profiles.FirstOrDefault().Email && updateuser.UserName != username)
+			if(updateUser.Email == context.Profiles.FirstOrDefault().Email && updateUser.UserName != userName)
             {
                 return null;
 			}
@@ -85,9 +85,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 				//if image for book is already stored then we need to delete it first
 				//Tried but doesn't work || updateuser.ImagePath != "\"/images/default.png" for default image
-				if (updateuser.ImagePath != null)
+				if (updateUser.ImagePath != null)
                 {
-                    var oldImagePath = Path.Combine(webHostEnvironment.WebRootPath + updateuser.ImagePath );
+                    var oldImagePath = Path.Combine(webHostEnvironment.WebRootPath + updateUser.ImagePath );
                     if (System.IO.File.Exists(oldImagePath))
                     {
                         System.IO.File.Delete(oldImagePath);
@@ -99,17 +99,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     updateModel.ProfileImage.CopyTo(fileStreams);
                 }
 
-                updateuser.ImagePath ="/images/" + filename + extension;
+				updateUser.ImagePath ="/images/" + filename + extension;
             }
-            updateuser.FirstName = updateModel.FirstName;
-			updateuser.LastName = updateModel.LastName;
-			updateuser.Email = updateModel.Email;
-            updateuser.Designation = updateModel.Designation;
-            updateuser.LastUpdatedAt= DateTime.Now;
+			updateUser.FirstName = updateModel.FirstName;
+			updateUser.LastName = updateModel.LastName;
+			updateUser.Email = updateModel.Email;
+			updateUser.Designation = updateModel.Designation;
+			updateUser.LastUpdatedAt= DateTime.Now;
 
-			context.Profiles.Update(updateuser);
+			context.Profiles.Update(updateUser);
             context.SaveChanges();
-            return updateuser;
+            return updateUser;
 		}
 
         private string GenerateDefaultImage()

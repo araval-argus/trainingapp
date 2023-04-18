@@ -1,9 +1,9 @@
 export interface MessageModel
 {
-  Content:string,
-  MessageFrom:string,
-  MessageTo:string,
-  RepliedTo:number,
-  Seen : number,
-  Type : string
+  content:string,
+  messageFrom:string,
+  messageTo:string,
+  repliedTo:number,
+  seen : number,
+  type : string
 }

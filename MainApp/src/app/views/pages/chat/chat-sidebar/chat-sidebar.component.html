@@ -3,12 +3,12 @@
     <div class="d-flex justify-content-between align-items-center pb-2 mb-2">
       <div class="d-flex align-items-center">
         <figure class="mr-2 mb-0">
-          <img [src]="ImageSource" class="img-sm rounded-circle" alt="profile">
+          <img [src]="imageSource" class="img-sm rounded-circle" alt="profile">
           <div class="status online"></div>
         </figure>
         <div>
           <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
-          <p class="text-muted tx-13">{{loggedInUser.Designation}}</p>
+          <p class="text-muted tx-13">{{loggedInUser.designation}}</p>
         </div>
       </div>
       <div class="dropdown" ngbDropdown>
@@ -33,8 +33,7 @@
         <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Search here..." (input)="onSearch($event)">
       </div>
       <!-- DROPDOWN -->
-      <div class="dropdown appDropdown" style="position: absolute;z-index: 100; background-color: white; width:80%;"
-        appDropdown>
+      <div class="dropdown" *ngIf="showDropDown" appClickOutside (clickedOutside)="Outside()" style="position: absolute;z-index: 100; background-color: white; width:80%;">
         <div class="dropdown-item pl-0" *ngFor="let colleague of colleagues , let i = index " (click)="onColleagueSelected(colleague)" [routerLink]="[colleague.userName]">
           <div class="d-inline-flex" >
             <div>
@@ -62,10 +61,10 @@
           <div class="ps" [perfectScrollbar]>
             <div style="display: flex; justify-content: space-between;">
               <p class="text-muted mb-1">Recent chats</p>
-              <p class="text-muted mb-1 mdi mdi-checkbox-multiple-marked-outline onhoverr"  title="Mark all as read" (click)="MarkAllAsRead()"></p>
+              <p class="text-muted mb-1 mdi mdi-checkbox-multiple-marked-outline onhoverr"  title="Mark all as read" (click)="markAllAsRead()"></p>
             </div>
             <ul class="list-unstyled chat-list px-1" >
-              <li class="chat-item pr-1" *ngFor="let recent of RecentChatList , let i = index" [routerLink]="[recent.userName]">
+              <li class="chat-item pr-1" *ngFor="let recent of recentChatList , let i = index" (click)="removeMarkCount(recent.userName)" [routerLink]="[recent.userName]">
                 <a  class="d-flex align-items-center">
                   <figure class="mb-0 mr-2">
                     <img [src]="ImageStartUrl + recent.imagePath" class="img-xs rounded-circle" alt="user">
@@ -74,14 +73,14 @@
                   <div class="d-flex justify-content-between flex-grow border-bottom">
                     <div>
                       <p class="text-body font-weight-bold">{{recent.firstName}} {{recent.lastName}}</p>
-                      <p *ngIf="recent.type == null" class="text-muted tx-13">{{recent.content}}</p>
+                      <p *ngIf="recent.type == null" class="text-muted tx-13">{{recent.content | slice:0:30}}{{recent.content.length<30?'':'...'}}</p>
                       <p *ngIf="recent.type == 'audio'" class="text-muted tx-13">Audio</p>
                       <p *ngIf="recent.type == 'video'" class="text-muted tx-13">Video</p>
                       <p *ngIf="recent.type == 'image'" class="text-muted tx-13">Photo</p>
                     </div>
                     <div class="d-flex flex-column align-items-end">
                       <div style="display: flex;">
-                        <p class="text-muted tx-13 mb-1  mdi mdi-checkbox-marked-outline"  title="Mark as read" (click)="MarkAsRead($event ,recent.userName)"></p>
+                        <p class="text-muted tx-13 mb-1  mdi mdi-checkbox-marked-outline"  title="Mark as read" (click)="markAsRead($event ,recent.userName)"></p>
                        <p class="text-muted tx-13 mb-1">{{recent.createdAt | date:'shortTime'}}</p>
                       </div>
                     <div class="badge badge-pill badge-primary ml-auto" *ngIf="recent.seen > 0">{{recent.seen}}</div>

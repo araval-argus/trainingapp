@@ -56,17 +56,17 @@ namespace ChatApp.Controllers
 
         [Authorize]
         [HttpPost("update-profile")]
-        public IActionResult UpdateProfile([FromForm] UpdateModel updatemodel, [FromHeader] string Authorization)
+        public IActionResult UpdateProfile([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
             var handler = new JwtSecurityTokenHandler();
             string auth = Authorization.Split(' ')[1];
             var decodedToken = handler.ReadJwtToken(auth);
 
-            string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+            string userName = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
 
-            if (updatemodel.UserName == username)
+            if (updateModel.UserName == userName)
             {    //Method to update User Profile
-                var user = _profileService.UpdateUser(updatemodel, username);
+                var user = _profileService.UpdateUser(updateModel, userName);
                 {
                     var tokenString = GenerateJSONWebToken(user);
                     return Ok(new { token = tokenString, user = user });
@@ -75,10 +75,10 @@ namespace ChatApp.Controllers
             return BadRequest(new { Message = " Cannot Update User " });
         }
 
-        [HttpGet("{username}")]
-        public IActionResult GetUser(string username)
+        [HttpGet("{userName}")]
+        public IActionResult GetUser(string userName)
         {
-            Profile user = _profileService.GetUser(profile => profile.UserName == username);
+            Profile user = _profileService.GetUser(profile => profile.UserName == userName);
             ColleagueModel model = new ColleagueModel();
             model.UserName = user.UserName;
             model.FirstName = user.FirstName;

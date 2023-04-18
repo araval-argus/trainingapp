@@ -53,12 +53,12 @@ namespace ChatApp.Controllers
 			return BadRequest();
 		}
 
-		[HttpGet("MsgList{seluserusername}")]
-		public IActionResult GetMessage(string seluserusername , [FromHeader] string Authorization)
+		[HttpGet("MsgList{selUserUserName}")]
+		public IActionResult GetMessage(string selUserUserName , [FromHeader] string Authorization)
 		{
 			string userName = GetUsernameFromToken(Authorization);
 
-			IEnumerable<MessageSendModel> msgList = _chatService.GetMsg(userName, seluserusername);
+			IEnumerable<MessageSendModel> msgList = _chatService.GetMsg(userName, selUserUserName);
 			if(msgList!=null)
 			{
 				return Ok(msgList);
@@ -66,14 +66,14 @@ namespace ChatApp.Controllers
 			return Ok();
 		}
 
-		[HttpPost("MarkAsRead{seluserusername}")]
-		public IActionResult MarkAsRead(string seluserusername ,[FromHeader] string Authorization)
+		[HttpPost("MarkAsRead{selUserUserName}")]
+		public IActionResult MarkAsRead(string selUserUserName, [FromHeader] string Authorization)
 		{
 			string userName = GetUsernameFromToken(Authorization);
 
-			if (userName != null && seluserusername != null)
+			if (userName != null && selUserUserName != null)
 			{
-				_chatService.MarkAsRead(userName, seluserusername);
+				_chatService.MarkAsRead(userName, selUserUserName);
 				return Ok();
 			}
 			return BadRequest();
@@ -97,8 +97,8 @@ namespace ChatApp.Controllers
 			string auth = Authorization.Split(' ')[1];
 			var decodedToken = handler.ReadJwtToken(auth);
 
-			string username = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
-			return username;
+			string userName = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+			return userName;
 		}
 	}
 }

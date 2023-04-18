@@ -16,38 +16,43 @@ export class ChatSidebarComponent implements OnInit {
 
   defaultNavActiveId = 1;
   loggedInUser : LoggedInUser;
-  ImageSource : string;
+  imageSource : string;
   colleagues : ColleagueModel [] = [] ;
-  RecentChatList : RecentChatModel[] =[];
+  recentChatList : RecentChatModel[] =[];
   ImageStartUrl = environment.ImageUrl;
-
+  showDropDown : boolean = false;
 
   constructor(private authService : AuthService ,private router : Router ,
     private route : ActivatedRoute , private chatService : ChatService ) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
-    this.FetchRecentChat();
-    this.chatService.MarkAsSeenChanged.subscribe(()=>{
-      this.FetchRecentChat();
-    })
+    //console.log(this.loggedInUser);
+    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
+    this.fetchRecentChat();
+
     this.chatService.DidAMessage.subscribe(()=>{
-      this.FetchRecentChat();
+      this.fetchRecentChat();
     });
   }
 
-  FetchRecentChat(){
-    this.chatService.LoadRecentChat().subscribe((data:RecentChatModel[])=>{
-      this.RecentChatList = data;
+  fetchRecentChat(){
+    this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
+      this.recentChatList = data;
     })
   }
 
   onColleagueSelected(selUser : ColleagueModel){
-    console.log('User Selected');
+    this.Outside();
+    this.recentChatList.forEach((recent)=>{
+      if(recent.userName === selUser.userName){
+      recent.seen = 0;
+      }
+    })
    }
 
    onSearch(event:any){
+    this.showDropDown = true;
     if(event.target.value.length>2){
       this.chatService.search(event.target.value)
         .subscribe((data: ColleagueModel[]) => {
@@ -65,18 +70,31 @@ export class ChatSidebarComponent implements OnInit {
     this.router.navigate(['../view-profile'],{relativeTo:this.route});
    }
 
-   MarkAllAsRead(){
-    this.chatService.MarkAsRead('All').subscribe();
-    this.chatService.MarkAsSeenChanged.next();
+   markAllAsRead(){
+    this.chatService.markAsRead('All').subscribe();
+    this.recentChatList.forEach((recent)=>{
+      recent.seen = 0;
+    })
    }
 
-   MarkAsRead(e:Event , username:string){
+   markAsRead(e:Event , username:string){
     e.preventDefault();
     e.stopPropagation();
-    this.chatService.MarkAsRead(username).subscribe();
-    this.chatService.MarkAsSeenChanged.next();
+    this.chatService.markAsRead(username).subscribe();
+    this.removeMarkCount(username);
    }
 
+   removeMarkCount(username : string){
+    this.recentChatList.forEach((recent)=>{
+      if(recent.userName === username){
+      recent.seen = 0;
+      }
+    })
+   }
+
+   Outside(){
+    this.showDropDown = false;
+   }
 
   ngAfterViewInit(): void {
     // Show chat-content when clicking on chat-item for tablet and mobile devices
@@ -97,3 +115,5 @@ export class ChatSidebarComponent implements OnInit {
   }
 
 }
+
+

@@ -15,7 +15,7 @@ import { environment } from 'src/environments/environment';
 export class NavbarComponent implements OnInit {
 
   loggedInUser: LoggedInUser;
-  ImageSource : String;
+  imageSource : String;
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -26,10 +26,10 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
     this.authService.UserProfileChanged.subscribe(()=>{
       this.loggedInUser = this.authService.getLoggedInUserInfo();
-      this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+      this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
     })
   }
 

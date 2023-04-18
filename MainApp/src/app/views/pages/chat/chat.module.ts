@@ -7,7 +7,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { ChatComponent } from './chat.component';
 import { ChatSidebarComponent } from './chat-sidebar/chat-sidebar.component';
 import { ChatLoadComponent } from './chat-load/chat-load.component';
-import { ScrollToBottomDirective } from 'src/app/core/helper/scroll-to-bottom.directive';
+import { ClickOutsideDirective } from 'src/app/core/helper/click-outside.directive';
 
 const routes: Routes = [
   {
@@ -22,7 +22,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [ChatComponent , ChatSidebarComponent , ChatLoadComponent, ScrollToBottomDirective],
+  declarations: [ChatComponent , ChatSidebarComponent , ChatLoadComponent, ClickOutsideDirective ],
   imports: [
     RouterModule.forChild(routes),
     NgbDropdownModule,

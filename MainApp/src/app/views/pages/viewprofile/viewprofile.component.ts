@@ -11,12 +11,12 @@ import { environment } from 'src/environments/environment';
 export class ViewprofileComponent implements OnInit {
 
   loggedInUser:LoggedInUser;
-  ImageSource : string;
+  imageSource : string;
   constructor(private authService : AuthService) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
     }
 }
 

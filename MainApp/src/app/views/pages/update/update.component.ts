@@ -15,31 +15,31 @@ import Swal from 'sweetalert2';
 export class UpdateComponent implements OnInit {
 
   loggedInUser : LoggedInUser;
-  ImageFile : File;
-  ImageUrl : string;
+  imageFile : File;
+  imageUrl : string;
 
   constructor(private authService : AuthService, private accountService : AccountService) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.ImageUrl = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.imageUrl = environment.ImageUrl + this.loggedInUser.imagePath;
   }
 
   onFileSelected(event) {
     if (event.target.files.length > 0) {
-      this.ImageFile = (event.target as HTMLInputElement).files[0];
-      console.log(this.ImageFile);
+      this.imageFile = (event.target as HTMLInputElement).files[0];
+      console.log(this.imageFile);
     }
   }
 
   onSubmit(){
     const formdata = new FormData();
-    formdata.append('username',this.loggedInUser.UserName);
+    formdata.append('username',this.loggedInUser.userName);
     formdata.append('firstName' ,this.loggedInUser.firstName);
     formdata.append('lastName' ,this.loggedInUser.lastName);
     formdata.append('email' ,this.loggedInUser.email);
-    formdata.append('designation',this.loggedInUser.Designation);
-    formdata.append('profileImage',this.ImageFile);
+    formdata.append('designation',this.loggedInUser.designation);
+    formdata.append('profileImage',this.imageFile);
     this.accountService.update(formdata)
       .subscribe((data:any) => {
         this.authService.login(data.token, () => {

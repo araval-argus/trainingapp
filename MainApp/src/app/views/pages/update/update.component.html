@@ -5,7 +5,7 @@
 
       <div class="mb-3">
         <label for="username" class="form-label">UserName</label>
-        <input type="text" class="form-control" id="exampleInputDisabled1" readonly [(ngModel)]="loggedInUser.UserName" name="username" >
+        <input type="text" class="form-control" id="exampleInputDisabled1" readonly [(ngModel)]="loggedInUser.userName" name="username" >
       </div>
 
       <div class="mb-3">
@@ -27,7 +27,7 @@
 
       <div class="mb-3">
         <label for="designation" class="form-label">Designation</label>
-        <input type="text" class="form-control" id="designation"  [(ngModel)]="loggedInUser.Designation" name="designation" placeholder="Enter Designation" #designation="ngModel" required >
+        <input type="text" class="form-control" id="designation"  [(ngModel)]="loggedInUser.designation" name="designation" placeholder="Enter Designation" #designation="ngModel" required >
       </div>
       <span *ngIf="designation.invalid && designation.touched" class="text-danger"><p>Enter a Valid Designation</p></span>
 

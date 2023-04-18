@@ -1,7 +1,6 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ScrollToBottomDirective } from 'src/app/core/helper/scroll-to-bottom.directive';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { MessageDisplayModel } from 'src/app/core/models/message-display-model';
@@ -15,7 +14,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './chat-load.component.html',
   styleUrls: ['./chat-load.component.scss']
 })
-export class ChatLoadComponent implements OnInit {
+export class ChatLoadComponent implements OnInit , AfterViewChecked{
 
   localPath : string = environment.ImageUrl;
   basicModalCode: any;
@@ -23,38 +22,39 @@ export class ChatLoadComponent implements OnInit {
   selUser: ColleagueModel;
   selUserImage : string;
   loggedInUser : LoggedInUser;
-  ImageSource : string;
+  imageSource : string;
   msg : MessageModel ;
   displayMsgList : MessageDisplayModel[] = [];
-  IsReplying : Boolean = false;
-  RplyMsg : string ;
-  RplyMsgId: number;
-  ImageFile : File;
-  //To Scroll to Bottom
-  @ViewChild(ScrollToBottomDirective)
-  scroll: ScrollToBottomDirective;
+  isReplying : Boolean = false;
+  rplyMsg : string ;
+  rplyMsgLen : number;
+  rplyMsgId: number;
+  imageFile : File;
+  @ViewChild('scrollMe') private myScrollContainer: ElementRef;
 
   constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService , private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.msg = {
-      Content: '',
-      MessageFrom: '',
-      MessageTo: '',
-      RepliedTo:-1,
-      Seen :0,
-      Type:''
+      content: '',
+      messageFrom: '',
+      messageTo: '',
+      repliedTo:-1,
+      seen :0,
+      type:''
     };
+
+    this.scrollToBottom();
 
     this.route.params.subscribe(
       (params : Params) =>{
         this.username = params['username'];
 
-        this.chatService.GetUser(this.username).subscribe((data:ColleagueModel)=>{
+        this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
           this.selUser = data;
           this.selUserImage = environment.ImageUrl + data.imagePath;
 
-          this.chatService.FetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
+          this.chatService.fetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
             this.displayMsgList = data;
            // console.log(this.displayMsgList);
           })
@@ -62,53 +62,58 @@ export class ChatLoadComponent implements OnInit {
       });
 
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.ImageSource = environment.ImageUrl + this.loggedInUser.ImagePath;
+    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
 
-    this.chatService.GetUser(this.username).subscribe((data:ColleagueModel)=>{
+    this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
       this.selUser = data;
       this.selUserImage = environment.ImageUrl + data.imagePath;
 
-      this.chatService.FetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
-        console.log(data);
+      this.chatService.fetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
         this.displayMsgList = data;
-        console.log(this.displayMsgList);
       })
     })
+  }
+
+  ngAfterViewChecked():void {
+    this.scrollToBottom();
   }
 
   onMessage(message:HTMLInputElement){
     if(message.value.trim()==''){}
     else{
-    this.msg.Content = message.value;
-    this.msg.MessageFrom = this.loggedInUser.UserName;
-    this.msg.MessageTo = this.selUser.userName;
-    if(this.IsReplying)
+    this.msg.content = message.value;
+    this.msg.messageFrom = this.loggedInUser.userName;
+    this.msg.messageTo = this.selUser.userName;
+    if(this.isReplying)
     {
-      this.msg.RepliedTo = this.RplyMsgId;
+      this.msg.repliedTo = this.rplyMsgId;
     }
     else{
-      this.msg.RepliedTo = -1;
+      this.msg.repliedTo = -1;
     }
-    this.msg.Seen=0;
-    this.msg.Type=null;
+    this.msg.seen=0;
+    this.msg.type=null;
     this.chatService.doMessage(this.msg).subscribe((data:MessageDisplayModel)=>{
       this.displayMsgList.push(data);
       this.chatService.DidAMessage.next();
     });
     message.value = null;
-    this.CloseRplyMsg();
+    this.closeRplyMsg();
     }
   }
 
-  ToggleReplyMsg(popupmessage:MessageDisplayModel){
-    this.IsReplying = true;
-    this.RplyMsg = popupmessage.content;
-    this.RplyMsgId = popupmessage.id;
+  toggleReplyMsg(popupmessage:MessageDisplayModel){
+    this.isReplying = true;
+    this.rplyMsg = popupmessage.content;
+    this.rplyMsgId = popupmessage.id;
+    this.rplyMsgLen = popupmessage.content.length;
   }
 
-  CloseRplyMsg(){
-    this.IsReplying = false;
-    this.RplyMsg = '';
+  closeRplyMsg(){
+    this.isReplying = false;
+    this.rplyMsg = '';
+    this.rplyMsgId = -1;
+    this.rplyMsgLen = 0;
   }
 
   openBasicModal(content) {
@@ -118,15 +123,15 @@ export class ChatLoadComponent implements OnInit {
 
   onFileSelected(event){
     if (event.target.files.length > 0) {
-      this.ImageFile = (event.target as HTMLInputElement).files[0];
+      this.imageFile = (event.target as HTMLInputElement).files[0];
     }
   }
 
-  UploadFile(){
+  uploadFile(){
     console.log('Sending.....');
     const formdata = new FormData();
-    formdata.append('File',this.ImageFile);
-    formdata.append('MessageFrom',this.loggedInUser.UserName),
+    formdata.append('File',this.imageFile);
+    formdata.append('MessageFrom',this.loggedInUser.userName),
     formdata.append('MessageTo',this.selUser.userName),
     this.chatService.sendFileMessage(formdata).subscribe((data:MessageDisplayModel)=>{
       console.log(data);
@@ -134,6 +139,12 @@ export class ChatLoadComponent implements OnInit {
       console.log(this.displayMsgList);
       this.chatService.DidAMessage.next();
     })
+  }
+
+  scrollToBottom(): void {
+    try {
+        this.myScrollContainer.nativeElement.scrollTop = this.myScrollContainer.nativeElement.scrollHeight;
+    } catch(err) { }
   }
 
 }
