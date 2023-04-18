@@ -30,6 +30,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
   rplyMsgLen : number;
   rplyMsgId: number;
   imageFile : File;
+  todayDate : Date = new Date();
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
 
   constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService , private modalService: NgbModal) { }

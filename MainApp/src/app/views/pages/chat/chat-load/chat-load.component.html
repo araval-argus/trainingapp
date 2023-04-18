@@ -25,8 +25,15 @@
     </div>
   </div>
 </div>
+<div style="min-height:60vh; display:flex; flex-direction:column;
+            justify-content:space-between;">
 <div class="chat-body" [perfectScrollbar] #scrollMe>
   <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
+    <li *ngIf="i===0||((displayMsgList[i].createdAt | date:'shortDate') !==(displayMsgList[i-1].createdAt| date:'shortDate'))">
+      <div class="text-center">
+        {{msg.createdAt| date:'mediumDate'}}
+      </div>
+    </li>
     <li *ngIf="msg.messageFrom == selUser.userName" class="message-item friend">
       <img [src]="selUserImage" class="img-xs rounded-circle" alt="avatar">
       <div class="content"(dblclick)="toggleReplyMsg(msg)">
@@ -128,4 +135,5 @@
       <i class="feather icon-send"></i>
     </button>
   </div>
+</div>
 </div>

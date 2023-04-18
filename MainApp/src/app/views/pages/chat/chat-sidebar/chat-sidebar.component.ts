@@ -85,16 +85,34 @@ export class ChatSidebarComponent implements OnInit {
    }
 
    removeMarkCount(username : string){
-    this.recentChatList.forEach((recent)=>{
-      if(recent.userName === username){
-      recent.seen = 0;
-      }
-    })
+    var recent = this.recentChatList.find(recent=>recent.userName===username);
+    recent.seen = 0;
    }
 
    Outside(){
     this.showDropDown = false;
    }
+
+   recentChatDate(date: Date): string {
+    const recievedDate = new Date(date)
+    const today = new Date();
+    let curDate = recievedDate.getDate();
+    let curMonth = recievedDate.getMonth();
+    let curYear = recievedDate.getFullYear()
+    if (
+      curDate === today.getDate() &&
+      curMonth === today.getMonth() &&
+      curYear === today.getFullYear()
+    ) {
+      // Date is same as today, return time
+      const hours = recievedDate.getHours().toString().padStart(2, '0');
+      const minutes = recievedDate.getMinutes().toString().padStart(2, '0');
+      return `${hours}:${minutes}`;
+    } else {
+      // Date is different from today, return full date
+      return `${curDate}/${curMonth}/${curYear}`;
+    }
+  }
 
   ngAfterViewInit(): void {
     // Show chat-content when clicking on chat-item for tablet and mobile devices
