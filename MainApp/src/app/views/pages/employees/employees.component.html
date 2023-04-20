@@ -1,0 +1,89 @@
+<p-table [value]="employees" [scrollable]="true" [rows]="10" [style]="{width:'100%'}" scrollHeight="500px" styleClass="p-datatable-sm">
+  <ng-template pTemplate="colgroup" let-columns>
+    <colgroup>
+        <col style="width:100px">
+        <col style="width:100px">
+        <col style="width:200px">
+        <col style="width:100px">
+        <col style="width:64px">
+        <col style="width:90px" *ngIf="isAdmin">
+    </colgroup>
+</ng-template>
+  <ng-template pTemplate="header">
+    <tr>
+      <th>Name</th>
+      <th>UserName</th>
+      <th>Email</th>
+      <th>Designation</th>
+      <th>Image</th>
+      <th *ngIf="isAdmin">   </th>
+    </tr>
+  </ng-template>
+
+  <ng-template pTemplate="body" let-employee>
+    <tr>
+      <td>{{ employee.firstName }} {{ employee.lastName }}</td>
+      <td>{{ employee.userName }}</td>
+      <td>{{ employee.email }}</td>
+      <td>{{ employee.designation.designation }}</td>
+      <td><img [src]="employee.imageUrl" alt="" class="rounded-circle" width="32"></td>
+      <td *ngIf="isAdmin">
+        <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
+         (click)="selectEmployee(employee); openScrollableModal(scrollableModal)"></button>
+        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning ml-2" (click)="deleteEmployee(employee)"></button>
+      </td>
+    </tr>
+  </ng-template>
+</p-table>
+
+
+  <!-- Modal -->
+  <ng-template #scrollableModal let-modal>
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Edit Information</h5>
+      <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <form #formVar="ngForm" enctype="multipart/form-data" (ngSubmit)="updateEmployeeData()">
+        <input type="hidden" [(ngModel)]="selectedEmployee.userName" name="userName">
+        <div class="form-group">
+          <label for="firstNameInput">First Name</label>
+          <input type="text" class="form-control" id="firstNameInput" [(ngModel)]="selectedEmployee.firstName"
+            #firstNameInput="ngModel" name="firstNameInput" required />
+          <span class="text-danger" *ngIf="firstNameInput.invalid && firstNameInput.touched">*Required field</span>
+        </div>
+        <div class="form-group">
+          <label for="lastNameInput">Last Name</label>
+          <input type="text" class="form-control" id="lastNameInput" [(ngModel)]="selectedEmployee.lastName"
+            #lastNameInput="ngModel" name="lastNameInput" required>
+          <span class="text-danger" *ngIf="lastNameInput.invalid && lastNameInput.touched">*Required field</span>
+        </div>
+        <div class="form-group">
+          <label for="lastNameInput">Username</label>
+          <input type="text" class="form-control" id="usernameInput" [(ngModel)]="selectedEmployee.userName"
+            #usernameInput="ngModel" name="usernameInput" (input)="onUserNameValueChange($event)" required>
+          <span class="text-danger" *ngIf="usernameInput.invalid && usernameInput.touched">*Required field</span>
+          <span class="text-danger" *ngIf="usernameInput.valid && usernameExists">*username already exists</span>
+        </div>
+        <div class="form-group">
+          <label for="emailInput">Email Address</label>
+          <input type="text" class="form-control" id="emailInput" [(ngModel)]="selectedEmployee.email" #emailInput="ngModel"
+            name="emailInput" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+          <span class="text-danger" *ngIf="emailInput.invalid && emailInput.touched">*Enter an email id</span>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputPassword1">Designation</label>
+          <select type="text" [(ngModel)]="selectedEmployee.designation.id" name="designationInput" class="form-control" (input)="designationChanged($event)">
+            <option *ngFor="let designation of designations" [value]="designation.id" class="form-control">{{ designation.designation }}</option>
+          </select>
+        </div>
+        <button type="submit" #submitButton class="d-none"></button>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+      <button type="submit" class="btn btn-primary" [disabled]="formVar.invalid" (click)="submitButton.click(); modal.close('by: submit button')">Save changes</button>
+    </div>
+  </ng-template>

@@ -3,6 +3,7 @@ using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
 using System;
 using System.Collections.Generic;
@@ -21,7 +22,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public IEnumerable<FriendProfileModel> FetchFriendsProfiles(string searchTerm)
         {
-            return context.Profiles
+            return context.Profiles.Include("Designation")
                 .Where(profile => profile.FirstName.ToLower().StartsWith(searchTerm))
                 .Select(profile => new FriendProfileModel()
                 {
@@ -29,7 +30,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     LastName = profile.LastName,
                     Email = profile.Email,
                     UserName = profile.UserName,
-                    Designation = Business.Helpers.Designation.getDesignationType(profile.DesignationID),
+                    Designation = profile.Designation,
                     ImageUrl = profile.ImageUrl,
                 }); ;
         }

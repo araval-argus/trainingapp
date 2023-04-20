@@ -4,7 +4,7 @@ import { BaseComponent } from "./views/layout/base/base.component";
 import { AuthGuard } from "./core/guard/auth.guard";
 import { ErrorPageComponent } from "./views/pages/error-page/error-page.component";
 import { EditFormComponent } from "./views/pages/edit-form/edit-form.component";
-import { ChatComponent } from "./views/pages/chat/chat.component";
+import { EmployeesAuthGuard } from './core/guard/employees-auth.guard';
 
 const routes: Routes = [
   {
@@ -30,7 +30,16 @@ const routes: Routes = [
       },
       {
         path: "chats",
-        component: ChatComponent
+        loadChildren: () =>
+          import("./views/pages/chat/chat.module").then((m) => m.ChatModule),
+      },
+      {
+        path: "employees",
+        canActivate: [EmployeesAuthGuard],
+        loadChildren: () =>
+          import("./views/pages/employees/employees.module").then(
+            (m) => m.EmployeesModule
+          ),
       },
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
     ],

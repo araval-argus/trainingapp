@@ -94,8 +94,8 @@ namespace ChatApp.Controllers
                 }
                 var tokenString = GenerateJSONWebToken(user);
                 return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
-             }
-                return BadRequest(new { Message = "User does not exists" });
+            }
+            return BadRequest(new { Message = "User does not exists" });
         }
 
         [HttpGet("checkUsername")]

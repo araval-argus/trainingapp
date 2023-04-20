@@ -42,7 +42,6 @@ export class ChatContentFooterComponent implements OnInit {
       message: this.messageInput.nativeElement.value,
       repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"
     };
-    console.log(messageModel);
     this.signalRService.sendMessage(messageModel);
     this.messageInput.nativeElement.value = "";
     this.messageToBeReplied = null;
@@ -57,7 +56,7 @@ export class ChatContentFooterComponent implements OnInit {
 
   sendFile(){
     let file = this.fileInput.nativeElement.files[0];
-    console.log(file)
+
 
     const formData = new FormData();
     formData.append("file",file);
@@ -73,7 +72,6 @@ export class ChatContentFooterComponent implements OnInit {
   }
 
   addEmoji(event: any){
-    console.log(event.emoji.native);
     this.messageInput.nativeElement.value += event.emoji.native;
   }
 
@@ -82,7 +80,6 @@ export class ChatContentFooterComponent implements OnInit {
     emojiMart.classList.toggle('d-none');
   }
   cancelReply() {
-    console.log(this.messageToBeReplied.id);
     this.messageToBeReplied = null;
   }
 }

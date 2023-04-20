@@ -32,8 +32,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         // this method checks (username and password) or (email and password)
         public Profile CheckPassword(LoginModel model)
         {
-            return this.context.Profiles.Include("Designation").FirstOrDefault(x => model.Password == x.Password
-            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()));
+            return this.context.Profiles.Include("Designation").FirstOrDefault(x => x.IsActive && (model.Password == x.Password
+            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim())));
         }
 
         public Profile RegisterUser(RegisterModel regModel)
@@ -55,6 +55,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
+
+                newUser = context.Profiles.Include("Designation").FirstOrDefault(p => p.UserName == regModel.UserName);
             }
             return newUser;
         }
@@ -77,13 +79,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         private bool CheckEmailOrUserNameExists(string userName, string email)
         {
-            return context.Profiles.Any(x => x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim());
+            return context.Profiles.Any(x => x.IsActive && (x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim()));
         }
 
         public Profile FetchProfile(string userName)
         {
             Profile user = null;
-            user = context.Profiles.FirstOrDefault(u => u.UserName.Trim() == userName.Trim());
+            if (!string.IsNullOrEmpty(userName))
+            {
+                user = this.context.Profiles.Include("Designation").FirstOrDefault(u => u.IsActive && u.UserName.Trim() == userName.Trim());
+            }
             return user;
         }
 
@@ -93,7 +98,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             {
                 return false;
             }
-            return context.Profiles.Any(p => p.UserName.Trim() == userName.Trim());
+            return context.Profiles.Any(p => p.IsActive && p.UserName.Trim() == userName.Trim());
         }
 
         private string SetDefaultImage()
@@ -112,13 +117,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public int FetchIdFromUserName(string userName)
         {
             return this.context.Profiles.FirstOrDefault(
-                profile => profile.UserName.Equals(userName)).Id;
+                profile => profile.IsActive && profile.UserName.Equals(userName)).Id;
         }
 
         public string FetchUserNameFromId(int id)
         {
             return this.context.Profiles.FirstOrDefault(
-                profile => profile.Id == id
+                profile => profile.IsActive && profile.Id == id
                 ).UserName;
         }
 
@@ -139,7 +144,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             //for fetching the profiles
             foreach(int id in Ids)
             {
-                var profile = this.context.Profiles.FirstOrDefault(p => p.Id == id);
+                var profile = this.context.Profiles.Include("Designation").FirstOrDefault(p => p.IsActive && p.Id == id);
                 friendsProfiles.Add(profile);
             }
 
@@ -155,7 +160,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     return new FriendProfileModel()
                     {
                         UserName = profile.UserName,
-                        Designation = Business.Helpers.Designation.getDesignationType(profile.DesignationID),
+                        Designation = profile.Designation,
                         Email = profile.Email,
                         FirstName = profile.FirstName,
                         LastName = profile.LastName,
@@ -183,7 +188,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool ChangePassword(PasswordModel passwordModel)
         {
-            Profile profile = this.context.Profiles.FirstOrDefault(p => p.UserName == passwordModel.UserName && p.Password == passwordModel.OldPassword);
+            Profile profile = this.context.Profiles.FirstOrDefault(p => p.IsActive && p.UserName == passwordModel.UserName && p.Password == passwordModel.OldPassword);
             if(profile != null)
             {
                 profile.Password = passwordModel.NewPassword;
@@ -195,7 +200,24 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
        
+        public IEnumerable<Profile> FetchAllProfiles()
+        {
+            var employees = this.context.Profiles.Include("Designation").Where(p => p.IsActive).AsNoTracking();
+            return employees;
+        }
 
+        public void DeleteProfile(Profile profile)
+        {
+            profile.IsActive = false;
+            this.context.Profiles.Update(profile);
+            this.context.SaveChanges();
+        }
+
+        public void UpdateEmployeeProfile(Profile employee)
+        {
+            this.context.Profiles.Update(employee);
+            this.context.SaveChanges();
+        }
     }
 }
 

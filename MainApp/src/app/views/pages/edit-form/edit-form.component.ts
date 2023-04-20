@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, OnInit, ViewChild } from '@angular/core';
+import { Component,  EventEmitter, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JwtHelper } from 'src/app/core/helper/jwt-helper';

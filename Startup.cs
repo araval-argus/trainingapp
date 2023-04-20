@@ -1,3 +1,4 @@
+using ChatApp.Business.Helpers;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Hubs;
@@ -30,7 +31,6 @@ namespace ChatApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ChatAppContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("Default")));
-
             // Default Policy
             services.AddCors(options =>
             {
@@ -46,6 +46,7 @@ namespace ChatApp
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
              {
+                 
                  options.TokenValidationParameters = new TokenValidationParameters
                  {
                      ValidateIssuer = true,
@@ -57,6 +58,19 @@ namespace ChatApp
                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                  };
              });
+
+            services.AddAuthorization( options =>
+            {
+                options.AddPolicy("Employee", policy =>
+                {
+                    policy.RequireClaim(ClaimsConstant.DesignationClaim, "Chief Technical Officer", "Programmer Analyst",
+                        "Solution Analyst", "Lead Solution Analyst", "Quality Analyst");
+                });
+                options.AddPolicy("Admin", policy =>
+                {
+                    policy.RequireClaim(ClaimsConstant.DesignationClaim, "Chief Technical Officer");
+                });
+            });
 
             services.AddControllersWithViews();
 

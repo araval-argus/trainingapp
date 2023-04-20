@@ -13,5 +13,6 @@
     [LastUpdatedBy] INT NULL, 
     [ImageUrl] NVARCHAR(1000) NULL,
     [DesignationID] INT,
+    [IsActive] BIT NOT NULL DEFAULT 1, 
     FOREIGN KEY ([DesignationID]) REFERENCES [Designations]([id])
 )

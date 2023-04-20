@@ -30,6 +30,10 @@ namespace ChatApp.Business.ServiceInterfaces
 
         bool ChangePassword(PasswordModel passwordModel);
 
+        IEnumerable<Profile> FetchAllProfiles();
 
+        void DeleteProfile(Profile profile);
+
+        void UpdateEmployeeProfile(Profile employee);
     }
 }

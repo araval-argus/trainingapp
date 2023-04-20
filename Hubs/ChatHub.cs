@@ -61,6 +61,7 @@ namespace ChatApp.Hubs
             };
 
             this.onlineUserService.RegisterOnlineUser(onlineUserEntity);
+
         }
 
         public async Task AddMessage(MessageModel messageModel)

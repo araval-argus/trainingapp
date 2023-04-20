@@ -9,4 +9,5 @@ export interface MenuItem {
   isTitle?: boolean;
   badge?: any;
   parentId?: number;
+  //to make this item appear for certain type of users
 }

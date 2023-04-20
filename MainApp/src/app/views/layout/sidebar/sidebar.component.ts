@@ -6,6 +6,7 @@ import MetisMenu from 'metismenujs/dist/metismenujs';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { Router, NavigationEnd } from '@angular/router';
+import { AuthService } from 'src/app/core/service/auth-service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,7 +20,12 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   menuItems = [];
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
 
-  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router) { 
+  constructor(@Inject(DOCUMENT) private document: Document,
+   private renderer: Renderer2,
+   router: Router,
+   private authService: AuthService
+  ) {
+
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
 
@@ -40,7 +46,6 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
-    this.menuItems = MENU;
 
     /**
      * Sidebar-folded on desktop (min-width:992px and max-width: 1199px)
@@ -48,12 +53,24 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     const desktopMedium = window.matchMedia('(min-width:992px) and (max-width: 1199px)');
     desktopMedium.addListener(this.iconSidebar);
     this.iconSidebar(desktopMedium);
+    this.authService.LoggedInUserChanged.subscribe( () => {
+      //for rendering the sidebar again
+      this.initializeMenuItems();
+    })
+    this.initializeMenuItems();
   }
 
+  initializeMenuItems(){
+    this.menuItems = MENU.slice();
+    if(this.authService.getLoggedInUserInfo().designation === "Intern" ||
+    this.authService.getLoggedInUserInfo().designation === "Probationer" ){
+      this.menuItems.pop();
+    }
+  }
   ngAfterViewInit() {
     // activate menu item
     new MetisMenu(this.sidebarMenu.nativeElement);
-    
+
     this._activateMenuDropdown();
   }
 
@@ -74,7 +91,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
 
   /**
-   * Toggle settings-sidebar 
+   * Toggle settings-sidebar
    */
   toggleSettingsSidebar(e) {
     e.preventDefault();
@@ -147,7 +164,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   resetMenuItems() {
 
     const links = document.getElementsByClassName('nav-link-ref');
-    
+
     for (let i = 0; i < links.length; i++) {
       const menuItemEl = links[i];
       menuItemEl.classList.remove('mm-active');
@@ -156,7 +173,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
       if (parentEl) {
           parentEl.classList.remove('mm-active');
           const parent2El = parentEl.parentElement;
-          
+
           if (parent2El) {
             parent2El.classList.remove('mm-show');
           }
@@ -196,13 +213,13 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     const links = document.getElementsByClassName('nav-link-ref');
 
     let menuItemEl = null;
-    
+
     for (let i = 0; i < links.length; i++) {
       // tslint:disable-next-line: no-string-literal
         if (window.location.pathname === links[i]['pathname']) {
-          
+
             menuItemEl = links[i];
-            
+
             break;
         }
     }

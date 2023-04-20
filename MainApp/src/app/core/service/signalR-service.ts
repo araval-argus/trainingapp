@@ -22,7 +22,7 @@ export class SignalRService {
   }
 
   makeConnection() {
-
+    if(this.connection.state !== "Connected"){
     this.connection.start().then(
       () => {
         console.log("connected successfully");
@@ -33,9 +33,9 @@ export class SignalRService {
       }
     );
     this.connection.on("AddMessageToTheList", (message: MessageModel) => {
-
       this.messageAdded.emit(message);
     });
+  }
   }
 
   registerUser() {

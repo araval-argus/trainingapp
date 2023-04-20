@@ -37,9 +37,6 @@ export class LoginComponent implements OnInit {
 
     // Implementation of API.
     this.accountService.login(this.loginModel).subscribe((result: any) => {
-
-      this.signalRService.makeConnection();
-
       this.authService.login(result.token, () => {
 
         Swal.fire({
@@ -57,6 +54,7 @@ export class LoginComponent implements OnInit {
         this.router.navigate([this.returnUrl]);
 
       });
+      this.signalRService.makeConnection();
     }, (err) => {
       Swal.fire({
         title: 'Error!',

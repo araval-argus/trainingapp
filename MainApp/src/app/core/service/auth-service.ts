@@ -32,7 +32,6 @@ export class AuthService {
     let token = localStorage.getItem("USERTOKEN");
     var user: LoggedInUserModel = this.jwtHelper.decodeToken(token);
     user.imageUrl = environment.apiUrl + "/../Images/Users/" + user.imageUrl
-    //console.log(user);
     //user.designation = this.setDesignation(user.designation)
     //console.log("user inside getLoggedInUserModelInfo:- ", user)
     return user;

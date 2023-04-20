@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ChatApp.Business.Helpers;
+using ChatApp.Context.EntityClasses;
+using System;
 
 namespace ChatApp.Models
 {
@@ -12,7 +14,7 @@ namespace ChatApp.Models
         public string Email { get; set; }
 
         public string ImageUrl { get; set; }
-        public string Designation { get; set; }
+        public DesignationEntity Designation { get; set; }
 
         public string? LastMessage { get; set; } = null;
 
