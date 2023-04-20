@@ -20,7 +20,7 @@ namespace ChatApp.Hubs
             _context =context;
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override Task OnDisconnectedAsync(Exception exception)
         {
             var conId = Context.ConnectionId;
 

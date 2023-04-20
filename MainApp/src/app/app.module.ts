@@ -17,6 +17,7 @@ import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
 import { ChatModule } from './views/pages/chat/chat.module';
 import { ClickOutsideDirective } from './core/directives/click-outside.directive';
+import { GroupModule } from './views/pages/group/group.module';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { ClickOutsideDirective } from './core/directives/click-outside.directive
     HttpClientModule,
     FormsModule,
     ChatModule,
+    GroupModule,
     ReactiveFormsModule,
   ],
   providers: [

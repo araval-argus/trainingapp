@@ -38,7 +38,7 @@
                     </div>
                     <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Enter First 3 Character" (input)="fetchProfile($event)" #searchBar>
                   </div>
-                </form>
+                </form> 
                 <app-search-dropdown class="overlap col-xs-0" [items]="profiles" (selectedItem)="loadInbox($event)"></app-search-dropdown>
               </div>
               <div class="aside-body navBox" style="padding-top: 2rem;">

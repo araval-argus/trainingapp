@@ -20,5 +20,9 @@ namespace ChatApp.Context
         public virtual DbSet<Profile> Profiles { get; set; }
         public virtual DbSet<Chat> Chats { get; set; }
         public virtual DbSet<Connections> Connections { get; set; }
+        public virtual DbSet<Groups> Groups { get; set; }
+        public virtual DbSet<GroupMember> GroupMember { get; set; }
+
+        public virtual DbSet<GroupMessage> GroupMessage { get; set; }
     }
 }

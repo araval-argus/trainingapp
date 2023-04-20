@@ -1,0 +1,29 @@
+.date-container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 3rem;
+    width: 100%;
+}
+.date{
+    text-align: center;
+    margin: 0 auto; 
+    background-color:darkgray;
+    border-radius: 15%;
+    margin: 1rem;
+    padding: 0.5rem;
+}
+.replying{
+    background: #f1f2fe;
+    margin: 0 auto;
+    padding: 5px;
+    border: 2px solid ;
+    width: 90%;
+    position: absolute;
+    bottom: 3rem;
+    left: 0;
+    right: 0;
+}
+.center{
+    margin: auto;
+}

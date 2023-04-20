@@ -97,7 +97,20 @@ namespace ChatApp.Business.Helpers
             return chatDTOs;
         }
 
-        //Mapper for single Chat
+        //Mapper for Group to Group DTO -- remove admin Profile
+        public static GroupDTO groupToGroupDTO(Groups group)
+        {
+            return new GroupDTO()
+            {
+                Id = group.Id,
+                Name = group.Name,
+                Description = group.Description,
+                ProfileImage = group.ProfileImage,
+                Admin = group.AdminProfile.UserName
+            };
+        }
 
+
+        //Profile 
     }
 }

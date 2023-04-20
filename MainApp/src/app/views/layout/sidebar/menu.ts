@@ -32,5 +32,10 @@ export const MENU: MenuItem[] = [
     label: 'Messages',
     icon: 'inbox',
     link: '/chat'
+  },
+  {
+    label: 'Group',
+    icon: 'users',
+    link: '/group'
   }
 ];

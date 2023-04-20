@@ -100,10 +100,18 @@ namespace ChatApp.Controllers
 
         [HttpGet("getAll")]
         [Authorize]
-        public IActionResult getAll()
+        public IActionResult getAll([FromHeader]string authorization)
         {
-            List<profileDTO> profiles = _profileService.getAll();
-            return Ok(profiles);
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if(claim != null)
+            {
+                List<profileDTO> profiles = _profileService.getAll();
+                response = Ok(profiles);
+            }
+            return response;
         }
 
         [HttpGet("getImage")]
