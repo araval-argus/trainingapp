@@ -8,7 +8,7 @@ import { AuthService } from './auth-service';
   providedIn: "root",
 })
 export class SignalRService {
-   connection: signalR.HubConnection;
+  connection: signalR.HubConnection;
 
   messageAdded: EventEmitter<MessageModel> = new EventEmitter<MessageModel>();
 
@@ -22,20 +22,24 @@ export class SignalRService {
   }
 
   makeConnection() {
-    if(this.connection.state !== "Connected"){
-    this.connection.start().then(
-      () => {
-        console.log("connected successfully");
-        this.registerUser();
-      },
-      (err) => {
-        console.log(err.message);
-      }
-    );
-    this.connection.on("AddMessageToTheList", (message: MessageModel) => {
-      this.messageAdded.emit(message);
-    });
-  }
+    if (this.connection.state !== "Connected") {
+      this.connection.start().then(
+        () => {
+          console.log("connected successfully");
+          this.registerUser();
+          this.connection.on("AddMessageToTheList", (message: MessageModel) => {
+            this.messageAdded.emit(message);
+          });
+          this.connection.on("StopConnection", () => {
+            this.stopConnection()
+          });
+        },
+        (err) => {
+          console.log(err.message);
+        }
+      );
+
+    }
   }
 
   registerUser() {
@@ -50,12 +54,22 @@ export class SignalRService {
   }
 
   logout() {
+    console.log("logout method");
     if (this.connection.state === "Connected") {
-      this.connection
-        .send("LogoutUser", this.authService.getLoggedInUserInfo().sub)
-        .then(() => {
-          console.log("user logged out");
-        });
+      console.log("is in connected");
+      console.log(this.authService.getLoggedInUserInfo());
+      this.connection.send(
+        "LogoutUser",
+        this.authService.getLoggedInUserInfo().sub
+      );
     }
+  }
+
+  stopConnection(){
+    this.connection.stop().then( () => {
+      console.log("connection stopped")
+    }).catch( (err) => {
+      console.log(err)
+    })
   }
 }

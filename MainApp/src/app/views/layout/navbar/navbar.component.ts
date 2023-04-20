@@ -46,6 +46,7 @@ export class NavbarComponent implements OnInit {
     e.preventDefault();
     if(this.signalRService.connection){
       this.signalRService.logout();
+      //this.signalRService.stopConnection();
     }
     this.authService.logout(() => {
       Swal.fire({

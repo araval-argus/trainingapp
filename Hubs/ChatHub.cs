@@ -44,6 +44,7 @@ namespace ChatApp.Hubs
             if (onlineUser != null)
             {
                 this.onlineUserService.RemoveOnlineUser(onlineUser);
+                Console.WriteLine("disconnected");
             }
             if (exception != null)
             {
@@ -66,7 +67,6 @@ namespace ChatApp.Hubs
 
         public async Task AddMessage(MessageModel messageModel)
         {
-            Console.WriteLine("Addmessage");
             
             MessageEntity messageEntityFromDb = this.chatService.AddMessage(messageModel);
 
@@ -89,6 +89,7 @@ namespace ChatApp.Hubs
         {
             OnlineUserEntity onlineUserEntity = this.onlineUserService.FetchOnlineUser(userName);
             this.onlineUserService.RemoveOnlineUser(onlineUserEntity);
+            await Clients.Caller.SendAsync("StopConnection");
         }
 
 

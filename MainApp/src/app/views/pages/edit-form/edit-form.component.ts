@@ -1,4 +1,4 @@
-import { Component,  EventEmitter, OnInit } from '@angular/core';
+import { Component,  EventEmitter, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { JwtHelper } from 'src/app/core/helper/jwt-helper';
@@ -16,6 +16,7 @@ import Swal from 'sweetalert2'
 export class EditFormComponent implements OnInit {
 
   LoggedInUserModelChanged = new EventEmitter();
+  @ViewChild("formVar") formVar;
 
   loggedInUser: LoggedInUserModel;
   usernameExists: boolean = false;
@@ -40,14 +41,12 @@ export class EditFormComponent implements OnInit {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.loggedInUser.userName = this.loggedInUser.sub;
     this.imgUrl = this.loggedInUser.imageUrl;
-    console.log(this.loggedInUser);
     this.passwordModel = new PasswordModel();
     this.passwordModel.username = this.loggedInUser.userName;
   }
 
   onUpdate(e: Event) {
     e.preventDefault();
-    console.log("in onUpdate method ", this.loggedInUser);
 
     const formData = new FormData();
 
@@ -57,6 +56,14 @@ export class EditFormComponent implements OnInit {
     formData.append("lastName", this.loggedInUser.lastName);
     formData.append("email", this.loggedInUser.email);
 
+    if(this.usernameExists){
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Username already exists'
+      })
+    }
+    else{
     this.accountService.update(formData).subscribe(
       (data: any) => {
         console.log(data);
@@ -79,12 +86,13 @@ export class EditFormComponent implements OnInit {
         console.log(err);
       }
     );
+    }
   }
 
 
   onUserNameValueChange(event: Event) {
     const value = (event.target as HTMLInputElement).value;
-
+    this.usernameExists = false;
 
     if (this.timeOutIdForUsername) {
       clearTimeout(this.timeOutIdForUsername);
@@ -95,14 +103,11 @@ export class EditFormComponent implements OnInit {
       const token = this.authService.getUserToken();
       const decodedToken = this.jwtHelper.decodeToken(token);
 
-      console.log("timeout in username change")
 
       //dont send a request if both are equal
       if (value !== decodedToken.sub) {
         this.accountService.checkUsername(value).subscribe((data) => {
-          console.log(data.usernameExists);
           this.usernameExists = data.usernameExists;
-
         });
       }
     }, 1000);
@@ -111,9 +116,6 @@ export class EditFormComponent implements OnInit {
 
   onFileChange(event: Event) {
     this.imgFile = (event.target as HTMLInputElement).files[0];
-    //this.imgUrl = this.imgFile.;
-    console.log(this.imgFile);
-    // console.log(img);
 
     var reader = new FileReader();
     reader.onload = (e) => {
@@ -127,7 +129,6 @@ export class EditFormComponent implements OnInit {
 
   openVerticalCenteredModal(content) {
     this.modalService.open(content, {centered: true}).result.then((result) => {
-      console.log("Modal closed" + result);
       this.passwordModel.oldPassword = "";
       this.passwordModel.newPassword = "";
     }).catch((res) => {});
@@ -146,7 +147,6 @@ export class EditFormComponent implements OnInit {
   }
 
   onPasswordChange(){
-    console.log("onPasswordChange");
     this.accountService.changePassword(this.passwordModel).subscribe( data => {
       console.log(data)
     }, err => {

@@ -2,6 +2,7 @@
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -39,7 +40,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public void RemoveOnlineUser(OnlineUserEntity onlineUserEntity)
         {
-            this.context.Remove(onlineUserEntity);
+            this.context.OnlineUsers.Remove(onlineUserEntity);
+            Console.WriteLine("user removed");
             this.context.SaveChanges();
         }
     }
