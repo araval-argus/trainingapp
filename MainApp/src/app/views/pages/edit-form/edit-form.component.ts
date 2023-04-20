@@ -149,6 +149,16 @@ export class EditFormComponent implements OnInit {
   onPasswordChange(){
     this.accountService.changePassword(this.passwordModel).subscribe( data => {
       console.log(data)
+      Swal.fire({
+        icon: 'success',
+        title: 'Password Changed',
+        text: 'You password has been changed successfully please login again',
+        timer: 2000,
+        timerProgressBar: true
+      })
+      setTimeout(() => {
+
+      }, 2000);
     }, err => {
       console.log(err)
       Swal.fire({

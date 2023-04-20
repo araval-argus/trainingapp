@@ -25,12 +25,15 @@ export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
     this.chatService.friendSelected.subscribe(profile => {
       this.selectedFriend = profile;
     })
-    this.chatService.fetchAll(this.authService.getLoggedInUserInfo().sub).subscribe((data:any) => {
-      this.friends = data.data;
+    console.log(this.authService.getLoggedInUserInfo().sub);
+    this.chatService.fetchAll(this.authService.getLoggedInUserInfo().sub).subscribe((data: FriendProfileModel[]) => {
+      this.friends = data;
      // console.log("all users fetched" , this.friends)
       this.friends.forEach((friend, index)=>{
         this.friends[index].imageUrl = environment.apiUrl + "/../Images/Users/" + friend.imageUrl;
       })
+    }, err => {
+      console.log(err);
     })
   }
 

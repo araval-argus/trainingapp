@@ -51,7 +51,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     CreatedAt = DateTime.UtcNow,
                     ProfileType = ProfileType.User,
                     ImageUrl = SetDefaultImage(),
-                    DesignationID = regModel.DesignationID
+                    DesignationID = regModel.DesignationID,
+                    IsActive = true
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
@@ -116,6 +117,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public int FetchIdFromUserName(string userName)
         {
+            if(string.IsNullOrEmpty(userName))
+            {
+                return 0;
+            }
             return this.context.Profiles.FirstOrDefault(
                 profile => profile.IsActive && profile.UserName.Equals(userName)).Id;
         }
@@ -153,8 +158,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 profile => {
                     
                      //for counting of unread messages:-
-                    
-
                     MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => (m.SenderID == profile.Id && m.RecieverID == userId) || (m.RecieverID == profile.Id && m.SenderID == userId));
 
                     return new FriendProfileModel()

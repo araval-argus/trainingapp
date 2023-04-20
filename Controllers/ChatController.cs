@@ -97,11 +97,15 @@ namespace ChatApp.Controllers
         [HttpGet("fetchAll")]
         public IActionResult FetchAllUsers(string loggedInUsername)
         {
+            if (string.IsNullOrEmpty(loggedInUsername))
+            {
+                return BadRequest("ënter username");
+            }
             int id = FetchIdFromUserName(loggedInUsername);
 
             //list of friends that have interacted with logged in user before
             IEnumerable<FriendProfileModel> friends = this.profileService.FetchAllUsers(id);
-            return Ok(new { data = friends });
+            return Ok(friends);
         }
 
         [HttpPost("addFile")]
