@@ -232,3 +232,4 @@ _Pvt_Extensions
 
 # .jfm files are not handled by git anymore
 *.jfm
+*.jfm
