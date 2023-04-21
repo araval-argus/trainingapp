@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { SignalRService } from './core/service/signalr-service';
+import { AuthService } from './core/service/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -8,6 +10,10 @@ import { Component, OnInit } from '@angular/core';
 export class AppComponent implements OnInit {
   title = 'nobleui-angular';
 
-  ngOnInit(): void {}
+  constructor( private signalRService : SignalRService , private authService : AuthService){}
+
+  ngOnInit(): void {
+    this.signalRService.startConnection(this.authService.getLoggedInUserInfo().userName);
+  }
 
 }

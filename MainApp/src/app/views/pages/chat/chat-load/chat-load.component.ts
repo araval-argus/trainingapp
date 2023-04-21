@@ -7,6 +7,7 @@ import { MessageDisplayModel } from 'src/app/core/models/message-display-model';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
+import { SignalRService } from 'src/app/core/service/signalr-service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -33,7 +34,8 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
   todayDate : Date = new Date();
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
 
-  constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService , private modalService: NgbModal) { }
+  constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService ,
+     private modalService: NgbModal , private signalRService : SignalRService) { }
 
   ngOnInit(): void {
     this.msg = {
@@ -44,6 +46,10 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
       seen :0,
       type:''
     };
+
+    this.signalRService.hubConnection.on('recieveMessage',(msg:MessageDisplayModel)=>{
+      this.displayMsgList.push(msg);
+    })
 
     this.scrollToBottom();
 
@@ -79,6 +85,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     this.scrollToBottom();
   }
 
+
   onMessage(message:HTMLInputElement){
     if(message.value.trim()==''){}
     else{
@@ -94,12 +101,10 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     }
     this.msg.seen=0;
     this.msg.type=null;
-    this.chatService.doMessage(this.msg).subscribe((data:MessageDisplayModel)=>{
-      this.displayMsgList.push(data);
-      this.chatService.DidAMessage.next();
-    });
+    this.signalRService.hubConnection.invoke('sendMsg',this.msg).catch((error)=>console.log(error));
     message.value = null;
     this.closeRplyMsg();
+
     }
   }
 
@@ -135,9 +140,6 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     formdata.append('MessageFrom',this.loggedInUser.userName),
     formdata.append('MessageTo',this.selUser.userName),
     this.chatService.sendFileMessage(formdata).subscribe((data:MessageDisplayModel)=>{
-      console.log(data);
-      this.displayMsgList.push(data);
-      console.log(this.displayMsgList);
       this.chatService.DidAMessage.next();
     })
   }

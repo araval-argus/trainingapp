@@ -10,11 +10,11 @@ namespace ChatApp.Business.ServiceInterfaces
 	{
 		IEnumerable<ColleagueModel> SearchColleague(string name,string username);
 		string GetUsername(string authorization);
-		MessageSendModel DoMessage(MessageModel message);
 		int GetIdFromUserName(string username);
 		 IEnumerable<MessageSendModel> GetMsg(string username, string selUserName);
 		IEnumerable<RecentChatModel> GetRecentUsers(string username);
 		public void MarkAsRead(string username, string selusername);
-		public MessageSendModel SendFileMessage(MessageModel msg);
+		public void SendFileMessage(MessageModel msg);
+		public void ResponsesToUsersMessage(int msgFrom, int msgTo, MessageSendModel response);
 	}
 }

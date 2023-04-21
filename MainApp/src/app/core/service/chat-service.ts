@@ -24,10 +24,6 @@ export class ChatService{
     return this.http.get(environment.apiUrl+ "/account/" + userName);
   }
 
-  doMessage(msg : MessageModel){
-    return this.http.post(environment.apiUrl + "/Chat/Message" , msg);
-  }
-
   fetchMessages(selUserUserName:string){
     return this.http.get(environment.apiUrl + "/Chat/MsgList" + selUserUserName);
   }

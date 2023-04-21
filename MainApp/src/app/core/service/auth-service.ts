@@ -2,13 +2,14 @@ import { Injectable } from "@angular/core";
 import { JwtHelper } from "../helper/jwt-helper";
 import { LoggedInUser } from "../models/loggedin-user";
 import { Subject } from "rxjs";
+import { SignalRService } from "./signalr-service";
 
 @Injectable({
     providedIn: 'root'
 })
 
 export class AuthService {
-    constructor(private jwtHelper: JwtHelper) {}
+    constructor(private jwtHelper: JwtHelper , private signalRService : SignalRService) {}
 
     UserProfileChanged = new Subject<LoggedInUser>();
 
@@ -22,6 +23,7 @@ export class AuthService {
     logout(callback) {
         localStorage.removeItem('isLoggedin');
         localStorage.removeItem('USERTOKEN');
+        this.signalRService.hubConnection?.stop().catch(error=>{console.log(error)});
         if (callback) {
             callback();
         }
@@ -32,7 +34,6 @@ export class AuthService {
         var user: LoggedInUser = this.jwtHelper.decodeToken(token);
         user.userName = user.sub;
         return user;
-
     }
 
     getUserToken() {

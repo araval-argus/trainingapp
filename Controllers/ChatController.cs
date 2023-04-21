@@ -30,16 +30,6 @@ namespace ChatApp.Controllers
 			return Ok( _chatService.SearchColleague(Search , userName));
 		}
 
-		[HttpPost("Message")]
-		public IActionResult DoMessage(MessageModel message)
-		{
-			if (message!=null) 
-			{
-				return Ok(_chatService.DoMessage(message));
-			}
-			return BadRequest();
-		}
-
 		[HttpGet("RecentChat")]
 		public IActionResult RecentChat([FromHeader] string Authorization)
 		{
@@ -85,8 +75,8 @@ namespace ChatApp.Controllers
 			string filetype = msg.File.ContentType.Split('/')[0];
 			if (filetype == "audio" || filetype == "image" || filetype == "video")
 			{
-				return Ok(_chatService.SendFileMessage(msg));
-				
+				_chatService.SendFileMessage(msg);
+				return Ok();
 			}
 			return BadRequest();
 		}

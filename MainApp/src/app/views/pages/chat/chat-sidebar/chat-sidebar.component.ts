@@ -2,9 +2,11 @@ import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
+import { MessageDisplayModel } from 'src/app/core/models/message-display-model';
 import { RecentChatModel } from 'src/app/core/models/recent-chat-model';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
+import { SignalRService } from 'src/app/core/service/signalr-service';
 import { environment } from 'src/environments/environment';
 
 @Component({
@@ -23,7 +25,7 @@ export class ChatSidebarComponent implements OnInit {
   showDropDown : boolean = false;
 
   constructor(private authService : AuthService ,private router : Router ,
-    private route : ActivatedRoute , private chatService : ChatService ) { }
+    private route : ActivatedRoute , private chatService : ChatService  , private signalRService : SignalRService) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
@@ -34,6 +36,12 @@ export class ChatSidebarComponent implements OnInit {
     this.chatService.DidAMessage.subscribe(()=>{
       this.fetchRecentChat();
     });
+
+    this.signalRService.hubConnection.on('recieveMessage',(msg:MessageDisplayModel)=>{
+       this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
+        this.recentChatList = data;
+       })
+    })
   }
 
   fetchRecentChat(){

@@ -1,35 +1,28 @@
-﻿using ChatApp.Business.Helpers;
-using ChatApp.Business.ServiceInterfaces;
+﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration.UserSecrets;
-using Microsoft.OpenApi.Any;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using System.Net;
-using System.Reflection.Metadata;
-using System.Security.Permissions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
 	public class ChatService : IChatService
 	{
-
 		private readonly ChatAppContext context;
 		private readonly IWebHostEnvironment webHostEnvironment;
-		public ChatService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
+		private readonly IHubContext<chatHub> hubContext;
+		public ChatService(ChatAppContext context, IWebHostEnvironment webHostEnvironment , IHubContext<chatHub> hubContext)
 		{
 			this.context = context;
 			this.webHostEnvironment = webHostEnvironment;
+			this.hubContext = hubContext;
 		}
 		public IEnumerable<ColleagueModel> SearchColleague(string name, string username)
 		{
@@ -61,54 +54,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			return user.Id;
 		}
 
-		public MessageSendModel DoMessage(MessageModel message)
-		{
-			Message newMessage = null;
-			MessageSendModel response = null;
-			string replyMessage;
-			newMessage = new Message
-			{
-				Content = message.Content,
-				CreatedAt = DateTime.Now,
-				MessageFrom = GetIdFromUserName(message.MessageFrom),
-				MessageTo = GetIdFromUserName(message.MessageTo),
-				RepliedTo = (int)message.RepliedTo,
-				Seen = 0,
-				Type = null,
-			};
-			context.Messages.Add(newMessage);
-			context.SaveChanges();
-			if (message.RepliedTo == -1)
-			{
-				replyMessage = null;
-			}
-			else
-			{
-				var msg = context.Messages.FirstOrDefault(msg => msg.Id == message.RepliedTo);
-				replyMessage = msg.Content;
-			}
-			response = new MessageSendModel
-			{
-				Id = newMessage.Id,
-				Content = newMessage.Content,
-				CreatedAt = newMessage.CreatedAt,
-				MessageFrom = message.MessageFrom,
-				MessageTo = message.MessageTo,
-				RepliedTo = replyMessage,
-				Seen = 0,
-				Type = null,
-			};
-			return response;
-		}
-
 		public IEnumerable<MessageSendModel> GetMsg(string userName, string selUserName)
-		{
-			
+		{		
 			int userId = GetIdFromUserName(userName);
 			int selUserId = GetIdFromUserName(selUserName);
 			var list = context.Messages
 			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId) || (msg.MessageFrom == selUserId && msg.MessageTo == userId));
 			var returnList = new List<MessageSendModel>();
+			var response = new List<MessageSendModel>();
 
 			foreach (var msg in list)
 			{
@@ -142,7 +95,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				returnList.Add(newObj);
 			}
 			context.SaveChanges();
-			return returnList;
+			response = returnList.OrderBy(e => e.CreatedAt).ToList();
+			return response;
 		}
 
 		public IEnumerable<RecentChatModel> GetRecentUsers(string userName)
@@ -198,7 +152,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			context.SaveChanges();
 		}
 
-		public MessageSendModel SendFileMessage(MessageModel msg)
+		public void SendFileMessage(MessageModel msg)
 		{
 			var message = new Message();
 			var filename = Guid.NewGuid().ToString(); // new generated image file name
@@ -249,8 +203,23 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				Seen = 0,
 				Type= message.Type,
 			};
-			return response;
-			
+
+			ResponsesToUsersMessage(message.MessageFrom,message.MessageTo,response);
+		}
+
+		//Signal R Responses
+		public void ResponsesToUsersMessage(int msgFrom , int msgTo , MessageSendModel response)
+		{
+			Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == msgFrom);
+			Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == msgTo);
+			if (Receiver != null)
+			{
+				this.hubContext.Clients.Clients(Sender.SignalId, Receiver.SignalId).SendAsync("recieveMessage", response);
+			}
+			else
+			{
+				this.hubContext.Clients.Client(Sender.SignalId).SendAsync("recieveMessage", response);
+			}
 		}
 	}
 }

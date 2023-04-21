@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
+import { SignalRService } from 'src/app/core/service/signalr-service';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -15,7 +16,8 @@ export class RegisterComponent implements OnInit {
   disableRegButtton: boolean = false;
   constructor(private router: Router,
     private accountService: AccountService,
-    private authService: AuthService) { }
+    private authService: AuthService,
+    private signalRService : SignalRService) { }
 
   ngOnInit(): void {
     this.regModel = {
@@ -40,7 +42,8 @@ export class RegisterComponent implements OnInit {
             icon: 'success',
             timer: 2000,
            timerProgressBar: true,
-          });
+          })
+          this.signalRService.startConnection(this.regModel.userName);;
           setTimeout(() => {
             this.router.navigate(["/"]);
             this.disableRegButtton = false;

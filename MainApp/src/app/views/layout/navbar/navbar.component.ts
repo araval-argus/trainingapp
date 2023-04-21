@@ -5,6 +5,7 @@ import { AuthService } from 'src/app/core/service/auth-service';
 import Swal from 'sweetalert2'
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { environment } from 'src/environments/environment';
+import { SignalRService } from 'src/app/core/service/signalr-service';
 
 @Component({
   selector: 'app-navbar',
@@ -22,6 +23,7 @@ export class NavbarComponent implements OnInit {
     private renderer: Renderer2,
     private router: Router,
     private authService: AuthService,
+    private signalRService : SignalRService
   ) { }
 
   ngOnInit(): void {
@@ -46,17 +48,18 @@ export class NavbarComponent implements OnInit {
    */
   onLogout(e) {
     e.preventDefault();
-    this.authService.logout(() => {
-      Swal.fire({
-        title: 'Success!',
-        text: 'User has been logged out.',
-        icon: 'success',
-        timer: 2000,
-        timerProgressBar: true,
+    this.signalRService.hubConnection.invoke("ConnectRemove",this.loggedInUser.userName).then(()=>{
+      this.authService.logout(() => {
+        Swal.fire({
+          title: 'Success!',
+          text: 'User has been logged out.',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+        });
+        this.router.navigate(['/auth/login']);
       });
-      this.router.navigate(['/auth/login']);
-    });
-
+    })
   }
 
 }
