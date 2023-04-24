@@ -43,6 +43,7 @@ namespace ChatApp.Hubs
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
             var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+
             if (claim != null)
             {
                 Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(claim.Value));
@@ -61,12 +62,21 @@ namespace ChatApp.Hubs
                     Connections connection = new()
                     {
                         ConnectionId = Context.ConnectionId,
-                        User = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == claim.Value).Id,
+                        User = profile.Id,
                         loginTime = DateTime.Now,
                     };
                     _context.Connections.Add(connection);
                 }
                 _context.SaveChanges();
+                //List Of groups name in which user is present
+                List<string> groups = _context.GroupMember.AsNoTracking().Where(e => e.MemberId == profile.Id).Include(e => e.Group).Select(e => e.Group.Name).ToList();
+                if(groups.Count > 0)
+                {
+                    foreach (var group in groups)
+                    {
+                        await Groups.AddToGroupAsync(Context.ConnectionId, group);
+                    }
+                }
                 await Clients.Others.SendAsync("userIsOnline", profile.UserName);
             }
         }
@@ -76,12 +86,22 @@ namespace ChatApp.Hubs
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
             var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            
             if (claim != null)
             {
+                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName == claim.Value);
                 int Id = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == claim.Value).Id;
                 Connections connection = _context.Connections.FirstOrDefault(e => e.User == Id);
                 _context.Connections.Remove(connection);
                 _context.SaveChanges();
+                List<string> groups = _context.GroupMember.AsNoTracking().Where(e => e.MemberId == profile.Id).Include(e => e.Group).Select(e => e.Group.Name).ToList();
+                if (groups.Count > 0)
+                {
+                    foreach (var group in groups)
+                    {
+                        await Groups.RemoveFromGroupAsync(Context.ConnectionId, group);
+                    }
+                }
                 await Clients.All.SendAsync("updateStatus", claim.Value + " is Offline");
             }
         }
@@ -112,5 +132,7 @@ namespace ChatApp.Hubs
                 await Clients.Client(sendersConnectiom.ConnectionId).SendAsync("seenMessageNotification", receiver.UserName);
             }
         }
+
+
     }
 }

@@ -41,17 +41,6 @@
             </div> -->
           </div>
         </div>
-        <div class="dropdown" ngbDropdown *ngIf="group.admin == loggedInUser.sub">
-          <button class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton" ngbDropdownToggle>
-            <i class="feather icon-settings icon-md text-muted pb-3px" ngbTooltip="Settings"></i>
-          </button>
-          <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
-            <a class="dropdown-item d-flex align-items-center" (click)="addMemberModal(group.name, addMemberModalContent)"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">Add Member</span></a>
-            <!-- <a class="dropdown-item d-flex align-items-center" href="" routerLink="/profile/editProfile"><i class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Profile</span></a>
-            <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add status</span></a>
-            <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a> -->
-          </div>
-        </div>
       </a>
     </li>
   </ul>
@@ -92,17 +81,6 @@
                 </div>
             </form>
         </div>
-        <!-- Ng-Select Selection -->
-        <!-- Will add inside group -->
-        <!-- <div class="col-lg-12">
-          <ng-select [multiple]="true" [(ngModel)]="selectedUsers" [items]="users" [closeOnSelect]="false" [searchable]="true" bindValue="userName" placeholder="Select People..."[hideSelected]="true">
-            <ng-template ng-label-tmp let-item="item" let-clear="clear">
-              <span class="ng-value-label">{{item.userName}}</span>
-              <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true">×</span>
-            </ng-template>
-            <ng-template ng-option-tmp let-user="item">{{user.firstName}} {{user.lastName}}</ng-template>
-          </ng-select> 
-        </div> -->
     </div>
   </div>
   <div class="modal-footer">
@@ -110,35 +88,3 @@
     <button type="submit" class="btn btn-primary" (click)="c(); onSubmit()" [disabled]="addForm.invalid">Save changes</button>
   </div>
 </ng-template>
-
-<!-- Modal For edit group -->
-<!-- <button class="btn btn-primary" (click)="openEditModal(editModal)">Launch demo modal</button> -->
-<!-- Modal -->
-<ng-template #addMemberModalContent let-modal let-c="close" let-d="dismiss">
-  <div class="modal-header">
-    <h5 class="modal-title" id="exampleModalLabel">Add Members To {{addMemberModalGroup.name}}</h5>
-    <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="d(); clearSelection();" ></i>
-  </div>
-  <div class="modal-body">
-    <!-- Ng-Select Selection -->
-    <!-- Will add inside group -->
-    <div class="col-lg-12">
-      <div>
-        <span class="text-muted mb-1">People In the Group :- </span>
-        <span *ngFor="let user of members">{{user}} </span>
-      </div>
-      <ng-select [multiple]="true" [(ngModel)]="selectedUsers" [items]="users" [closeOnSelect]="false" bindValue="userName" placeholder="Select People..." [searchable]="false" [hideSelected]="true">
-        <ng-template ng-label-tmp let-item="item" let-clear="clear">
-          <span class="ng-value-label">{{item.userName}}</span>
-          <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true" *ngIf="item.userName != loggedInUser.sub">×</span>
-        </ng-template>
-        <ng-template ng-option-tmp let-user="item">{{user.firstName}} {{user.lastName}}</ng-template>
-      </ng-select> 
-    </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="d(); clearSelection();">Close</button>
-    <button type="button" class="btn btn-primary" (click)="c(); membersToAdd();">Save changes</button>
-  </div>
-</ng-template>
-

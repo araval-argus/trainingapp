@@ -111,6 +111,22 @@ namespace ChatApp.Business.Helpers
         }
 
 
-        //Profile 
+        //Notification Mapper Notifications -> NotificationModel
+        public static List<NotificationModel> notificationsMapper(List<Notifications> notifications)
+        {
+            List<NotificationModel> notificationModels = new List<NotificationModel>();
+            foreach (Notifications notification in notifications)
+            {
+                notificationModels.Add(new NotificationModel()
+                {
+                    Id = notification.Id,
+                    Content = notification.Content,
+                    Time = notification.Time,
+                    isSeen = notification.isSeen,
+                    isGroup = notification.isGroup,
+                });
+            }
+            return notificationModels;
+        } 
     }
 }

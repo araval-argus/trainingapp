@@ -21,13 +21,15 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         private readonly IProfileService _profileService;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly INotificationService _notificationService;
 
-        public ChatService(ChatAppContext context, IProfileService profileService, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext)
+        public ChatService(ChatAppContext context, IProfileService profileService, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext, INotificationService notificationService)
         {
             this.context = context;
             this._profileService = profileService;
             this._webHostEnvironment = webHostEnvironment;
             this._hubContext = hubContext;
+            this._notificationService = notificationService;
         }
 
         public chatFormat AddChat(ChatModel chatModel, string userName)
@@ -59,6 +61,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 isRead = chat.isRead,
                 type = chat.type,
             };
+            _notificationService.addNotification(userName, false, receiver.Id);
             if (activeUser != null)
             {
                 //Profile is sender's profile

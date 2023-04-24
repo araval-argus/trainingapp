@@ -22,16 +22,28 @@
           <a (click)="reloadChat()">
             <i class="feather icon-refresh-ccw icon-md text-muted mr-3" ngbTooltip="Reload Chat"></i>
           </a>                  
-          <!-- <a href="" (click)="false">
-            <i class="feather icon-video icon-md text-muted mr-3" ngbTooltip="Start video call"></i>
+          <a (click)="aboutGroupModal(viewGroupModal)">
+            <i class="feather icon-alert-circle icon-md text-muted mr-3" ngbTooltip="About Group"></i>
           </a>
-          <a href="" (click)="false">
-            <i class="feather icon-phone-call icon-md text-muted mr-0 mr-sm-3" ngbTooltip="Start voice call"></i>
+          <a (click)="leaveGroup()">
+            <i class="feather icon-log-out icon-md text-muted mr-0 mr-sm-3" ngbTooltip="Leave Group"></i>
           </a>
-          <a href="" (click)="false" class="d-none d-sm-block">
+                    
+          <!-- <a href="" (click)="false" class="d-none d-sm-block">
             <i class="feather icon-user-plus icon-md text-muted" ngbTooltip="Add to contacts"></i>
           </a> -->
+          <div class="dropdown" ngbDropdown *ngIf="selectedGroup.admin == loggedInUser.sub">
+            <button class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton" ngbDropdownToggle>
+              <i class="feather icon-settings icon-md text-muted pb-3px" ngbTooltip="Settings"></i>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
+              <a class="dropdown-item d-flex align-items-center" (click)="addMemberModal(addMemberModalContent)"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">Add Member</span></a>
+              <a class="dropdown-item d-flex align-items-center" (click)="removeMemberModal(removeMemberModalContent)"><i class="feather icon-edit icon-xs mr-2"></i> <span class="">Remove Member</span></a>
+              <a class="dropdown-item d-flex align-items-center" (click)="editGroupModal(editGroupModalContent)"><i class="feather icon-edit icon-xs mr-2"></i> <span class="">Edit Group</span></a>
+            </div>
+          </div>
         </div>
+
       </div>
     </div>
     <div class="chat-body" [perfectScrollbar] #scrollMe>
@@ -41,11 +53,17 @@
             <span>{{message.time | date : 'mediumDate'}}</span>
           </p>
         </li>
-        <li class="message-item" [class.friend]="loggedInUser.sub !== message.Sender" [class.me]="loggedInUser.sub === message.Sender" (dblclick)="replyTo(message.Id)" [id]="message.Id">
+        <li class="text-center" *ngIf="message.Type == 'notification'">
+          <p class="p-1 d-inline-block text-muted rounded" style="font-size: 0.7rem; background-color: rgba(194, 202, 209, 0.897);">
+            <span>{{message.Content}}</span>
+          </p>
+        </li>
+        <li class="message-item" [class.friend]="loggedInUser.sub !== message.Sender" [class.me]="loggedInUser.sub === message.Sender" (dblclick)="replyTo(message.Id)" [id]="message.Id" *ngIf="message.Type !== 'notification'">
           <div class="content">
-              <div class="bubble">
+            <div class="bubble">
+                <p class="text-muted rounded" *ngIf="loggedInUser.sub !== message.Sender">~{{message.Sender}}</p>
                 <a (click)="false">
-                  <span *ngIf="message.ReplyingId != null">
+                  <span *ngIf="message.ReplyingId != -1">
                       {{message.ReplyingContent}}
                       <hr>
                   </span>
@@ -100,23 +118,142 @@
         </button>
       </div>
     </div>
-    <ng-template #fileModal let-modal>
-        <div class="modal-header">
-          <h5 class="modal-title" id="exampleModalLabel">Name Of The File : - {{file.name}}</h5>
-          <button type="button" (click)="modal.close()" aria-label="Close">
-            <i class="feather icon-x text-muted"></i>
-          </button>
+
+    <!-- File Previewing Modal -->
+    <ng-template #fileModal let-modal let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Send File</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c(); resetFile();" ></i>
+      </div>    
+      <div class="modal-body align-items-center">
+        <img [src]="url" *ngIf="format==='image' && url" height="200"> <br/>
+        <video [src]="url" *ngIf="format==='video' && url" height="200" controls></video> <br/>
+        <audio [src]="url" *ngIf="format==='audio' && url" controls></audio> <br/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c(); resetFile();">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="sendFile(); c();">Send File</button>
+      </div>
+    </ng-template>    
+    
+    <!-- Modal For edit group -->
+    <!-- <button class="btn btn-primary" (click)="openEditModal(editModal)">Launch demo modal</button> -->
+    <!-- Add Member Modal -->
+    <ng-template #addMemberModalContent let-modal let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add Members To {{selectedGroup.name}}</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="d(); clearSelection();" ></i>
+      </div>
+      <div class="modal-body">
+        <!-- Ng-Select Selection -->
+        <!-- Will add inside group -->
+        <div class="col-lg-12">
+          <div>
+            <span class="text-muted mb-1">People In the Group :- </span>
+            <span *ngFor="let user of members">{{user}} </span>
+          </div>
+          <ng-select [multiple]="true" [(ngModel)]="selectedUsers" [items]="users" [closeOnSelect]="false" bindValue="userName" placeholder="Select People..." [searchable]="false" [hideSelected]="true">
+            <ng-template ng-label-tmp let-item="item" let-clear="clear">
+              <span class="ng-value-label">{{item.userName}}</span>
+              <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true" *ngIf="item.userName != loggedInUser.sub">×</span>
+            </ng-template>
+            <ng-template ng-option-tmp let-user="item">{{user.firstName}} {{user.lastName}}</ng-template>
+          </ng-select> 
         </div>
-        <div class="modal-body align-items-center">
-          <img [src]="url" *ngIf="format==='image' && url" height="200"> <br/>
-          <video [src]="url" *ngIf="format==='video' && url" height="200" controls></video> <br/>
-          <audio [src]="url" *ngIf="format==='audio' && url" controls></audio> <br/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="d(); clearSelection();">Close</button>
+        <button type="button" class="btn btn-primary" (click)="c(); membersToAdd();">Save changes</button>
+      </div>
+    </ng-template>
+
+
+    <!-- About Group Modal -->
+    <ng-template #viewGroupModal let-modal let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{selectedGroup.name}}</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c(); resetviewMemberList();" ></i>
+      </div>    
+      <div class="modal-body modal-content" [perfectScrollbar] style="max-height: 30rem">
+        <div >
+          <figure class="px-5">
+            <img [src]="thumbnail" height="200" width="200" class="rounded-circle" alt="profile">
+          </figure>          
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="modal.close();">Cancel</button>
-          <button type="button" class="btn btn-primary" (click)="sendFile(); modal.close();">Send File</button>
+        <div >
+          <h6>Description:</h6>
+          <p>{{selectedGroup.description}}</p>
+          <h6>Admin:</h6>
+          <p>{{selectedGroup.admin}}</p>
+          <h6>Members:</h6>
+            <ul class="list-group" >
+              <li *ngFor="let member of viewMemberList" class="list-group-item">{{member}}</li>
+            </ul>
         </div>
-      </ng-template>      
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c(); resetviewMemberList();">Close</button>
+      </div>
+    </ng-template>    
+
+    <!-- Update Group Modal -->
+    <ng-template #editGroupModalContent let-modal let-c="close" let-d="dismiss">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Update Group</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c();" ></i>
+      </div>    
+      <div class="modal-body modal-content">
+        <div class="d-flex justify-content-center align-items-center">
+        <form class="p-4 bg-white border rounded" style="box-shadow: 0 0 10px rgba(0,0,0,0.2);" [formGroup]="editGroupDetail" (ngSubmit)="submitUpdateForm()">
+          <h2 class="text-center mb-4">{{selectedGroup.name}}</h2>
+          <div class="mb-3 text-center" >
+            <img [src]="editPhoto" height="100" width="100" class="rounded-circle" alt="profile">
+          </div>
+          <div class="mb-3">
+            <label for="groupDescription" class="form-label">Group Description</label>
+            <textarea id="groupDescription" class="form-control" rows="3" [value]="selectedGroup.description" formControlName="groupDesc"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="groupImage" class="form-label">Group Profile Image</label>
+            <input type="file" id="groupImage" class="form-control-file" formControlName="groupProfile" (change)="editPhotoUploaded($event)">
+          </div>
+          <div class="d-flex justify-content-center mt-4">
+            <button type="submit" class="btn btn-primary" (click)="c();">Update</button>
+          </div>
+        </form>
+      </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c();">Close</button>
+      </div>
+    </ng-template> 
+
+    <!-- Remove Member Modal -->
+    <ng-template #removeMemberModalContent let-modal let-c="close">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Remove Members From{{selectedGroup.name}}</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c(); clearRemoveList();" ></i>
+      </div>
+      <div class="modal-body">
+        <div class="col-lg-12">
+          <span class="text-muted mb-1">Remove From the Group :- </span>
+          <ng-select [multiple]="true" [(ngModel)]="removeMemberList" [items]="currentMembers" [closeOnSelect]="false" bindValue="userName" placeholder="Select People..." [searchable]="false" [hideSelected]="true">
+            <ng-template ng-label-tmp let-item="item" let-clear="clear">
+              <span class="ng-value-label">{{item.userName}}</span>
+              <span class="ng-value-icon right" (click)="clear(item)" aria-hidden="true" *ngIf="item.userName != loggedInUser.sub">×</span>
+            </ng-template>
+            <ng-template ng-option-tmp let-user="item">{{user.firstName}} {{user.lastName}}</ng-template>
+          </ng-select> 
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="c(); clearRemoveList()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="c(); removeMember()">Save changes</button>
+      </div>
+      <!-- <span>Remove List</span>
+      <span *ngFor="let name of removeMemberList">{{name}}</span> -->
+    </ng-template>
+
 </div>
 <div class="container text-center" *ngIf="selectedGroup.name == ''">
     <div class="chat-content" >

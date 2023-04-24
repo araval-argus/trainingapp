@@ -1,4 +1,5 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
+using ChatApp.Context.EntityClasses;
 using ChatApp.Infrastructure.ServiceImplementation;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("addgroup")]
-        [Authorize]
         public IActionResult AddGroup([FromForm] GroupModel groupModel, [FromHeader] string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -42,7 +42,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpGet("getAll")]
-        [Authorize]
         public IActionResult getAll([FromHeader]string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -61,7 +60,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpGet("getMembers")]
-        [Authorize]
         public IActionResult getMembers([FromQuery]string name, [FromHeader]string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -77,7 +75,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("addMembers")]
-        [Authorize]
         public IActionResult addMember([FromBody]List<string> userNames, [FromHeader] string authorization, [FromQuery]string groupName)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -94,7 +91,6 @@ namespace ChatApp.Controllers
 
 
         [HttpPost("addMessage")]
-        [Authorize]
         public IActionResult addMessage([FromBody] GroupReceiveChatModel message, [FromHeader] string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -111,7 +107,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpGet("getAllChat")]
-        [Authorize]
         public IActionResult getAllChat([FromQuery] string groupName, [FromHeader] string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -128,7 +123,6 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("addFile")]
-        [Authorize]
         public IActionResult addFile([FromForm] GroupChatFileModel fileMsg, [FromHeader] string authorization)
         {
             IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
@@ -143,6 +137,59 @@ namespace ChatApp.Controllers
             return response;
         }
 
+        [HttpPost("updateGroup")]
+        public IActionResult updateGroup([FromForm] GroupModel group, [FromHeader] string authorization)
+        {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var updatedGroup = _groupService.UpdateGroup(group, claim.Value);
+                if(updatedGroup)
+                {
+                    response = Ok(new { updatedGroup });
+                }
+            }
+            return response;
+        }
 
+        [HttpPost("removeMember")]
+        public IActionResult removeMember([FromBody] List<string> removeList, [FromHeader] string authorization, [FromQuery] string groupName)
+        {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var removeMember = _groupService.removeMember(removeList, groupName, claim.Value);
+                if (removeMember)
+                {
+                    response = Ok(new { removeMember });
+                }
+            }
+            return response;
+        }
+
+
+        [HttpGet("leaveGroup")]
+        public IActionResult leaveGroup([FromQuery]string groupName, [FromHeader]string authorization) {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var leaveGroup = _groupService.leaveGroup(claim.Value, groupName);
+                if (leaveGroup)
+                {
+                    response = Ok(new { leaveGroup });
+                }
+            }
+            return response;
+
+        }
     }
 }

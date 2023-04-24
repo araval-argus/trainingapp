@@ -11,6 +11,7 @@ import { GroupNewChat } from "../models/groupNewChat-model";
 export class GroupService {
 
     public readonly groupSelection = new Subject<GroupModel>();
+    public readonly openFromNotification = new Subject<string>();
 
     constructor(private http: HttpClient) { }
     addGroup(formData: FormData) {
@@ -38,6 +39,15 @@ export class GroupService {
         return environment.api + "/images/" + name;
     }
     addFile(formData: FormData) {
-        return this.http.post(environment.apiUrl + "/group/addFile", formData)
+        return this.http.post(environment.apiUrl + "/group/addFile", formData);
+    }
+    updateGroup(formData: FormData) {
+        return this.http.post(environment.apiUrl + "/group/updateGroup", formData);
+    }
+    removeMember(removeList: string[], groupName: string) {
+        return this.http.post(environment.apiUrl + "/group/removeMember?groupName=" + groupName, removeList);
+    }
+    leaveGroup(groupName: string) {
+        return this.http.get(environment.apiUrl + "/group/leaveGroup?groupName=" + groupName)
     }
 }

@@ -3,4 +3,5 @@ export interface GroupModel {
     name: string,
     profileImage?: string,
     description: string,
+    admin: string
 }

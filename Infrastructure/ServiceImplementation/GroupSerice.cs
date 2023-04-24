@@ -9,6 +9,8 @@ using System.Linq;
 using ChatApp.Business.Helpers;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using ChatApp.Hubs;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -16,13 +18,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public GroupSerice(ChatAppContext context, IWebHostEnvironment webHostEnvironment) {
-            _context = context;
-            _webHostEnvironment = webHostEnvironment;
+
+        public GroupSerice(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext) {
+            this._context = context;
+            this._webHostEnvironment = webHostEnvironment;
+            this._hubContext = hubContext;
+
         }
 
-        public SentGroupMessage addFile(GroupChatFileModel message, string senderUserName)
+        public bool addFile(GroupChatFileModel message, string senderUserName)
         {
             Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName);
             if (profile != null)
@@ -73,10 +79,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         sentAt = newMessage.Time,
                         Type = newMessage.Type,
                     };
-                    return msg;
+                    Groups group = _context.Groups.AsNoTracking().Include(e => e.AdminProfile).FirstOrDefault(e => e.Id == msg.GroupId);
+                    _hubContext.Clients.Group(group.Name).SendAsync("receivedChatForGroup", msg);
+                    return true;
                 }
             }
-            return null;
+            return false;
 
         }
 
@@ -128,6 +136,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             {
                 return false;
             }
+            var memberList = "";
             List<int> presentMembersId = _context.GroupMember.AsNoTracking().Where(e => e.GroupId == group.Id).Select(e => e.MemberId).ToList();
             foreach(string user in userName)
             {
@@ -142,16 +151,54 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                             AddedDate = DateTime.Now,
                         };
                         _context.GroupMember.Add(newMember);
+                        Connections isActiveConnection = _context.Connections.AsNoTracking().FirstOrDefault(e => e.User == profile.Id);
+                        if (isActiveConnection != null)
+                        {
+                            _hubContext.Groups.AddToGroupAsync(isActiveConnection.ConnectionId, groupName);
+                            _hubContext.Clients.Client(isActiveConnection.ConnectionId).SendAsync("addedToGroup", Mapper.groupToGroupDTO(group));
+                        }
                     }
                 }
+            }
+            foreach(var member in userName)
+            {
+                memberList += member + " ";
+            }
+            if(userName.Count> 0)
+            {
+                Profile adminProfile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == adminUser);
+                GroupMessage addedNotification = new()
+                {
+                    Content = adminUser + " has added " + memberList,
+                    GroupID = group.Id,
+                    SenderId = adminProfile.Id,
+                    ReplyMessageID = -1,
+                    Type = "notification",
+                    Time = DateTime.Now,
+                };
+                _context.GroupMessage.Add(addedNotification);
+                _context.SaveChanges();
+                SentGroupMessage msg = new()
+                {
+                    Id = addedNotification.Id,
+                    Content = addedNotification.Content,
+                    GroupId = group.Id,
+                    SenderUserName = adminUser,
+                    sentAt = addedNotification.Time,
+                    ReplyingContent = null,
+                    ReplyingMessageId = -1,
+                    Type = addedNotification.Type
+                };
+                _hubContext.Clients.Group(groupName).SendAsync("addNotification", msg);
             }
             _context.SaveChanges();
             return true;
         }
 
-        public SentGroupMessage addMessage(GroupReceiveChatModel message, string senderUserName)
+        public bool addMessage(GroupReceiveChatModel message, string senderUserName)
         {
             Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName);
+            Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == message.GroupId);
             if(profile != null)
             {
                 if(_context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == message.GroupId) != null)
@@ -168,7 +215,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     _context.GroupMessage.Add(newMessage);
                     _context.SaveChanges();
                     string repliedMsgContent = null;
-                    if(newMessage.ReplyMessageID != null)
+                    if(newMessage.ReplyMessageID != -1)
                     {
                         GroupMessage repliedMsg = _context.GroupMessage.AsNoTracking().FirstOrDefault(e => e.Id == newMessage.ReplyMessageID);
                         repliedMsgContent = repliedMsg.Content;
@@ -184,10 +231,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         sentAt = newMessage.Time,
                         Type= newMessage.Type,
                     };
-                    return msg;
+                    _hubContext.Clients.Group(group.Name).SendAsync("receivedChatForGroup", msg);
+                    return true;
                 }
             }
-            return null;
+            return false
+                ;
         }
 
         public List<GroupDTO> getAll(string userName)
@@ -239,5 +288,164 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             List<profileDTO> profileDTOs = Mapper.profilesMapper(memberProfile);
             return profileDTOs;
         }
+
+        public bool removeMember(List<string> userNames, string groupName, string userName)
+        {
+            //Find the group
+            //Check if given user is admin
+            //if admin is in remove list skip it
+            Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Name == groupName);
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
+            if(group != null) { 
+                if(profile != null)
+                {
+                    if(group.Admin == profile.Id)
+                    {
+                        if(userNames.Contains(userName)) {
+                            userNames.Remove(userName);
+                        }
+                        List<GroupMember> removingProfiles = new List<GroupMember>();
+                       string removingMemberListSent  = "";
+                        foreach (string name in userNames)
+                        {
+                            GroupMember removingMember = _context.GroupMember.Include(e => e.Group).Include(e => e.Profile).FirstOrDefault( e=> e.Group.Name == groupName && e.Profile.UserName == name);
+                            if(removingMember != null)
+                            {
+                                removingMemberListSent += name + ", ";
+                                removingProfiles.Add(removingMember);
+                                Connections connection = _context.Connections.FirstOrDefault(e => e.User == removingMember.Profile.Id);
+                                if(connection != null)
+                                {
+                                    _hubContext.Clients.Client(connection.ConnectionId).SendAsync("removedFromGroup", groupName);
+                                    _hubContext.Groups.RemoveFromGroupAsync(connection.ConnectionId, groupName);
+                                }
+                            }
+                        }
+                        if(removingProfiles.Count() > 0)
+                        {
+                            _context.GroupMember.RemoveRange(removingProfiles);
+                            GroupMessage addedNotification = new()
+                            {
+                                Content = userName + " has removed " + removingMemberListSent,
+                                GroupID = group.Id,
+                                SenderId = profile.Id,
+                                ReplyMessageID = -1,
+                                Type = "notification",
+                                Time = DateTime.Now,
+                            };
+                            _context.GroupMessage.Add(addedNotification);
+                            _context.SaveChanges();
+
+                            //Creating new Message notification 
+                            SentGroupMessage msg = new()
+                            {
+                                Id = addedNotification.Id,
+                                Content = addedNotification.Content,
+                                GroupId = group.Id,
+                                SenderUserName = userName,
+                                sentAt = addedNotification.Time,
+                                ReplyingContent = null,
+                                ReplyingMessageId = -1,
+                                Type = addedNotification.Type
+                            };
+                            _hubContext.Clients.Group(groupName).SendAsync("addNotification", msg);
+                            return true;
+                        }
+                    }
+                }
+            }
+            return false;
+        }
+
+        public bool UpdateGroup(GroupModel model, string userName)
+        {
+            Groups group = _context.Groups.Include(e => e.AdminProfile).FirstOrDefault(e => e.Name == model.Name);
+            if(group != null && group.AdminProfile.UserName == userName)
+            {
+                group.Description = model.Description;
+                if(model.Image != null)
+                {
+                    var file = model.Image;
+                    string rootPath = _webHostEnvironment.WebRootPath;
+                    string fileName = Guid.NewGuid().ToString();
+                    var extension = Path.GetExtension(file.FileName);
+                    var pathToSave = Path.Combine(rootPath, @"images");
+                    var fullFile = fileName + extension;
+                    var dbPath = Path.Combine(pathToSave, fullFile);
+                    using (var fileStreams = new FileStream(dbPath, FileMode.Create))
+                    {
+                        file.CopyTo(fileStreams);
+                    }
+                    group.ProfileImage = fullFile;
+                }
+                _context.Groups.Update(group);
+                _context.SaveChanges();
+                var updatedGroup = Mapper.groupToGroupDTO(group);
+                _hubContext.Clients.Group(group.Name).SendAsync("groupUpdate", updatedGroup);
+                return true;
+            }
+            return false;
+        }
+
+        public bool leaveGroup(string userName, string groupName)
+        {
+            Groups groupProfile = _context.Groups.FirstOrDefault(e => e.Name == groupName);
+            Profile member = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName));
+            if(groupProfile != null && member != null)
+            {
+                GroupMember leavingMember = _context.GroupMember.FirstOrDefault(e => e.MemberId == member.Id);
+                if(leavingMember!= null)
+                {
+                    _context.GroupMember.Remove(leavingMember);
+                    _context.SaveChanges();
+                    string notificationMessage = userName + " has leave " + groupName;
+                    if (groupProfile.Admin == member.Id)
+                    {
+                        GroupMember newAdmin = _context.GroupMember.AsNoTracking().Include(e => e.Profile).Where(e => e.GroupId == groupProfile.Id).OrderBy(e => e.AddedDate).FirstOrDefault();
+                        groupProfile.Admin = newAdmin.MemberId;
+                        notificationMessage += " and new Admin is " + newAdmin.Profile.UserName;
+                        _context.Groups.Update(groupProfile);
+                    }
+
+                    //Adding Notification Message
+                    GroupMessage addedNotification = new()
+                    {
+                        Content = notificationMessage,
+                        GroupID = groupProfile.Id,
+                        SenderId = member.Id,
+                        ReplyMessageID = -1,
+                        Type = "notification",
+                        Time = DateTime.Now,
+                    };
+                    _context.GroupMessage.Add(addedNotification);
+                    _context.SaveChanges();
+
+                    //Creating new Message notification 
+                    SentGroupMessage msg = new()
+                    {
+                        Id = addedNotification.Id,
+                        Content = addedNotification.Content,
+                        GroupId = addedNotification.GroupID,
+                        SenderUserName = userName,
+                        sentAt = addedNotification.Time,
+                        ReplyingContent = null,
+                        ReplyingMessageId = -1,
+                        Type = addedNotification.Type
+                    };
+                    _hubContext.Clients.Group(groupName).SendAsync("addNotification", msg);
+
+                    //remove Connection from group && clear group (hide inbox if open and remove from group List)
+                    Connections connection = _context.Connections.FirstOrDefault(e => e.User == leavingMember.MemberId);
+                    if (connection != null)
+                    {
+                        _hubContext.Clients.Client(connection.ConnectionId).SendAsync("removedFromGroup", groupName);
+                        _hubContext.Groups.RemoveFromGroupAsync(connection.ConnectionId, groupName);
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
     }
 }

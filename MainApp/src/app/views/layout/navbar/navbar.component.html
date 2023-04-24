@@ -6,7 +6,36 @@
     
     <ul class="navbar-nav">
       
-      
+      <li class="nav-item nav-notifications dropdown show" ngbDropdown>
+        <a class="nav-link" (click)="false" ngbDropdownToggle>
+          <i class="link-icon feather icon-bell"></i>
+          <div class="indicator"><div class="circle"></div></div>
+        </a>
+        <div ngbDropdownMenu aria-labelledby="profileDropdown">
+          <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+            <p>{{notifications.length}} New notifications</p>
+            <a class="text-muted">Seen All</a>
+          </div>
+          <div class="dropdown-body px-0  show">
+            <div class="p-1" *ngFor="let notification of notifications; let i = index;">
+              <a (click)="openNotification(notification)" class="dropdown-item d-flex align-items-center py-2" *ngIf="i < 5" >
+                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle mr-3">
+                  <i class="feather icon-user icon-sm text-white" *ngIf="notification.isGroup == 0"></i>
+                  <i class="feather icon-users icon-sm text-white" *ngIf="notification.isGroup == 1"></i>
+                </div>
+                <div class="flex-grow-1 me-2">
+                  <p>Message From {{notification.content}}</p>
+                  <p class="tx-12 text-muted">{{notification.time | date:'short'}}</p>
+                  <div class="indicator"><div class="circle"></div></div>
+                </div>  
+              </a>
+            </div>
+          </div>
+          <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
+            <a>View all</a>
+          </div>
+        </div>
+      </li>
       
       
       <li class="nav-item nav-profile" ngbDropdown>
@@ -19,7 +48,7 @@
             <div class="figure mb-3">
               <img src="https://via.placeholder.com/80x80"  class="rounded-circle" alt="profile" *ngIf="imageURL === null">
               <img [src]="imageURL" height="80" width="80"  class="rounded-circle" alt="profile" *ngIf="imageURL !== null">
-                </div>
+            </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">{{loggedInUser.firstName}} {{loggedInUser.lastName}}</p>
               <p class="email text-muted mb-3">{{loggedInUser.email}}</p>
@@ -27,7 +56,7 @@
           </div>
           <div class="dropdown-body">
             <ul class="profile-nav p-0 pt-3">
-              
+
               <li class="nav-item">
                 <a routerLink="/profile/editProfile" class="nav-link">
                   <i class="feather icon-edit"></i>

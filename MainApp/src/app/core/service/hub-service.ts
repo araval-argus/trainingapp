@@ -22,6 +22,7 @@ export class HubService {
         const success = () => {
             console.log("Success");
             const token = localStorage.getItem('USERTOKEN');
+            console.log(token);
             this.hubConnection.send("saveConnection", token).then(e => {
                 console.log("Connection Saved in Database");
             }

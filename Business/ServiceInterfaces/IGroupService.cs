@@ -11,9 +11,14 @@ namespace ChatApp.Business.ServiceInterfaces
         List<profileDTO> getMembers(string userName, string groupName);
         bool addMembers(List<string> userName, string groupName, string adminUser);
 
-        SentGroupMessage addMessage(GroupReceiveChatModel message, string senderUserName);
+        bool addMessage(GroupReceiveChatModel message, string senderUserName);
         List<SentGroupMessage> getAllChat(string groupName);
-        SentGroupMessage addFile(GroupChatFileModel message, string senderUserName);
+        bool addFile(GroupChatFileModel message, string senderUserName);
 
+        bool UpdateGroup(GroupModel model, string userName);
+
+        bool removeMember(List<string> userNames, string groupName, string userName);
+
+        bool leaveGroup(string userName, string groupName);
     }
 }

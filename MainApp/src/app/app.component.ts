@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HubService } from './core/service/hub-service';
+import { AuthService } from './core/service/auth-service';
 
 @Component({
   selector: 'app-root',
@@ -11,7 +12,9 @@ export class AppComponent implements OnInit {
 
   constructor(private hubService: HubService) { }
   ngOnInit(): void {
-    this.hubService.createConnection();
+    if (localStorage.getItem('isLoggedin')) {
+      this.hubService.createConnection();
+    }
   }
 
 }

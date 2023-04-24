@@ -4,10 +4,10 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
 import { GroupModel } from 'src/app/core/models/group-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
-import { Profile } from 'src/app/core/models/profile-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { GroupService } from 'src/app/core/service/group-service';
+import { HubService } from 'src/app/core/service/hub-service';
 
 @Component({
   selector: 'app-group-sidebar',
@@ -27,28 +27,19 @@ export class GroupSidebarComponent implements OnInit {
   unsafeUrl;
   //To handle Uploaded Image
   uploadFile: File;
-  //To get current users
-  users: Profile[] = [];
-  //To handle selected users
-  selectedUsers = [];
-  //already In group Memeber
-  members = [];
+
   //To add Group data to the formData
   formData: FormData = new FormData();
   //GroupList
   groupList: GroupModel[] = [];
-  //For adding Member Modal
-  addMemberModalGroup: GroupModel = {
-    name: '',
-    description: ''
-  }
 
 
 
 
-  constructor(config: NgbModalConfig, private modalService: NgbModal, private domSanitizer: DomSanitizer, private accountService: AccountService, private groupService: GroupService, private authService: AuthService) {
+  constructor(config: NgbModalConfig, private modalService: NgbModal, private domSanitizer: DomSanitizer, private accountService: AccountService, private groupService: GroupService, private authService: AuthService, private hubService: HubService) {
     config.backdrop = 'static';
     config.keyboard = false;
+    config.centered = true;
   }
 
   ngOnInit(): void {
@@ -61,6 +52,40 @@ export class GroupSidebarComponent implements OnInit {
       groupName: new FormControl('', [Validators.required, Validators.maxLength(50)]),
       description: new FormControl('', Validators.maxLength(200)),
       groupProfile: new FormControl(''),
+    })
+
+
+    this.groupService.openFromNotification.subscribe(data => {
+      let group = this.groupList.find(e => e.name == data);
+      if (group != null) {
+        this.selectedGroup(group);
+      }
+    })
+
+    this.hubService.hubConnection.on("receivedChatForGroup", (data: any) => {
+      console.log(data);
+    })
+
+    this.hubService.hubConnection.on("addedToGroup", (data: any) => {
+      this.groupList.push(data);
+    })
+
+    this.hubService.hubConnection.on("groupUpdate", data => {
+      var groupIndex = this.groupList.findIndex(e => e.id == data.id);
+      if (groupIndex != -1) {
+        this.groupList.splice(groupIndex, 1);
+        this.groupList.push({
+          id: data.Id,
+          name: data.name,
+          description: data.description,
+          profileImage: data.profileImage,
+          admin: data.admin
+        });
+      }
+    })
+
+    this.hubService.hubConnection.on("removedFromGroup", (data) => {
+      this.groupList = this.groupList.filter(e => e.name != data);
     })
   }
 
@@ -79,7 +104,8 @@ export class GroupSidebarComponent implements OnInit {
     if (this.uploadFile != null) {
       this.formData.append('Image', this.uploadFile);
     }
-    this.groupService.addGroup(this.formData).subscribe(data => {
+    this.groupService.addGroup(this.formData).subscribe((data: any) => {
+      this.groupList.push(data.savedGroup);
     }, err => {
     })
     this.clearForm();
@@ -114,51 +140,8 @@ export class GroupSidebarComponent implements OnInit {
     return this.accountService.fetchImage(imageName);
   }
 
-  //To add and Manage Members Of the Grou
-  addMemberModal(groupName: string, content: TemplateRef<any>) {
-    this.groupService.getMembers(groupName).subscribe((data: any) => {
-      if (data.members != null) {
-        data.members.forEach(element => {
-          this.members.push(element.userName);
-        });
-      }
-      this.accountService.getAll().subscribe((data: any) => {
-        if (data != null) {
-          this.users = data;
-          this.members.forEach(element => {
-            var userProfileIndex = this.users.findIndex(e => e.userName === element);
-            if (userProfileIndex > -1) {
-              this.users.splice(userProfileIndex, 1);
-            }
-          });
-        }
-      })
-    })
-
-    this.addMemberModalGroup.name = groupName;
-    this.modalService.open(content, {});
-  }
-
-
-  //To handle submission event of adding member modal
-  membersToAdd() {
-    this.groupService.addMembers(this.selectedUsers, this.addMemberModalGroup.name).subscribe(data => {
-    })
-    this.clearSelection();
-  }
-
-  //To clear selected List on closing of modal
-  clearSelection() {
-
-    this.selectedUsers = [];
-    this.members = [];
-    this.users = [];
-  }
-
-
   //OnSelection Of Group
-  selectedGroup(event: Event, group: GroupModel) {
-    event.stopPropagation();
+  selectedGroup(group: GroupModel) {
     this.groupService.groupSelection.next(group);
   }
 }
