@@ -31,6 +31,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
   rplyMsgLen : number;
   rplyMsgId: number;
   imageFile : File;
+  showEmoji : boolean = false;
   todayDate : Date = new Date();
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
 
@@ -155,6 +156,16 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     this.chatService.sendFileMessage(formdata).subscribe((data:MessageDisplayModel)=>{
       this.chatService.DidAMessage.next();
     })
+  }
+
+  Emoji(event, message : HTMLInputElement){
+    const text = message.value + event.emoji.native;
+    message.value = text;
+    this.showEmoji = false;
+  }
+
+  toggleEmoji(message : HTMLInputElement){
+    this.showEmoji = !this.showEmoji;
   }
 
   scrollToBottom(): void {

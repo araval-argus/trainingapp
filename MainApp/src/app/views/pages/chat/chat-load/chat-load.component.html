@@ -91,9 +91,11 @@
     </span>
   </div>
 </div>
+  <emoji-mart class="emoji-mart" set="apple" *ngIf="showEmoji" (emojiClick)="Emoji($event, message)" [showPreview]="false">
+  </emoji-mart>
 <div class="chat-footer d-flex">
   <div>
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji" (click)="toggleEmoji(message)">
       <i class="feather icon-sun text-muted"></i>
     </button>
   </div>

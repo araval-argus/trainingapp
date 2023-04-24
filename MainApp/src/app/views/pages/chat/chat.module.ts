@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule  } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { NgbDropdownModule, NgbTooltipModule, NgbNavModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,7 @@ import { ChatComponent } from './chat.component';
 import { ChatSidebarComponent } from './chat-sidebar/chat-sidebar.component';
 import { ChatLoadComponent } from './chat-load/chat-load.component';
 import { ClickOutsideDirective } from 'src/app/core/helper/click-outside.directive';
+import { PickerModule } from '@ctrl/ngx-emoji-mart';
 
 const routes: Routes = [
   {
@@ -30,8 +31,9 @@ const routes: Routes = [
     NgbNavModule,
     NgbCollapseModule,
     PerfectScrollbarModule,
+    PickerModule
   ],
   providers: [
-  ]
+  ],
 })
 export class ChatModule { }
