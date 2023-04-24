@@ -47,15 +47,16 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
       type:''
     };
 
-    this.signalRService.hubConnection.on('recieveMessage',(msg:MessageDisplayModel)=>{
-      this.displayMsgList.push(msg);
-    })
+    this.loggedInUser = this.authService.getLoggedInUserInfo();
+    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
 
     this.scrollToBottom();
 
     this.route.params.subscribe(
       (params : Params) =>{
         this.username = params['username'];
+
+        this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
 
         this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
           this.selUser = data;
@@ -68,8 +69,12 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
         })
       });
 
-    this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
+    this.signalRService.hubConnection.on('recieveMessage',(msg:MessageDisplayModel)=>{
+        this.displayMsgList.push(msg);
+      if(msg.messageFrom == this.username && msg.messageTo == this.loggedInUser.userName){
+        this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
+      }
+    })
 
     this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
       this.selUser = data;
@@ -77,6 +82,14 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
 
       this.chatService.fetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
         this.displayMsgList = data;
+      })
+    })
+
+    this.signalRService.hubConnection.on('msgSeen',(msgFrom:string)=>{
+      this.displayMsgList.forEach(element=>{
+        if(element.messageFrom == this.loggedInUser.userName){
+          element.seen = 1;
+        }
       })
     })
   }

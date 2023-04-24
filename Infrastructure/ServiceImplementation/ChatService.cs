@@ -132,18 +132,34 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			var orderedRecentChatList = recentChatList.OrderByDescending(m => m.CreatedAt);
 			return orderedRecentChatList;
 		}
-		public void MarkAsRead(string userName, string selUserName)
+		public async void MarkAsRead(string userName, string selUserName)
 		{
 			List<Message> msgs = null;
 			var CurUserId = GetIdFromUserName(userName);
 			if (selUserName == "All")
 			{
 				msgs = context.Messages.Where(m => m.MessageTo == CurUserId).ToList();
+				var allUsers = context.Messages.Where(u=>u.MessageTo== CurUserId).Select(u=>u.MessageFrom).Distinct().ToList();
+				
+				foreach(var user in allUsers)
+				{
+					if (context.Connections.Any(u => u.ProfileId == user))
+					{
+						string signalId = context.Connections.FirstOrDefault(u => u.ProfileId == user).SignalId;
+						await this.hubContext.Clients.Clients(signalId).SendAsync("msgSeen");
+					}
+				}
+				
 			}
 			else
 			{
 				var SelUserId = GetIdFromUserName(selUserName);
 				msgs = context.Messages.Where(m => m.MessageFrom == SelUserId && m.MessageTo == CurUserId).ToList();
+				if (context.Connections.Any(u => u.ProfileId == SelUserId))
+				{
+					var msgFromSignalId = context.Connections.FirstOrDefault(u => u.ProfileId == SelUserId).SignalId;
+					await this.hubContext.Clients.Client(msgFromSignalId).SendAsync("msgSeen");
+				}
 			}
 			foreach (var msg in msgs)
 			{

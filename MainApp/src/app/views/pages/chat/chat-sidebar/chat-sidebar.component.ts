@@ -42,12 +42,16 @@ export class ChatSidebarComponent implements OnInit {
         this.recentChatList = data;
        })
     })
+
+    this.signalRService.hubConnection.on('msgSeen',(msgFrom:string)=>{
+      this.removeMarkCount(msgFrom);
+    })
   }
 
   fetchRecentChat(){
     this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
       this.recentChatList = data;
-    })
+    });
   }
 
   onColleagueSelected(selUser : ColleagueModel){

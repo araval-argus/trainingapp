@@ -3,6 +3,7 @@ using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,5 +125,25 @@ namespace ChatApp
 			this.chatService.ResponsesToUsersMessage(messageFromId, messageToId, response);
 		}
 
+		public async Task seenMessage(string msgFrom , string msgTo)
+		{
+			int msgFromId = context.Profiles.FirstOrDefault(u=>u.UserName== msgFrom).Id;
+			int msgToId = context.Profiles.FirstOrDefault(u=>u.UserName== msgTo).Id;
+
+			var msgs = context.Messages.Where(u=>u.MessageFrom==msgFromId && u.MessageTo==msgToId).ToList();
+			foreach ( var msg in msgs )
+			{
+				msg.Seen = 1;
+			}
+			context.UpdateRange(msgs);
+			await context.SaveChangesAsync();
+
+			if(context.Connections.Any(u => u.ProfileId == msgFromId))
+			{
+				var msgFromSignalId = context.Connections.FirstOrDefault(u => u.ProfileId == msgFromId).SignalId;
+				var msgToSignalId = context.Connections.FirstOrDefault(u => u.ProfileId== msgToId).SignalId;
+				await Clients.Clients(msgFromSignalId , msgToSignalId).SendAsync("msgSeen",msgFrom);
+			}
+		}
 	}
 }
