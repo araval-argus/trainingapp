@@ -213,5 +213,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             }
             return false;
         }
+
+        public List<ChatDataModel> getData(string user)
+        {
+            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user);
+            List<ChatDataModel> chatDataModel = new();
+            if (profile != null)
+            {
+                chatDataModel = context.Chats.AsNoTracking().Where(e => e.To == profile.Id).GroupBy(e => e.sentAt.Date).Select(e => new ChatDataModel { date = e.Key.ToString("yyyy-MM-dd"), value = e.Count() }).ToList();
+            }
+            return chatDataModel;
+        }
     }
 }

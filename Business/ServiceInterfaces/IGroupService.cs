@@ -20,5 +20,7 @@ namespace ChatApp.Business.ServiceInterfaces
         bool removeMember(List<string> userNames, string groupName, string userName);
 
         bool leaveGroup(string userName, string groupName);
+
+        List<ChatDataModel> getData(string userName);
     }
 }

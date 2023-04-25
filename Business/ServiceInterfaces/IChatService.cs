@@ -13,5 +13,7 @@ namespace ChatApp.Business.ServiceInterfaces
 
         chatFormat addFile(string userName , ChatFileModel chatFile);
         bool markAsRead(string value, string user);
+        List<ChatDataModel> getData(string user);
+
     }
 }

@@ -13,6 +13,7 @@ import { NgApexchartsModule } from "ng-apexcharts";
 import { ChartsModule } from 'ng2-charts';
 
 import { DashboardComponent } from './dashboard.component';
+import { ChartComponent } from './chart/chart.component';
 
 const routes: Routes = [
   {
@@ -22,7 +23,7 @@ const routes: Routes = [
 ]
 
 @NgModule({
-  declarations: [DashboardComponent],
+  declarations: [DashboardComponent, ChartComponent],
   imports: [
     CommonModule,
     RouterModule.forChild(routes),
@@ -31,7 +32,8 @@ const routes: Routes = [
     NgbDropdownModule,
     NgbDatepickerModule,
     NgApexchartsModule,
-    ChartsModule
+    ChartsModule,
+    NgApexchartsModule
   ]
 })
 export class DashboardModule { }

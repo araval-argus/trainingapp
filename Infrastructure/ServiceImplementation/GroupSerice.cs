@@ -453,5 +453,22 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return false;
         }
 
+
+        public List<ChatDataModel> getData(string userName)
+        {
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
+            List<ChatDataModel> groupDataModel = new List<ChatDataModel>();
+            if (profile != null)
+            {
+                List<int> groupId = _context.GroupMember.AsNoTracking().Where(e => e.MemberId == profile.Id).Select(e => e.GroupId).ToList();
+                foreach(int id in groupId)
+                {
+                    List<ChatDataModel> list = _context.GroupMessage.AsNoTracking().Where(e => e.GroupID == id && e.SenderId != profile.Id).GroupBy(e => e.Time.Date).Select(e => new ChatDataModel { date = e.Key.ToString("yyyy-MM-dd"), value = e.Count() }).ToList();
+                    groupDataModel.AddRange(list);
+                }
+            }
+            List<ChatDataModel> chatData = groupDataModel.GroupBy(e => e.date).Select(e => new ChatDataModel { date=e.Key, value=e.Sum(g => g.value)}).ToList();
+            return chatData;
+        }
     }
 }

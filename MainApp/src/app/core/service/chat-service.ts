@@ -38,4 +38,8 @@ export class ChatService {
     markAsRead(user: string) {
         return this.http.get(environment.apiUrl + "/chat/markAsRead?s=" + user);
     }
+
+    getChatData() {
+        return this.http.get(environment.apiUrl + "/chat/getData")
+    }
 }

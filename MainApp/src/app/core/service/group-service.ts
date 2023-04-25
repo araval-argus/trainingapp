@@ -50,4 +50,8 @@ export class GroupService {
     leaveGroup(groupName: string) {
         return this.http.get(environment.apiUrl + "/group/leaveGroup?groupName=" + groupName)
     }
+
+    getChatData() {
+        return this.http.get(environment.apiUrl + "/group/getData")
+    }
 }

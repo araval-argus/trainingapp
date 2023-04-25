@@ -191,5 +191,25 @@ namespace ChatApp.Controllers
             return response;
 
         }
+
+
+        [HttpGet("getData")]
+        public IActionResult getData([FromHeader] string authorization)
+        {
+            IActionResult response = Unauthorized(new { Message = "You Are Not Authorized To Get Other's Data" });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                var data = _groupService.getData(claim.Value);
+                if (data != null)
+                {
+                    response = Ok(data);
+                }
+            }
+            return response;
+
+        }
     }
 }
