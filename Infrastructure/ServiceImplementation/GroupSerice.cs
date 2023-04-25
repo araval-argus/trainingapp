@@ -19,12 +19,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         private readonly ChatAppContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IHubContext<ChatHub> _hubContext;
+        private readonly INotificationService _notificationService;
 
 
-        public GroupSerice(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext) {
+        public GroupSerice(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext, INotificationService notificationService) {
             this._context = context;
             this._webHostEnvironment = webHostEnvironment;
             this._hubContext = hubContext;
+            this._notificationService = notificationService;
 
         }
 
@@ -33,7 +35,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName);
             if (profile != null)
             {
-                if (_context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == int.Parse(message.GroupId)) != null)
+                Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == int.Parse(message.GroupId));
+                if (group != null)
                 {
                     var fullFile = "";
                     if (message.File != null)
@@ -50,6 +53,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                             file.CopyTo(fileStreams);
                         }
                     }
+
+                    _notificationService.addNotification(message.GroupId, true, profile.Id);
 
                     GroupMessage newMessage = new()
                     {
@@ -79,7 +84,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         sentAt = newMessage.Time,
                         Type = newMessage.Type,
                     };
-                    Groups group = _context.Groups.AsNoTracking().Include(e => e.AdminProfile).FirstOrDefault(e => e.Id == msg.GroupId);
                     _hubContext.Clients.Group(group.Name).SendAsync("receivedChatForGroup", msg);
                     return true;
                 }
@@ -214,6 +218,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     };
                     _context.GroupMessage.Add(newMessage);
                     _context.SaveChanges();
+                    _notificationService.addNotification(group.Name, true, profile.Id);
+
                     string repliedMsgContent = null;
                     if(newMessage.ReplyMessageID != -1)
                     {

@@ -153,6 +153,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     {
                         file.CopyTo(fileStreams);
                     }
+                    _notificationService.addNotification(userName, false, receiver.Id);
                     //In case user provide invalid replyToChat Id
                     var parse = int.TryParse(chatFile.replyToChat, out int replyToChat);
                     Chat chat = new()

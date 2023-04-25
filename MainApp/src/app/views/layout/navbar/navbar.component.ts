@@ -1,4 +1,4 @@
-import { Component, OnInit, Inject, Renderer2 } from '@angular/core';
+import { Component, OnInit, Inject, Renderer2, TemplateRef } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -9,6 +9,7 @@ import { HubService } from 'src/app/core/service/hub-service';
 import { notificationModel } from 'src/app/core/models/notification-model';
 import { NotificationService } from 'src/app/core/service/notification-service';
 import { GroupService } from 'src/app/core/service/group-service';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-navbar',
@@ -28,7 +29,7 @@ export class NavbarComponent implements OnInit {
     private accountService: AccountService,
     private hubService: HubService,
     private notificationService: NotificationService,
-    private groupService: GroupService
+    private modalService: NgbModal
   ) { }
 
   ngOnInit(): void {
@@ -51,7 +52,44 @@ export class NavbarComponent implements OnInit {
 
   }
 
+  seenAll() {
+    this.notificationService.markAsSeen().subscribe(data => {
+      this.notifications.forEach(e => e.isSeen = 1);
+      console.log(data);
+      this.newCount = 0;
+      console.log(this.newCount);
+    })
+  }
 
+  viewAll(content: TemplateRef<any>) {
+    this.modalService.open(content, {});
+  }
+
+  view(id: number) {
+    this.notificationService.view(id).subscribe((data: any) => {
+      if (data.notification) {
+        var curNotification = this.notifications.find(e => e.id == id);
+        curNotification.isSeen = 1;
+        this.newCount--;
+      }
+    })
+  }
+
+  deleteAll() {
+    this.notificationService.deleteAll().subscribe(data => {
+      this.notifications = [];
+    })
+  }
+
+
+  delete(id: number) {
+    this.notificationService.delete(id).subscribe((data: any) => {
+      if (data.notification) {
+        this.notifications = this.notifications.filter(e => e.id != id);
+        this.newCount--;
+      }
+    })
+  }
   /**
    * Sidebar toggle on hamburger button click
    */
@@ -78,11 +116,6 @@ export class NavbarComponent implements OnInit {
     });
   }
 
-  openNotification(notification: notificationModel) {
-    if (notification.isGroup == 1) {
-      this.groupService.openFromNotification.next(notification.content);
-    }
-  }
 
   pushNotification(notification: any) {
     this.notifications.push({

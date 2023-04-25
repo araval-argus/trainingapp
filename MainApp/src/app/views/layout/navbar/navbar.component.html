@@ -9,31 +9,36 @@
       <li class="nav-item nav-notifications dropdown show" ngbDropdown>
         <a class="nav-link" (click)="false" ngbDropdownToggle>
           <i class="link-icon feather icon-bell"></i>
-          <div class="indicator"><div class="circle"></div></div>
+          <div class="indicator" *ngIf="newCount != 0"><div class="circle"></div></div>
         </a>
         <div ngbDropdownMenu aria-labelledby="profileDropdown">
           <div class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
-            <p>{{notifications.length}} New notifications</p>
-            <a class="text-muted">Seen All</a>
+            <p>{{newCount}} New notifications</p>
+            <a class="text-muted" (click)="seenAll()">Seen All</a>
           </div>
           <div class="dropdown-body px-0  show">
-            <div class="p-1" *ngFor="let notification of notifications; let i = index;">
-              <a (click)="openNotification(notification)" class="dropdown-item d-flex align-items-center py-2" *ngIf="i < 5" >
-                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle mr-3">
-                  <i class="feather icon-user icon-sm text-white" *ngIf="notification.isGroup == 0"></i>
+            <div class="p-1" *ngFor="let notification of notifications | slice:0:3;">
+              <a class="dropdown-item d-flex align-items-center py-2">
+                <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle mr-1">
+                  <i class="feather icon-user icon-sm text-white" *ngIf="notification.isGroup == 0" ></i>
                   <i class="feather icon-users icon-sm text-white" *ngIf="notification.isGroup == 1"></i>
                 </div>
-                <div class="flex-grow-1 me-2">
-                  <p>Message From {{notification.content}}</p>
+                <div class="content">
+                  <p >Message From {{notification.content}}</p>
                   <p class="tx-12 text-muted">{{notification.time | date:'short'}}</p>
-                  <div class="indicator"><div class="circle"></div></div>
                 </div>  
+                <div class="d-flex align-items-center">
+                  <div class="mr-2">
+                    <i class="feather icon-clock icon-sm" *ngIf="notification.isSeen == 0" ngbTooltip="Mark As Seen" (click)="view(notification.id)"></i>
+                  </div>
+                  <div>
+                    <i class="feather icon-trash-2 icon-sm"  ngbTooltip="Delete" (click)="delete(notification.id)"></i>
+                  </div>
+                </div>
               </a>
             </div>
           </div>
-          <div class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
-            <a>View all</a>
-          </div>
+          <a class="px-3 py-2 d-flex align-items-center justify-content-center flex-grow-1 me-2" (click)="viewAll(notificationModal)">View all</a>
         </div>
       </li>
       
@@ -77,3 +82,32 @@
     </ul>
   </div>
 </nav>
+
+<!-- Notification Modal -->
+<ng-template #notificationModal let-modal let-c="close">
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Notifications</h5>
+    <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c();" ></i>
+  </div>
+  <div class="modal-body">
+    <div class="col-lg-12" [perfectScrollbar] style="max-height: 25rem;">
+      <div class="p-1" >
+        <a class="dropdown-item d-flex align-items-center py-2" *ngFor="let notification of notifications;">
+          <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle mr-3">
+            <i class="feather icon-user icon-sm text-white" *ngIf="notification.isGroup == 0"></i>
+            <i class="feather icon-users icon-sm text-white" *ngIf="notification.isGroup == 1"></i>
+          </div>
+          <div class="flex-grow-1 me-2 content" >
+            <p >Message From {{notification.content}}</p>
+            <p class="tx-12 text-muted">{{notification.time | date:'short'}}</p>
+          </div>  
+        </a>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="c();">Close</button>
+    <button type="button" class="btn btn-secondary" (click)="c(); deleteAll()">Delete All</button>
+    <button type="button" class="btn btn-primary" (click)="c(); seenAll()">Mark All As Seen</button>
+  </div>
+</ng-template>

@@ -20,7 +20,7 @@
   <p class="text-muted mb-1 text-center">Groups</p>
   <ul class="list-unstyled chat-list px-1 py-1">
     <li class="chat-item pr-1 border-bottom" *ngFor="let group of groupList">
-      <a (click)="false" class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;" (click)="selectedGroup($event, group)">
+      <a (click)="false" class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;" (click)="selectedGroup(group)">
         <div class="mb-0 mr-2">
           <img [src]="group.profileImage == null?'https://via.placeholder.com/37x37' : getImage(group.profileImage)" class="img-xs rounded-circle" alt="user">
         </div>

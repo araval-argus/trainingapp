@@ -10,4 +10,16 @@ export class NotificationService {
     getAll() {
         return this.http.get(environment.apiUrl + "/Notification/getAll");
     }
+    markAsSeen() {
+        return this.http.get(environment.apiUrl + "/Notification/markAsSeen");
+    }
+    deleteAll() {
+        return this.http.get(environment.apiUrl + "/Notification/deleteAll");
+    }
+    delete(id: number) {
+        return this.http.get(environment.apiUrl + "/Notification/delete?id=" + id);
+    }
+    view(id: number) {
+        return this.http.get(environment.apiUrl + "/Notification/view?id=" + id)
+    }
 }

@@ -12,7 +12,6 @@ import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { GroupService } from 'src/app/core/service/group-service';
 import { HubService } from 'src/app/core/service/hub-service';
-import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-group-message',
