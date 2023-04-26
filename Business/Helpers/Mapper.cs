@@ -24,7 +24,8 @@ namespace ChatApp.Business.Helpers
                     CreatedBy= profile.CreatedBy,
                     LastUpdatedAt= profile.LastUpdatedAt,
                     LastUpdatedBy= profile.LastUpdatedBy,
-                    imagePath= profile.imagePath
+                    imagePath= profile.imagePath,
+                    status = profile.Status
                 });
             }
             return profileDTOs;
@@ -45,7 +46,8 @@ namespace ChatApp.Business.Helpers
                 CreatedBy = profile.CreatedBy,
                 LastUpdatedAt = profile.LastUpdatedAt,
                 LastUpdatedBy = profile.LastUpdatedBy,
-                imagePath = profile.imagePath
+                imagePath = profile.imagePath,
+                status = profile.Status
             };
             return profileDTO;
         }

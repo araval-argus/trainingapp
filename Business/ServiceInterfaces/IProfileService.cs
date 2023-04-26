@@ -23,5 +23,7 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Profile getUser(int userName);
         Profile getUserFromUserName(string userName);
+
+        bool setStatus(string userName, int id);
     }
 }

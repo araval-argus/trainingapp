@@ -39,6 +39,7 @@ namespace ChatApp.Controllers
 
             if (user != null)
             {
+                _profileService.setStatus(loginModel.Username, 1);
                 var tokenString = GenerateJSONWebToken(user);
                 response = Ok(new { token = tokenString });
             }
@@ -88,10 +89,9 @@ namespace ChatApp.Controllers
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
             var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
-            List<profileDTO> profiles = new List<profileDTO>();
             if (claim != null)
             {
-                profiles = _profileService.GetProfileDTOs(s, claim.Value);
+                var profiles = _profileService.GetProfileDTOs(s, claim.Value);
                 return Ok(profiles);
 
             }
@@ -126,6 +126,23 @@ namespace ChatApp.Controllers
             }
             return Ok(new { imgPath = imgPath });
         }
+
+        [HttpGet("setStatus")]
+        [Authorize]
+        public IActionResult setStatus([FromHeader] string authorization, [FromQuery]int id)
+        {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                bool statusUpdated = _profileService.setStatus(claim.Value, id);
+                response = Ok(statusUpdated);
+            }
+            return response;
+        }
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

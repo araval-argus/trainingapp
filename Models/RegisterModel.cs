@@ -24,7 +24,7 @@ namespace ChatApp.Models
         public string UserName { get; set; }
         [Required(ErrorMessage = "Enter Email Address")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]
-        [StringLength(20, MinimumLength = 3, ErrorMessage = "Email Should Be between length of 3-50")]
+        [StringLength(100, MinimumLength = 3, ErrorMessage = "Email Should Be between length of 3-100")]
         public string Email { get; set; }
         [Required(ErrorMessage = "Enter Password")]
         [StringLength(20, MinimumLength = 6, ErrorMessage = "Password Should Be between length of 3-50")]

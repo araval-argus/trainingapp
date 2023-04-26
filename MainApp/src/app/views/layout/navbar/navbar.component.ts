@@ -98,12 +98,12 @@ export class NavbarComponent implements OnInit {
     this.document.body.classList.toggle('sidebar-open');
   }
 
-
   /**
    * Logout
    */
   onLogout(e) {
     e.preventDefault();
+    this.accountService.setStatus(6).subscribe(data => { });
     this.authService.logout(() => {
       Swal.fire({
         title: 'Success!',

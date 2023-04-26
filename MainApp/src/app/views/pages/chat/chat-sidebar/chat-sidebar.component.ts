@@ -58,6 +58,7 @@ export class ChatSidebarComponent implements OnInit {
             email: element.to.email,
             imagePath: element.to.imagePath,
             userName: element.to.userName,
+            status: element.to.status
           },
           chatContent: {
             content: element.chatContent.content,

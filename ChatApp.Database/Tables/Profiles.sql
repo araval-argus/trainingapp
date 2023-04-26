@@ -12,5 +12,7 @@
     [LastUpdatedAt] DATETIME2 NULL, 
     [LastUpdatedBy] INT NULL, 
     [imagePath] NVARCHAR(1000) NULL, 
-    CONSTRAINT [PK_Profiles] PRIMARY KEY ([Id])
+    [status] INT NOT NULL DEFAULT 6, 
+    CONSTRAINT [PK_Profiles] PRIMARY KEY ([Id]), 
+    CONSTRAINT [FK_Profiles_To_Status] FOREIGN KEY ([status]) REFERENCES dbo.Status(Id)
 )

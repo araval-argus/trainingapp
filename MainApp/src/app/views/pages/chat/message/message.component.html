@@ -5,8 +5,10 @@
         <i (click)="false" class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
         <figure class="mb-0 mr-2">
           <img [src]="selectedUserImagePath" class="img-sm rounded-circle">
-          <div class="status online"></div>
-          <div class="status online"></div>
+          <div class="status online" *ngIf="selectedUser.status === 1"></div>
+          <div class="status pause" *ngIf="selectedUser.status === 2 || selectedUser.status === 3"></div>
+          <div class="status away" *ngIf="selectedUser.status === 4|| selectedUser.status === 5"></div>
+          <div class="status offline" *ngIf="selectedUser.status === 6"></div>
         </figure>
         <div>
           <p>{{selectedUser.firstName}} {{selectedUser.lastName}}</p>

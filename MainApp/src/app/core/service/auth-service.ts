@@ -14,6 +14,7 @@ export class AuthService {
     login(token, callback) {
         localStorage.setItem('isLoggedin', 'true');
         localStorage.setItem('USERTOKEN', token);
+        localStorage.setItem('statusId', '1');
         this.hubService.createConnection();
         if (callback) {
             callback();
@@ -25,6 +26,7 @@ export class AuthService {
         localStorage.removeItem('isLoggedin');
         localStorage.removeItem('USERTOKEN');
         localStorage.removeItem('imagePath');
+        localStorage.removeItem('statusId');
         if (callback) {
             callback();
         }

@@ -2,8 +2,11 @@
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
+using ChatApp.Hubs;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
 using System;
 using System.Collections.Generic;
@@ -18,11 +21,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
+        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext)
         {
             this.context = context;
             this._webHostEnvironment = webHostEnvironment;
+            this._hubContext = hubContext; 
         }
         public Profile CheckPassword(LoginModel model)
         {
@@ -43,7 +48,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     UserName = regModel.UserName,
                     Email = regModel.Email,
                     CreatedAt = DateTime.UtcNow,
-                    ProfileType = ProfileType.User
+                    ProfileType = ProfileType.User,
+                    Status = 1
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
@@ -142,5 +148,20 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             return context.Profiles.Any(x => x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim());
         }
+
+        public bool setStatus(string userName, int id)
+        {
+            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
+            if(profile != null)
+            {
+                profile.Status = id;
+                context.Profiles.Update(profile);
+                context.SaveChanges();
+                _hubContext.Clients.All.SendAsync("userStatusUpdated", userName, id);
+                return true;
+            }
+            return false;
+        }
+
     }
 }

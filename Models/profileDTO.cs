@@ -15,6 +15,6 @@ namespace ChatApp.Models
         public DateTime? LastUpdatedAt { get; set; }
         public int? LastUpdatedBy { get; set; }
         public string imagePath { get; set; }
-
+        public int status { get; set; }
     }
 }

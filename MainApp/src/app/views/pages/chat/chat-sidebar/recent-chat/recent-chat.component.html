@@ -1,9 +1,12 @@
 <li class="chat-item pr-1 border-bottom">
     <a (click)="openChat(recentChat.to)" class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;">
-      <div class="mb-0 mr-2">
+      <figure class="mb-0 mr-2">
         <img [src]="thumbnail" class="img-xs rounded-circle" alt="user">
-        <div class="status online"></div>
-      </div>
+        <div class="status online" *ngIf="recentChat.to.status === 1"></div>
+        <div class="status pause" *ngIf="recentChat.to.status === 2 || recentChat.to.status === 3"></div>
+        <div class="status away" *ngIf="recentChat.to.status === 4|| recentChat.to.status === 5"></div>
+        <div class="status offline" *ngIf="recentChat.to.status === 6"></div>
+    </figure>
       <div class="d-flex justify-content-between flex-grow ">
         <div>
           <p class="text-body font-weight-bold">{{recentChat.to.firstName}} {{recentChat.to.lastName}}</p>

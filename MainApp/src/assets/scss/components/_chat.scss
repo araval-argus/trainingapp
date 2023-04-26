@@ -196,6 +196,12 @@
       &.offline {
         background: theme-color(secondary);
       }
+      &.pause{
+        background: theme-color(warning);
+      }
+      &.away{
+        background: theme-color(danger);
+      }
     }
   }
 }

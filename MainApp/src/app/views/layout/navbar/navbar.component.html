@@ -5,6 +5,8 @@
   <div class="navbar-content">
     
     <ul class="navbar-nav">
+
+      <app-status class="nav-item"></app-status>
       
       <li class="nav-item nav-notifications dropdown show" ngbDropdown>
         <a class="nav-link" (click)="false" ngbDropdownToggle>
@@ -41,13 +43,13 @@
           <a class="px-3 py-2 d-flex align-items-center justify-content-center flex-grow-1 me-2" (click)="viewAll(notificationModal)">View all</a>
         </div>
       </li>
-      
-      
+
+
       <li class="nav-item nav-profile" ngbDropdown>
         <a class="nav-link" ngbDropdownToggle id="profileDropdown">
           <img src="https://via.placeholder.com/30x30"  class="rounded-circle" alt="profile" *ngIf="imageURL === null">
           <img [src]="imageURL" height="30" width="30"  class="rounded-circle" alt="profile" *ngIf="imageURL !== null">
-      </a>
+        </a>
         <div ngbDropdownMenu aria-labelledby="profileDropdown">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">

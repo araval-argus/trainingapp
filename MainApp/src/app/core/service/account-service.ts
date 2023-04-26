@@ -42,4 +42,7 @@ export class AccountService {
     getAll(): Observable<Profile[]> {
         return this.http.get<Profile[]>(environment.apiUrl + "/account/getAll");
     }
+    setStatus(id: number) {
+        return this.http.get(environment.apiUrl + "/account/setStatus?id=" + id)
+    }
 }

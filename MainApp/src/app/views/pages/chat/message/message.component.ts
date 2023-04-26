@@ -59,10 +59,11 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
 
     this.isEmojiPickerVisible = false
     this.chatService.reloadInbox.subscribe((data: any) => {
-
+      console.log(data);
       this.selectedUser.firstName = data.firstName,
         this.selectedUser.lastName = data.lastName,
-        this.selectedUser.userName = data.userName
+        this.selectedUser.userName = data.userName,
+        this.selectedUser.status = data.status
       if (data.imagePath != '') {
         this.selectedUserImagePath = this.accountService.fetchImage(data.imagePath);
       } else {
@@ -117,6 +118,13 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
 
     this.hubService.hubConnection.on("userIsOnline", (user) => {
       console.log(user + " is online");
+    })
+
+
+    this.hubService.hubConnection.on("userStatusUpdated", (userName, statusId) => {
+      if (this.selectedUser.userName == userName) {
+        this.selectedUser.status = statusId
+      }
     })
   }
 

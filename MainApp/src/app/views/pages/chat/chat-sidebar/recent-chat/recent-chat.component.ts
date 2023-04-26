@@ -27,6 +27,12 @@ export class RecentChatComponent implements OnInit {
       this.contentToDisplay = this.recentChat.chatContent.content;
     }
 
+    this.hubService.hubConnection.on("userStatusUpdated", (userName, statusId) => {
+      if (this.recentChat.to.userName == userName) {
+        this.recentChat.to.status = statusId
+      }
+    })
+
   }
 
   openChat(item: any) {
