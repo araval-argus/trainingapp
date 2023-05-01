@@ -1,0 +1,55 @@
+p.mdi.mdi-account-star{
+  font-size: 1.2rem !important;
+}
+
+p.mdi.mdi-account-remove{
+  font-size: 1.2rem !important;
+  color:red !important;
+}
+
+.margin-to-left-right{
+  margin-left : 10vw;
+  margin-right: 50vw;
+  margin-bottom: 0.1vw;
+}
+
+.setColor{
+ background-color: rgba(252, 83, 86, 0.2);
+}
+
+.onhoverr{
+  cursor: pointer;
+}
+
+.replymsg{
+  background-color: white;
+  padding-left: 1vw;
+  padding-right: 1vw;
+  border-left: .2rem solid darkgreen;
+}
+
+.msgFrom{
+  font-size: 0.6rem;
+  color:#727CF5;
+  margin-left: .01rem !important;
+}
+
+.overflowrap{
+  overflow-wrap: anywhere;
+}
+
+p.colorAdmin{
+  color:green !important;
+}
+
+p.wordbreak {
+  word-break: break-all;
+  white-space: normal;
+}
+
+.emoji-mart {
+  position: absolute;
+  z-index: 1;
+  left: 0px;
+  bottom: 45px;
+}

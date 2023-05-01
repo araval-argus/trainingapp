@@ -16,26 +16,12 @@ namespace ChatApp
 		private readonly ChatAppContext context;
 		private readonly IChatService chatService;
 
-		public chatHub(ChatAppContext context, IChatService chatservice)
+		#region OneToOneHub
+		public chatHub(ChatAppContext context, IChatService chatservice )
 		{
 			this.context = context;
 			this.chatService = chatservice;
 		}
-
-		public override Task OnConnectedAsync()
-		{
-			return base.OnConnectedAsync();
-		}
-
-		public override Task OnDisconnectedAsync(Exception exception)
-		{
-			if (exception != null)
-			{
-				Console.WriteLine(exception.Message);
-			}
-			return base.OnDisconnectedAsync(exception);
-		}
-
 		public async Task ConnectDone(string userName)
 		{
 			string curSignalId = Context.ConnectionId;
@@ -74,8 +60,11 @@ namespace ChatApp
 			{
 				int userId = context.Profiles.FirstOrDefault(u => u.UserName == userName).Id;
 				var connect = context.Connections.FirstOrDefault(u => u.ProfileId == userId);
-				context.Connections.Remove(connect);
-				context.SaveChanges();
+				if (connect != null)
+				{
+					context.Connections.Remove(connect);
+					context.SaveChanges();
+				}
 			}
 			else
 			{
@@ -145,5 +134,58 @@ namespace ChatApp
 				await Clients.Clients(msgFromSignalId , msgToSignalId).SendAsync("msgSeen",msgFrom);
 			}
 		}
+		#endregion
+
+		#region GroupHub
+
+		public async Task sendGroupMsg(GMessageInModel message)
+		{
+			GroupMessages newMessage = null;
+			GMessageSendModel response = null;
+			string replyMessage;
+			int messageFromId = chatService.GetIdFromUserName(message.MessageFrom);
+			int groupId = message.GroupId;
+			newMessage = new GroupMessages
+			{
+				Content = message.Content,
+				CreatedAt = DateTime.Now,
+				MessageFrom = messageFromId,
+				GrpId= groupId,
+				RepliedTo = (int)message.RepliedTo,
+				Type = null,
+			};
+			context.GroupMessages.Add(newMessage);
+			context.SaveChanges();
+			if (message.RepliedTo == -1)
+			{
+				replyMessage = null;
+			}
+			else
+			{
+				var msg = context.GroupMessages.FirstOrDefault(msg => msg.Id == message.RepliedTo);
+				replyMessage = msg.Content;
+			}
+			var profile = context.Profiles.FirstOrDefault(p => p.Id == messageFromId);
+			response = new GMessageSendModel
+			{
+				Id = newMessage.Id,
+				Content = newMessage.Content,
+				CreatedAt = (DateTime)newMessage.CreatedAt,
+				MessageFrom = message.MessageFrom,
+				MessageFromImage = profile.ImagePath,
+				RepliedTo = replyMessage,
+				Type = null,
+			};
+			var groupMemberIds = context.GroupMembers.Where(u => u.GrpId == groupId).Select(u => u.ProfileId).ToList();
+			foreach(var memberId in groupMemberIds)
+			{
+				var connection = context.Connections.FirstOrDefault(u => u.ProfileId == memberId);
+				if(connection != null)
+				{
+					await Clients.Clients(connection.SignalId).SendAsync("RecieveMessageGroup", response);
+				}
+			}
+		}
+		#endregion
 	}
 }

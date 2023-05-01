@@ -1,6 +1,8 @@
-import { AfterViewChecked, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { MessageDisplayModel } from 'src/app/core/models/message-display-model';
@@ -15,10 +17,11 @@ import { environment } from 'src/environments/environment';
   templateUrl: './chat-load.component.html',
   styleUrls: ['./chat-load.component.scss']
 })
-export class ChatLoadComponent implements OnInit , AfterViewChecked{
+export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
 
   localPath : string = environment.ImageUrl;
   basicModalCode: any;
+  isHimself : boolean = false;
   username : string;
   selUser: ColleagueModel;
   selUserImage : string;
@@ -34,6 +37,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
   showEmoji : boolean = false;
   todayDate : Date = new Date();
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
+  private ngUnsubscribe = new Subject<void>();
 
   constructor(private route: ActivatedRoute , private chatService : ChatService , private authService:AuthService ,
      private modalService: NgbModal , private signalRService : SignalRService) { }
@@ -53,17 +57,20 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
 
     this.scrollToBottom();
 
-    this.route.params.subscribe(
+    this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (params : Params) =>{
         this.username = params['username'];
+        if(this.username==this.loggedInUser.userName){
+          this.isHimself = true;
+        }
 
         this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
 
-        this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
+        this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
           this.selUser = data;
           this.selUserImage = environment.ImageUrl + data.imagePath;
 
-          this.chatService.fetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
+          this.chatService.fetchMessages(this.selUser.userName).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:MessageDisplayModel[])=>{
             this.displayMsgList = data;
            // console.log(this.displayMsgList);
           })
@@ -77,11 +84,11 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
       }
     })
 
-    this.chatService.getUser(this.username).subscribe((data:ColleagueModel)=>{
+    this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
       this.selUser = data;
       this.selUserImage = environment.ImageUrl + data.imagePath;
 
-      this.chatService.fetchMessages(this.selUser.userName).subscribe((data:MessageDisplayModel[])=>{
+      this.chatService.fetchMessages(this.selUser.userName).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:MessageDisplayModel[])=>{
         this.displayMsgList = data;
       })
     })
@@ -153,7 +160,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     formdata.append('File',this.imageFile);
     formdata.append('MessageFrom',this.loggedInUser.userName),
     formdata.append('MessageTo',this.selUser.userName),
-    this.chatService.sendFileMessage(formdata).subscribe((data:MessageDisplayModel)=>{
+    this.chatService.sendFileMessage(formdata).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:MessageDisplayModel)=>{
       this.chatService.DidAMessage.next();
     })
   }
@@ -174,4 +181,8 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked{
     } catch(err) { }
   }
 
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next();
+    this.ngUnsubscribe.complete();
+}
 }

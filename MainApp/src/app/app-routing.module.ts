@@ -19,8 +19,12 @@ const routes: Routes = [
       },
       { path: 'update-profile' , component:UpdateComponent  },
       { path: 'view-profile' , component:ViewprofileComponent},
+      {
+        path: 'group' ,
+        loadChildren: () => import('./views/pages/group/group.module').then(m => m.GroupModule)
+      },
       { path: 'chat' ,
-        loadChildren: () => import('./views/pages/chat/chat.module').then(m=> m.ChatModule)
+        loadChildren: () => import('./views/pages/chat/chat.module').then(m => m.ChatModule)
       },
       {
         path: 'ui-component',

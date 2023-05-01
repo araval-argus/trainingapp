@@ -43,7 +43,7 @@ export class LoginComponent implements OnInit {
          timerProgressBar: true,
         });
         setTimeout(() => {
-          this.router.navigate(["/"]);
+         // this.router.navigate(["/"]);
         }, (3000));
         this.router.navigate([this.returnUrl]);
       });

@@ -1,5 +1,4 @@
-﻿
-CREATE TABLE [dbo].[Connections]
+﻿CREATE TABLE [dbo].[Connections]
 (
 	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1), 
     [ProfileId] INT UNIQUE NOT NULL, 

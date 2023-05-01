@@ -28,7 +28,7 @@ export class UpdateComponent implements OnInit {
   onFileSelected(event) {
     if (event.target.files.length > 0) {
       this.imageFile = (event.target as HTMLInputElement).files[0];
-      console.log(this.imageFile);
+     // console.log(this.imageFile);
     }
   }
 

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 const basicModal = {
-  htmlCode: 
+  htmlCode:
 `<!-- Button trigger modal -->
 <button class="btn btn-primary" (click)="openBasicModal(basicModal)">Launch demo modal</button>
 <!-- Modal -->
@@ -23,7 +23,7 @@ const basicModal = {
 </ng-template>
 <!-- Close result -->
 <p *ngIf="basicModalCloseResult != ''" class="mt-2">{{basicModalCloseResult}}</p>`,
-  tsCode: 
+  tsCode:
 `import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -32,7 +32,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal.component.html'
 })
 export class ModalComponent {
-  
+
   basicModalCloseResult: string = '';
 
   constructor(private modalService: NgbModal) { }
@@ -46,7 +46,7 @@ export class ModalComponent {
 }
 
 const scrollableModal = {
-  htmlCode: 
+  htmlCode:
 `<!-- Button trigger modal -->
 <button class="btn btn-primary" (click)="openScrollableModal(scrollableModal)">Launch demo modal</button>
 <!-- Modal -->
@@ -82,7 +82,7 @@ const scrollableModal = {
     <button type="button" class="btn btn-primary" (click)="modal.close('by: save button')">Save changes</button>
   </div>
 </ng-template>`,
-  tsCode: 
+  tsCode:
 `import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -91,7 +91,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal.component.html'
 })
 export class ModalComponent {
-  
+
   constructor(private modalService: NgbModal) { }
 
   openScrollableModal(content) {
@@ -103,7 +103,7 @@ export class ModalComponent {
 }
 
 const verticalCenteredModal = {
-  htmlCode: 
+  htmlCode:
 `<!-- Button trigger modal -->
 <button class="btn btn-primary" (click)="openVerticalCenteredModal(verticalCenteredModal)">Launch demo modal</button>
 <!-- Modal -->
@@ -122,7 +122,7 @@ const verticalCenteredModal = {
     <button type="button" class="btn btn-primary" (click)="modal.close('by: save button')">Save changes</button>
   </div>
 </ng-template>`,
-  tsCode: 
+  tsCode:
 `import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -131,7 +131,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal.component.html'
 })
 export class ModalComponent {
-  
+
   constructor(private modalService: NgbModal) { }
 
   openVerticalCenteredModal(content) {
@@ -143,7 +143,7 @@ export class ModalComponent {
 }
 
 const optionalSizesModal = {
-  htmlCode: 
+  htmlCode:
 `<!-- Button trigger xl modal -->
 <button class="btn btn-primary" (click)="openXlModal(xlModal)">Extra large modal</button>
 <!-- Modal -->
@@ -200,7 +200,7 @@ const optionalSizesModal = {
     <button type="button" class="btn btn-primary" (click)="modal.close('by: save button')">Save changes</button>
   </div>
 </ng-template>`,
-  tsCode: 
+  tsCode:
 `import { Component } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
@@ -209,7 +209,7 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
   templateUrl: './modal.component.html'
 })
 export class ModalComponent {
-  
+
   constructor(private modalService: NgbModal) { }
 
   openXlModal(content) {
@@ -223,7 +223,7 @@ export class ModalComponent {
       console.log("Modal closed" + result);
     }).catch((res) => {});
   }
-  
+
   openSmModal(content) {
     this.modalService.open(content, {size: 'sm'}).result.then((result) => {
       console.log("Modal closed" + result);
@@ -284,7 +284,7 @@ export class ModalComponent implements OnInit {
       console.log("Modal closed" + result);
     }).catch((res) => {});
   }
-  
+
   openSmModal(content) {
     this.modalService.open(content, {size: 'sm'}).result.then((result) => {
       console.log("Modal closed" + result);

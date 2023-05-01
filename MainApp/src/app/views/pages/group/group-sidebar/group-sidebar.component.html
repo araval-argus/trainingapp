@@ -1,0 +1,351 @@
+<div class="aside-content">
+  <div class="aside-header">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-2">
+      <div class="d-flex align-items-center">
+        <figure class="mr-2 mb-0">
+          <img [src]="imageSource" class="img-sm rounded-circle" alt="profile">
+          <div class="status online"></div>
+        </figure>
+        <div>
+          <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
+          <p class="text-muted tx-13">{{loggedInUser.designation}}</p>
+        </div>
+      </div>
+      <div class="dropdown" ngbDropdown>
+        <button class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton" ngbDropdownToggle>
+          <i class="feather icon-settings icon-md text-muted pb-3px" ngbTooltip="Settings"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
+          <a class="dropdown-item d-flex align-items-center" (click)="onViewProfile()"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">View Profile</span></a>
+          <a class="dropdown-item d-flex align-items-center" (click)="onEditProfile()"><i class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Profile</span></a>
+          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add status</span></a>
+          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
+        </div>
+      </div>
+    </div>
+    <div class="newgrp mdi mdi-plus" (click)="openVerticalCenteredModal(verticalCenteredModal)">
+      New Group
+    </div>
+    <!-- Modal -->
+    <ng-template #verticalCenteredModal let-modal>
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Create a Group</h5>
+        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="container bootstrap snippets bootdey">
+        <div class="row">
+            <!-- left column -->
+            <div class="col-md-5">
+              <div class="text-center">
+                <img *ngIf="url==''" src="assets/images/placeholder.jpg" class="avatar img-circle img-thumbnail" alt="avatar">
+                <img *ngIf="url!=''" [src]="url" class="avatar img-circle img-thumbnail" alt="avatar">
+                <h6>Upload a different photo...</h6>
+                <div class="image-upload">
+                  <label class="mdi mdi-upload bigg" for="file-input"></label>
+                  <input id="file-input" type="file" (change)="onSelectFile($event)" />
+                </div>
+              </div>
+            </div>
+            <!-- edit form column -->
+            <div class="col-md-7 personal-info">
+              <form class="form-horizontal" role="form" #f="ngForm">
+                <div class="form-group">
+                  <label class="col-lg-12 control-label">Group name:</label>
+                  <div class="col-lg-12">
+                    <input class="form-control" type="text" value="" name="GroupName" [(ngModel)]="createGrpModel.groupName" #GroupName="ngModel" maxlength="50" required>
+                  </div>
+                  <span *ngIf="GroupName.invalid && GroupName.touched" class="text-danger"><p>This is a Required Field</p></span>
+                </div>
+                <div class="form-group">
+                  <label class="col-lg-12 control-label">Description:</label>
+                  <div class="col-lg-12">
+                    <textarea rows="5" class="form-control" type="text" value="" name="grpDesc" [(ngModel)]="createGrpModel.description" #grpDesc="ngModel" maxlength="200"></textarea>
+                  </div>
+                </div>
+              </form>
+            </div>
+        </div>
+      </div>
+      <hr>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+        <button type="button" class="btn btn-primary" [disabled]="!f.valid" (click)="onSubmit();modal.close()">Create Group</button>
+      </div>
+    </ng-template>
+    <!-- End Modal-->
+  </div>
+  <div class="aside-body">
+    <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs mt-3">
+      <li [ngbNavItem]="1">
+        <ng-template ngbNavContent>
+          <div class="ps" [perfectScrollbar]>
+            <ul class="list-unstyled chat-list px-1" *ngFor="let item of recentGroupList , let i = index" (click)="OnSelectGroup(item.id)">
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img *ngIf="item.groupImage==null" src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <img *ngIf="item.groupImage!=null" [src]="environment + item.groupImage" class="img-xs rounded-circle" alt="user">
+                  </figure>
+                  <div class="d-flex justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body font-weight-bold">{{item.groupName}}</p>
+                      <p *ngIf="item.type == null && item.lastMsg!=null" class="text-muted tx-13">{{item.lastMsg | slice:0:30}}{{item.lastMsg.length<30?'':'...'}}</p>
+                      <p *ngIf="item.type == 'audio'" class="text-muted tx-13">Audio</p>
+                      <p *ngIf="item.type == 'video'" class="text-muted tx-13">Video</p>
+                      <p *ngIf="item.type == 'image'" class="text-muted tx-13">Photo</p>
+                      <!-- <p *ngIf="item.lastMsg!=null && item.type==null" class="text-muted tx-13">{{item.lastMsg}}</p>
+                      <p *ngIf="item.lastMsg!=null && item.type==null" class="text-muted tx-13">{{item.lastMsg}}</p>
+                      <p *ngIf="item.lastMsg!=null && item.type==null" class="text-muted tx-13">{{item.lastMsg}}</p> -->
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <p *ngIf="item.lastMsgAt!=null" class="text-muted tx-13 mb-1">{{recentGroupDate(item.lastMsgAt)}}</p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </li>  <!-- End chat tab
+      <li [ngbNavItem]="2">
+        <a ngbNavLink>
+          <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
+            <i class="feather icon-phone-call icon-xs mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+            <p class="d-none d-sm-block">Calls</p>
+          </div>
+        </a>
+        <ng-template ngbNavContent>
+          <div class="ps" [perfectScrollbar]>
+            <p class="text-muted mb-1">Recent calls</p>
+            <ul class="list-unstyled chat-list px-1">
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status online"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Jensen Combs</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-up-right icon-xs text-success mr-1"></i>
+                        <p class="text-muted tx-13">Today, 03:11 AM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-phone-call text-success icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Leonardo Payne</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-down-left icon-xs text-success mr-1"></i>
+                        <p class="text-muted tx-13">Today, 11:41 AM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-video text-success icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Carl Henson</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-down-left icon-xs text-danger mr-1"></i>
+                        <p class="text-muted tx-13">Today, 04:24 PM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-phone-call text-danger icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status online"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Jensen Combs</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-down-left icon-xs text-danger mr-1"></i>
+                        <p class="text-muted tx-13">Today, 12:53 AM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-video text-danger icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status online"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">John Doe</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-down-left icon-xs text-success mr-1"></i>
+                        <p class="text-muted tx-13">Today, 01:42 AM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-video text-success icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">John Doe</p>
+                      <div class="d-flex align-items-center">
+                        <i class="feather icon-arrow-up-right icon-xs text-success mr-1"></i>
+                        <p class="text-muted tx-13">Today, 12:01 AM</p>
+                      </div>
+                    </div>
+                    <div class="d-flex flex-column align-items-end">
+                      <i class="feather icon-phone-call text-success icon-sm"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </li>  End calls tab
+      <li [ngbNavItem]="3">
+        <a ngbNavLink>
+          <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">
+            <i class="feather icon-users icon-xs mr-sm-2 mr-lg-0 mr-xl-2 mb-md-1 mb-xl-0"></i>
+            <p class="d-none d-sm-block">Contacts</p>
+          </div>
+        </a>
+        <ng-template ngbNavContent>
+          <div class="ps" [perfectScrollbar]>
+            <p class="text-muted mb-1">Contacts</p>
+            <ul class="list-unstyled chat-list px-1">
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Amiah Burton</p>
+                      <div class="d-flex align-items-center">
+                        <p class="text-muted tx-13">Front-end Developer</p>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-end text-body">
+                      <i class="feather icon-message-square icon-sm text-success mr-2"></i>
+                      <i class="feather icon-phone-call icon-sm text-primary mr-2"></i>
+                      <i class="feather icon-video icon-sm text-danger"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status online"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">John Doe</p>
+                      <div class="d-flex align-items-center">
+                        <p class="text-muted tx-13">Back-end Developer</p>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-end text-body">
+                      <i class="feather icon-message-square icon-sm text-success mr-2"></i>
+                      <i class="feather icon-phone-call icon-sm text-primary mr-2"></i>
+                      <i class="feather icon-video icon-sm text-danger"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">Yaretzi Mayo</p>
+                      <div class="d-flex align-items-center">
+                        <p class="text-muted tx-13">Fullstack Developer</p>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-end text-body">
+                      <i class="feather icon-message-square icon-sm text-success mr-2"></i>
+                      <i class="feather icon-phone-call icon-sm text-primary mr-2"></i>
+                      <i class="feather icon-video icon-sm text-danger"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+              <li class="chat-item pr-1">
+                <a href="" (click)="false" class="d-flex align-items-center">
+                  <figure class="mb-0 mr-2">
+                    <img src="https://via.placeholder.com/37x37" class="img-xs rounded-circle" alt="user">
+                    <div class="status offline"></div>
+                  </figure>
+                  <div class="d-flex align-items-center justify-content-between flex-grow border-bottom">
+                    <div>
+                      <p class="text-body">John Doe</p>
+                      <div class="d-flex align-items-center">
+                        <p class="text-muted tx-13">Front-end Developer</p>
+                      </div>
+                    </div>
+                    <div class="d-flex align-items-end text-body">
+                      <i class="feather icon-message-square icon-sm text-success mr-2"></i>
+                      <i class="feather icon-phone-call icon-sm text-primary mr-2"></i>
+                      <i class="feather icon-video icon-sm text-danger"></i>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </ng-template>
+      </li> End contacts tab-->
+    </ul>
+    <div [ngbNavOutlet]="defaultNav" class="mt-3"></div>
+  </div>
+</div>

@@ -12,8 +12,13 @@ export const MENU: MenuItem[] = [
   },
   {
     label: 'Chat',
-    icon: 'users',
+    icon: 'user',
     link: '/chat'
+  },
+  {
+    label: 'Group',
+    icon : 'users',
+    link : '/group'
   },
   {
     label:'Profile',

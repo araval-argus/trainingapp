@@ -1,7 +1,7 @@
 <div class="card">
   <div class="card-body">
     <h4 class="card-title">Update Profile</h4>
-    <form enctype="multipart/form-data" (ngSubmit)="onSubmit()">
+    <form enctype="multipart/form-data" (ngSubmit)="onSubmit()"  #f="ngForm">
 
       <div class="mb-3">
         <label for="username" class="form-label">UserName</label>
@@ -16,8 +16,9 @@
 
       <div class="mb-3">
         <label for="lname" class="form-label">Last Name</label>
-        <input type="text" class="form-control" id="lname"  [(ngModel)]="loggedInUser.lastName" name="lname" placeholder="Enter Last Name" #lname="ngModel">
+        <input type="text" class="form-control" id="lname"  [(ngModel)]="loggedInUser.lastName" name="lname" placeholder="Enter Last Name" #lname="ngModel" required>
       </div>
+      <span *ngIf="lname.invalid && lname.touched" class="text-danger"><p>This is a Required Field</p></span>
 
       <div class="mb-3">
         <label for="email" class="form-label">Email</label>
@@ -36,7 +37,7 @@
         <input class="form-control" type="file" id="profileImage" (change)="onFileSelected($event)" name="profileImage" accept="image/*">
       </div>
 
-      <button class="btn btn-primary" type="submit">Submit form</button>
+      <button [disabled]="!f.valid" class="btn btn-primary" type="submit">Submit form</button>
     </form>
   </div>
 </div>

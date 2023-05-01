@@ -1,3 +1,4 @@
+<div *ngIf="!isHimself">
 <div class="chat-header border-bottom pb-2">
   <div *ngIf="selUser!=null" class="d-flex justify-content-between">
     <div class="d-flex align-items-center ">
@@ -83,6 +84,7 @@
   </ul>
 </div>
 <!-- Reply To A SPECIFIC MESSAGE -->
+<div>
 <div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!isReplying">
   <div class="input-group">
     <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsgLen<60?'':'...'}}</p>
@@ -137,5 +139,7 @@
       <i class="feather icon-send"></i>
     </button>
   </div>
+</div>
+</div>
 </div>
 </div>

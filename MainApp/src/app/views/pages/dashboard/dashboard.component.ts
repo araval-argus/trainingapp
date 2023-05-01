@@ -11,6 +11,8 @@ import { Label, Color, SingleDataSet } from 'ng2-charts';
 // Progressbar.js
 import ProgressBar from 'progressbar.js';
 import { SampleService } from 'src/app/core/service/sample-service';
+import { SignalRService } from 'src/app/core/service/signalr-service';
+import { AuthService } from 'src/app/core/service/auth-service';
 
 export type apexChartOptions = {
   series: ApexAxisChartSeries;
@@ -40,13 +42,13 @@ export type apexChartOptions = {
 })
 export class DashboardComponent implements OnInit {
 
-  constructor(private sampleService: SampleService) { }
+  constructor(private sampleService: SampleService , private signalRService:SignalRService,private authService:AuthService) { }
   ngOnInit(): void {
-    this.sampleService.runSampleAPI().subscribe((result) => {
-      console.log(result);
-    }, (err) => {
-
-    })
+   // this.sampleService.runSampleAPI().subscribe((result) => {
+     // console.log(result);
+   // }, (err) => {
+      this.signalRService.startConnection(this.authService.getLoggedInUserInfo().userName);
+   // })
+ // }
   }
-
 }

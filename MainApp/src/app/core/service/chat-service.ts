@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { BehaviorSubject, Subject } from "rxjs";
+import { Subject } from "rxjs";
 import { environment } from "src/environments/environment";
 import { MessageDisplayModel } from "../models/message-display-model";
 
@@ -37,6 +37,6 @@ export class ChatService{
 
   sendFileMessage( formdata : FormData ){
     return this.http.post(environment.apiUrl + "/Chat/SendFileMessage" , formdata);
-}
+  }
 
 }

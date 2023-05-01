@@ -19,8 +19,9 @@
               <span *ngIf="fname.invalid && fname.touched" class="text-danger"><p>This Field is Required</p></span>
               <div class="form-group">
                 <label for="exampleInputLastName">Last Name</label>
-                <input type="text" class="form-control" id="exampleInputLastName" placeholder="Last Name" [(ngModel)]="regModel.lastName" name="lname" #lname="ngModel">
+                <input type="text" class="form-control" id="exampleInputLastName" placeholder="Last Name" [(ngModel)]="regModel.lastName" name="lname" #lname="ngModel" required>
               </div>
+              <span *ngIf="lname.invalid && lname.touched" class="text-danger"><p>This Field is Required</p></span>
               <div class="form-group">
                 <label for="exampleInputUsername1">Username</label>
                 <input type="text" class="form-control" id="exampleInputUsername1" autocomplete="Username" placeholder="Username" [(ngModel)]="regModel.userName" name="username" #username="ngModel" required>

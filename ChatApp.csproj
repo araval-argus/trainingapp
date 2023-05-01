@@ -46,6 +46,10 @@
     <Folder Include="wwwroot\chat\images\" />
     <Folder Include="wwwroot\chat\audio\" />
     <Folder Include="wwwroot\chat\videos\" />
+    <Folder Include="wwwroot\group\audio\" />
+    <Folder Include="wwwroot\group\images\" />
+    <Folder Include="wwwroot\group\videos\" />
+    <Folder Include="wwwroot\grpimages\" />
   </ItemGroup>
 
   
