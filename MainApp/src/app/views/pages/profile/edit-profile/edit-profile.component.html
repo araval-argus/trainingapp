@@ -1,13 +1,6 @@
 <div class="row">
-    <div class="col-xs-4">
-        <figure class="py-3 px-5">
-            <img src="https://via.placeholder.com/200x200"  class="rounded-circle" alt="profile" *ngIf="profileImage === null">
-            <img [src]="profileImage" height="200" width="200" class="rounded-circle" alt="profile" *ngIf="profileImage !== null">
-        </figure>
-    </div>
-    <div class="col-md-4">
-        <form [formGroup]="editForm" (ngSubmit)="onSubmit($event)" class="row">
-            <div class="col-xs-8">
+    <div class="col-md-4 px-5">
+        <form [formGroup]="editForm" (ngSubmit)="onSubmit($event)">
                 <div class="form-group">
                     <label for="userName">UserName</label>
                     <input type="text" name="userName" class="form-control" [value]="loggedInUser.sub" readonly>
@@ -24,17 +17,78 @@
                     <label for="email">Email</label>
                     <input type="email" name="email" class="form-control" formControlName="email">
                 </div>
-                <div class="form-group">
-                    <label for="formFile" class="form-label">Upload Your Profile Photo</label>
-                    <input class="form-control" type="file" id="formFile">
-                  </div>
-                <div class="row">
-                    <div class="col-xs-12 btn-group px-5">
-                        <button type="submit" class="btn btn-success" [disabled]="editForm.invalid">Update</button>
-                        <button type="button" class="btn btn-danger" (click)="onCancel()">Cancel</button>
+                <div class=" row btn-group d-flex align-items-center">
+                    <button class="btn btn-primary text-white" type="button" role="button" (click)="openModal(changePasswordModal)">Change Password</button>
+                    <button type="submit" class="btn btn-success" [disabled]="editForm.invalid">Update</button>
+                    <button type="button" class="btn btn-danger" (click)="onCancel()">Back</button>
+                </div>
+        
+            </form>
+    </div>
+    <div class="col-xs-4">
+        <figure class="py-3 px-5 d-flex flex-column align-items-center justify-content-center">
+            <img src="https://via.placeholder.com/200x200"  class="rounded-circle" alt="profile" *ngIf="profileImage === null">
+            <img [src]="url == null ? profileImage : url" height="200" width="200" class="rounded-circle" alt="profile" *ngIf="profileImage !== null">
+            <div class="py-3">
+                <button class="btn btn-light" (click)="file.click()"><i class="mdi mdi-file-upload px-1"></i></button>
+            </div>
+        </figure>
+        <input class="form-control" type="file" (change)="fileUploaded($event)" hidden #file>
+    </div>
+</div>
+
+<!-- Change Password Modal -->
+<ng-template #changePasswordModal let-modal let-c="close">
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Change Password</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c();" ></i>
+    </div>    
+    <div class="modal-body">
+        <form [formGroup]="changePasswordForm">
+            <div class="form-group">
+                <label for="currentPassword">Current Password</label>
+                <div class="d-flex">
+                    <input type="{{toggleOldPwdEye ? 'text' : 'password'}}" class="form-control" formControlName="currentPassword" id="currentPassword">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text border-0">
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye' : toggleOldPwdEye}" (click)="toggleOldPwdEye = !toggleOldPwdEye"></i>
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye-off' : !toggleOldPwdEye}" (click)="toggleOldPwdEye = !toggleOldPwdEye"></i>
+                        </div>
                     </div>
                 </div>
             </div>
+            <div class="form-group">
+                <label for="newPassword">New Password</label>
+                <div class="d-flex">
+                    <input type="{{toggleNewPwdEye ? 'text' : 'password'}}" class="form-control" formControlName="newPassword" id="newPassword" pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$">
+                    <div class="input-group-prepend">
+                        <div class="input-group-text border-0">
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye' : toggleNewPwdEye}" (click)="toggleNewPwdEye = !toggleNewPwdEye"></i>
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye-off' : !toggleNewPwdEye}" (click)="toggleNewPwdEye = !toggleNewPwdEye"></i>
+                        </div>
+                    </div>
+                </div>
+                <span *ngIf="changePasswordForm.controls['newPassword'].invalid && changePasswordForm.controls['newPassword'].touched" class="invalid">
+                    *UpperCase, LowerCase, Number/SpecialChar and min 8 Chars
+                </span>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Confirm Password</label>
+                <div class="d-flex">
+                    <input type="{{toggleNewCnfPwdEye ? 'text' : 'password'}}" class="form-control"  formControlName="confirmPassword" id="confirmPassword" #confirmPassword>
+                    <div class="input-group-prepend">
+                        <div class="input-group-text border-0">
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye' : toggleNewCnfPwdEye}" (click)="toggleNewCnfPwdEye = !toggleNewCnfPwdEye"></i>
+                            <i class="feather cursor-pointer text-black" [ngClass]="{'icon-eye-off' : !toggleNewCnfPwdEye}" (click)="toggleNewCnfPwdEye = !toggleNewCnfPwdEye"></i>
+                        </div>
+                    </div>
+                </div>
+                <span *ngIf="changePasswordForm.get('newPassword').value != changePasswordForm.get('confirmPassword').value &&  changePasswordForm.controls['newPassword']?.touched" class="invalid">*Confirm Password Must Match New Password</span>
+            </div>
         </form>
     </div>
-</div>
+    <div class="modal-footer">
+        <button type="submit" class="btn btn-primary" [disabled]="changePasswordForm.invalid || changePasswordForm.get('newPassword').value != changePasswordForm.get('confirmPassword').value" (click)="c(); changePassword()">Save Changes</button>
+        <button type="button" class="btn btn-secondary" (click)="c(); clearPwdForm();">Close</button>
+    </div>
+</ng-template> 

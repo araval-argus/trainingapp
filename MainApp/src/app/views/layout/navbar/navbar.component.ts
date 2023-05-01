@@ -78,6 +78,7 @@ export class NavbarComponent implements OnInit {
   deleteAll() {
     this.notificationService.deleteAll().subscribe(data => {
       this.notifications = [];
+      this.newCount = 0;
     })
   }
 

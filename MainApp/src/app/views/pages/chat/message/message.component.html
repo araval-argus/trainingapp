@@ -99,8 +99,15 @@
   </div>
 </div>
 <div class="container text-center" *ngIf="selectedUser.userName == ''">
-  <div class="chat-content" >
-    Please Select User To Chat
+    <div class="chat-placeholder">
+      <div class="chat-placeholder-icon">
+        <i class="far fa-comment-dots"></i>
+      </div>
+      <div class="chat-placeholder-text">
+        <img src="../../../../../assets/images/ChatPlaceHolder.gif" alt="">
+        <h3>Welcome to Chat App!</h3>
+        <p>Please select a user to start chatting.</p>
+      </div>
   </div>
 </div>
 

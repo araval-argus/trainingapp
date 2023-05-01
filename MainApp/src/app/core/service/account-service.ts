@@ -45,4 +45,8 @@ export class AccountService {
     setStatus(id: number) {
         return this.http.get(environment.apiUrl + "/account/setStatus?id=" + id)
     }
+
+    changePassword(formData: FormData) {
+        return this.http.post(environment.apiUrl + "/account/changePassword", formData)
+    }
 }

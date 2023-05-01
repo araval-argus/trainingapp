@@ -1,4 +1,4 @@
-import { Component, OnInit, TemplateRef } from '@angular/core';
+import { Component, ElementRef, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal, NgbModalConfig } from '@ng-bootstrap/ng-bootstrap';
@@ -8,6 +8,7 @@ import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { GroupService } from 'src/app/core/service/group-service';
 import { HubService } from 'src/app/core/service/hub-service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-group-sidebar',
@@ -34,7 +35,8 @@ export class GroupSidebarComponent implements OnInit {
   groupList: GroupModel[] = [];
 
 
-
+  //Search List Result
+  searchList: GroupModel[] = [];
 
   constructor(config: NgbModalConfig, private modalService: NgbModal, private domSanitizer: DomSanitizer, private accountService: AccountService, private groupService: GroupService, private authService: AuthService, private hubService: HubService) {
     config.backdrop = 'static';
@@ -105,7 +107,15 @@ export class GroupSidebarComponent implements OnInit {
       this.formData.append('Image', this.uploadFile);
     }
     this.groupService.addGroup(this.formData).subscribe((data: any) => {
-      this.groupList.push(data.savedGroup);
+      if (data) {
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, text: 'Group Cretaed Successfully', icon: 'success', timerProgressBar: true
+        })
+      } else {
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, text: 'Something Went Wrong', icon: 'error', timerProgressBar: true
+        })
+      }
     }, err => {
     })
     this.clearForm();
@@ -143,5 +153,11 @@ export class GroupSidebarComponent implements OnInit {
   //OnSelection Of Group
   selectedGroup(group: GroupModel) {
     this.groupService.groupSelection.next(group);
+    this.searchList = [];
+  }
+
+  search(event) {
+    let searchChar = event.data;
+    this.searchList = this.groupList.filter(e => e.name.toLowerCase().includes(searchChar.toLowerCase()));
   }
 }

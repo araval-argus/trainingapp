@@ -33,7 +33,7 @@ namespace ChatApp.Controllers
             if (claim != null)
             {
                 var savedGroup = _groupService.AddGroup(groupModel, claim.Value);
-                if (savedGroup != null)
+                if (savedGroup)
                 {
                     return Ok(new { savedGroup });
                 }
@@ -69,7 +69,7 @@ namespace ChatApp.Controllers
             if (claim != null)
             {
                 var members = _groupService.getMembers(claim.Value, name);
-                response = Ok(new { members });
+                response = Ok(members);
             }
             return response;
         }
@@ -185,7 +185,7 @@ namespace ChatApp.Controllers
                 var leaveGroup = _groupService.leaveGroup(claim.Value, groupName);
                 if (leaveGroup)
                 {
-                    response = Ok(new { leaveGroup });
+                    response = Ok( leaveGroup );
                 }
             }
             return response;

@@ -12,6 +12,7 @@ import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { GroupService } from 'src/app/core/service/group-service';
 import { HubService } from 'src/app/core/service/hub-service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-group-message',
@@ -67,7 +68,7 @@ export class GroupMessageComponent implements OnInit {
   selectedUsers = [];
 
   //already In group Memeber
-  members = [];
+  members: Profile[] = [];
 
   //To get current users
   users: Profile[] = [];
@@ -293,20 +294,15 @@ export class GroupMessageComponent implements OnInit {
 
   //To add and Manage Members Of the Grou
   addMemberModal(content: TemplateRef<any>) {
-    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: any) => {
-      if (data.members != null) {
-        data.members.forEach(element => {
-          this.members.push(element.userName);
-        });
+    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: []) => {
+      if (data != null) {
+        this.members = data;
       }
       this.accountService.getAll().subscribe((data: any) => {
         if (data != null) {
           this.users = data;
           this.members.forEach(element => {
-            var userProfileIndex = this.users.findIndex(e => e.userName === element);
-            if (userProfileIndex > -1) {
-              this.users.splice(userProfileIndex, 1);
-            }
+            this.users = this.users.filter(e => e.userName !== element.userName)
           });
         }
       })
@@ -315,21 +311,15 @@ export class GroupMessageComponent implements OnInit {
   }
 
   //About group Modal
-  viewMemberList: any[] = [];
   aboutGroupModal(content: TemplateRef<any>) {
     this.modalService.open(content, {});
-    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: any) => {
-      if (data.members != null) {
-        data.members.forEach(element => {
-          this.viewMemberList.push(element.userName + " -> " + element.firstName + " " + element.lastName);
-        });
+    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: []) => {
+      if (data != null) {
+        this.members = data;
       }
     })
   }
 
-  resetviewMemberList() {
-    this.viewMemberList = [];
-  }
 
   //UpdateGroup
   editGroupModal(content: TemplateRef<any>) {
@@ -368,10 +358,9 @@ export class GroupMessageComponent implements OnInit {
 
   //Remove Members
   removeMemberModal(content: TemplateRef<any>) {
-    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: any) => {
-      console.log(data);
-      this.currentMembers = data.members;
-      this.currentMembers.splice(this.currentMembers.findIndex(e => e.userName == this.loggedInUser.sub), 1);
+    this.groupService.getMembers(this.selectedGroup.name).subscribe((data: []) => {
+      this.currentMembers = data;
+      this.currentMembers = this.currentMembers.filter(e => e.userName !== this.selectedGroup.admin);
     });
     this.modalService.open(content, {});
   }
@@ -393,7 +382,23 @@ export class GroupMessageComponent implements OnInit {
   //Leave Group
   leaveGroup() {
     this.groupService.leaveGroup(this.selectedGroup.name).subscribe((data: any) => {
-      console.log(data);
+      if (data) {
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, text: 'Group Leaved SuccessFully', icon: 'success', timerProgressBar: true
+        })
+      } else {
+        Swal.fire({
+          toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, text: 'You are the last Person, You can not leave group', icon: 'error', timerProgressBar: true
+        })
+      }
     })
+  }
+
+
+  getImage(imagePath: string) {
+    if (imagePath == null) {
+      return "https://via.placeholder.com/37x37";
+    }
+    return this.accountService.fetchImage(imagePath);
   }
 }

@@ -220,7 +220,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             List<ChatDataModel> chatDataModel = new();
             if (profile != null)
             {
-                chatDataModel = context.Chats.AsNoTracking().Where(e => e.To == profile.Id).GroupBy(e => e.sentAt.Date).Select(e => new ChatDataModel { date = e.Key.ToString("yyyy-MM-dd"), value = e.Count() }).ToList();
+                chatDataModel = context.Chats.AsNoTracking().Where(e => e.To == profile.Id).GroupBy(e => e.sentAt.Date).OrderBy(e => e.Key).Select(e => new ChatDataModel { date = e.Key.ToString("yyyy-MM-dd"), value = e.Count() }).ToList();
             }
             return chatDataModel;
         }

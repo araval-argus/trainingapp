@@ -1,4 +1,5 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { recentChat } from 'src/app/core/models/recentChat-model';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { HubService } from 'src/app/core/service/hub-service';
@@ -8,13 +9,17 @@ import { HubService } from 'src/app/core/service/hub-service';
   templateUrl: './chat-sidebar.component.html',
   styleUrls: ['./chat-sidebar.component.scss']
 })
-export class ChatSidebarComponent implements OnInit {
+export class ChatSidebarComponent implements OnInit, OnDestroy {
   recentChats: recentChat[] = [];
+
+  //To handle Subscription
+  reloadInBoxSub: Subscription;
+  recentChatSub: Subscription;
   constructor(private chatService: ChatService, private hubService: HubService) { }
   selectedUserName: string = '';
   ngOnInit(): void {
     this.reloadRecent();
-    this.chatService.reloadInbox.subscribe((data: any) => {
+    this.reloadInBoxSub = this.chatService.reloadInbox.subscribe((data: any) => {
       this.selectedUserName = data.userName;
     })
 
@@ -35,6 +40,7 @@ export class ChatSidebarComponent implements OnInit {
           email: data.to.email,
           imagePath: data.to.imagePath,
           userName: data.to.userName,
+          status: data.to.status
         },
         chatContent: {
           content: data.chatContent.content,
@@ -47,9 +53,14 @@ export class ChatSidebarComponent implements OnInit {
     })
   }
 
+  ngOnDestroy(): void {
+    this.reloadInBoxSub.unsubscribe();
+    this.recentChatSub.unsubscribe();
+  }
+
   reloadRecent() {
     this.recentChats = [];
-    this.chatService.recentChat().subscribe((data: any) => {
+    this.recentChatSub = this.chatService.recentChat().subscribe((data: any) => {
       data.chats.forEach(element => {
         this.recentChats.push({
           to: {

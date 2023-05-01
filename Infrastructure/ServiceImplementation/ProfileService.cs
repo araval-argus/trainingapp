@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using System.Threading.Tasks;
 using static System.Net.Mime.MediaTypeNames;
 
@@ -31,8 +33,18 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
         public Profile CheckPassword(LoginModel model)
         {
-            return this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
-            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()));
+            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == model.Username);
+            if (profile == null)
+            {
+                return null;
+            }
+            string salt = context.Salt.AsNoTracking().FirstOrDefault(e => e.UserId == profile.Id).HashSalt;
+            string hashedPWD = getHash(model.Password, salt);
+            if(hashedPWD == profile.Password)
+            {
+                return profile;
+            }
+            return null;
         }
 
         public Profile RegisterUser(RegisterModel regModel)
@@ -40,11 +52,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             Profile newUser = null;
             if (!CheckEmailOrUserNameExists(regModel.UserName, regModel.Email))
             {
+                //generating salt
+                byte[] bArray;
+                new RNGCryptoServiceProvider().GetBytes(bArray = new byte[32]);
+                string salt = Convert.ToHexString(bArray);
+                var hashPassword = getHash(regModel.Password, salt);
                 newUser = new Profile
                 {
                     FirstName = regModel.FirstName,
                     LastName = regModel.LastName,
-                    Password = regModel.Password,
+                    Password = hashPassword,
                     UserName = regModel.UserName,
                     Email = regModel.Email,
                     CreatedAt = DateTime.UtcNow,
@@ -52,6 +69,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Status = 1
                 };
                 context.Profiles.Add(newUser);
+                context.SaveChanges();
+
+                //saving salt
+                context.Salt.Add(new Salt { UserId = newUser.Id, HashSalt = salt });
                 context.SaveChanges();
             }
             return newUser;
@@ -163,5 +184,32 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return false;
         }
 
+
+        public bool changePassword(ChangePasswordModel newPasswordModel, string userName)
+        {
+            Profile profile = context.Profiles.FirstOrDefault(e => e.UserName == userName);
+                if(profile != null)
+            {
+                string salt = context.Salt.AsNoTracking().FirstOrDefault(e => e.UserId == profile.Id).HashSalt;
+                string newHash = getHash(newPasswordModel.OldPassword, salt);
+                if(newHash == profile.Password)
+                {
+                    var hashPassword = getHash(newPasswordModel.NewPassword, salt);
+                    profile.Password = hashPassword;
+                    context.Profiles.Update(profile);
+                    context.SaveChanges();
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private string getHash(string password, string salt)
+        {
+            SHA256 hash = SHA256.Create();
+            var passwordByte = Encoding.Default.GetBytes(password + salt);
+            var hashedPassword = hash.ComputeHash(passwordByte);
+            return Convert.ToHexString(hashedPassword);
+        }
     }
 }

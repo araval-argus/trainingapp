@@ -5,8 +5,6 @@
           <i (click)="false" class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
           <figure class="mb-0 mr-2">
             <img [src]="thumbnail" class="img-sm rounded-circle">
-            <div class="status online"></div>
-            <div class="status online"></div>
           </figure>
           <div>
             <p>{{selectedGroup.name}}</p>
@@ -150,7 +148,7 @@
         <div class="col-lg-12">
           <div>
             <span class="text-muted mb-1">People In the Group :- </span>
-            <span *ngFor="let user of members">{{user}} </span>
+            <span *ngFor="let user of members">{{user.userName}} </span>
           </div>
           <ng-select [multiple]="true" [(ngModel)]="selectedUsers" [items]="users" [closeOnSelect]="false" bindValue="userName" placeholder="Select People..." [searchable]="false" [hideSelected]="true">
             <ng-template ng-label-tmp let-item="item" let-clear="clear">
@@ -171,28 +169,53 @@
     <!-- About Group Modal -->
     <ng-template #viewGroupModal let-modal let-c="close" let-d="dismiss">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">{{selectedGroup.name}}</h5>
-        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c(); resetviewMemberList();" ></i>
+        <h5 class="modal-title" id="exampleModalLabel">About Group</h5>
+        <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="c(); " ></i>
       </div>    
-      <div class="modal-body modal-content" [perfectScrollbar] style="max-height: 30rem">
-        <div >
-          <figure class="px-5">
+      <div class="modal-body" [perfectScrollbar] style="max-height: 30rem">
+        <div class="d-flex align-items-center justify-content-center card">
+          <figure class="px-5 card-body">
             <img [src]="thumbnail" height="200" width="200" class="rounded-circle" alt="profile">
           </figure>          
         </div>
-        <div >
-          <h6>Description:</h6>
-          <p>{{selectedGroup.description}}</p>
-          <h6>Admin:</h6>
-          <p>{{selectedGroup.admin}}</p>
-          <h6>Members:</h6>
-            <ul class="list-group" >
-              <li *ngFor="let member of viewMemberList" class="list-group-item">{{member}}</li>
-            </ul>
+        <div class="card">
+          <div class="card-body d-flex flex-column align-items-center ">
+            <h4>{{selectedGroup.name}}</h4>
+            <h6>{{members.length}} Members</h6>
+          </div>
         </div>
+        <div class="card">
+          <div class="card-body d-flex flex-column align-items-center ">
+            <h6>{{selectedGroup.description}}</h6>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title text-center py-2">Members</div>
+          <div class="card-body">
+                <a *ngFor="let member of members" class="list-group-item d-flex" ngbTooltip="{{member.email}}">
+                    <figure class="mb-0 mr-2">
+                      <img [src]="member.imagePath == null?'https://via.placeholder.com/37x37' : getImage(member.imagePath)" class="img-xs rounded-circle" alt="user">
+                      <div class="status online" *ngIf="member.status === 1"></div>
+                      <div class="status pause" *ngIf="member.status === 2 || member.status === 3"></div>
+                      <div class="status away" *ngIf="member.status === 4|| member.status === 5"></div>
+                      <div class="status offline" *ngIf="member.status === 6"></div>
+                    </figure>
+                    <div class="">
+                      <div>
+                        <p class="text-body font-weight-bold">{{member.firstName}} {{member.lastName}}</p>
+                        <p class="text-muted tx-13">{{member.userName}}</p>
+                      </div>  
+                    </div>
+                    <div class="ml-auto">
+                      <span *ngIf="member.userName == selectedGroup.admin" class="badge badge-primary">Admin</span>
+                    </div>
+                </a>
+          </div>
+        </div>
+
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="c(); resetviewMemberList();">Close</button>
+        <button type="button" class="btn btn-secondary" (click)="c();">Close</button>
       </div>
     </ng-template>    
 
@@ -256,7 +279,13 @@
 
 </div>
 <div class="container text-center" *ngIf="selectedGroup.name == ''">
-    <div class="chat-content" >
-        Please Select User To Chat
+  <div class="chat-placeholder">
+    <div class="chat-placeholder-icon">
+      <i class="far fa-comment-dots"></i>
+    </div>
+    <div class="chat-placeholder-text">
+      <img src="../../../../../assets/images/ChatPlaceHolder.gif" alt="">
+      <h3>Welcome to Chat App!</h3>
+      <p>Please select a user to start chatting.</p>
     </div>
 </div>

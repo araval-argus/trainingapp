@@ -1,7 +1,7 @@
-import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { Subject } from 'rxjs';
+import { Subject, Subscription } from 'rxjs';
 import { ChatModel } from 'src/app/core/models/chat-model';
 import { loadChatModel } from 'src/app/core/models/loadingChat-model';
 import { Profile } from 'src/app/core/models/profile-model';
@@ -14,9 +14,9 @@ import { HubService } from 'src/app/core/service/hub-service';
   templateUrl: './message.component.html',
   styleUrls: ['./message.component.scss']
 })
-export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked {
+export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked, OnDestroy {
 
-  selectedUserImagePath: string = null;
+  selectedUserImagePath: string = "https://via.placeholder.com/37x37";
   selectedUser: Profile = {
     firstName: '',
     lastName: '',
@@ -51,6 +51,9 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
   file: File;
   @ViewChild('basicModal', { static: false }) content: TemplateRef<any>;
 
+  //To manage Subscription
+  reloadInboxSub: Subscription;
+
   constructor(private chatService: ChatService, private accountService: AccountService, private hubService: HubService, private modalService: NgbModal, private domSanitizer: DomSanitizer) {
 
   }
@@ -58,13 +61,13 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
   ngOnInit(): void {
 
     this.isEmojiPickerVisible = false
-    this.chatService.reloadInbox.subscribe((data: any) => {
+    this.reloadInboxSub = this.chatService.reloadInbox.subscribe((data: any) => {
       console.log(data);
       this.selectedUser.firstName = data.firstName,
         this.selectedUser.lastName = data.lastName,
         this.selectedUser.userName = data.userName,
         this.selectedUser.status = data.status
-      if (data.imagePath != '') {
+      if (data.imagePath != null) {
         this.selectedUserImagePath = this.accountService.fetchImage(data.imagePath);
       } else {
         this.selectedUserImagePath = "https://via.placeholder.com/43x43";
@@ -141,6 +144,11 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
 
   }
 
+
+  ngOnDestroy(): void {
+    this.selectedUser.userName = '';
+    this.reloadInboxSub.unsubscribe();
+  }
 
   replyTo(id: number) {
     this.chatService.replyToChat.next(id);

@@ -143,6 +143,23 @@ namespace ChatApp.Controllers
             return response;
         }
 
+
+        [HttpPost("changePassword")]
+        [Authorize]
+        public IActionResult changePassword([FromForm] ChangePasswordModel newPasswordModel, [FromHeader] string authorization)
+        {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            var handler = new JwtSecurityTokenHandler();
+            var token = handler.ReadJwtToken(authorization.Replace("bearer", "").Trim());
+            var claim = token.Claims.FirstOrDefault(e => e.Type == "sub");
+            if (claim != null)
+            {
+                bool passwordChanged = _profileService.changePassword(newPasswordModel, claim.Value);
+                response = Ok(passwordChanged);
+            }
+            return response;
+        }
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));

@@ -33,7 +33,10 @@
               </div>
               <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="regModel.password" name="password" required minlength="6">
+                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="regModel.password" name="password" required pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" #pwd="ngModel">
+                <span *ngIf="pwd.invalid && pwd.touched" class="error">
+                  *UpperCase, LowerCase, Number/SpecialChar and min 8 Chars
+                </span>
               </div>
               <div class="mt-3">
                 <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" [disabled]="disableRegButtton || regForm.invalid">Sign up</button>

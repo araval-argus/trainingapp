@@ -8,3 +8,22 @@ input.ng-invalid.ng-touched,
 textarea.ng-invalid.ng-touched{
   border: 1px solid red;
 }
+
+.welcome{
+  width: 128px;
+  height: 128px;
+  background-size: cover;
+  background-image: url('../../../../../assets/Emojis/smiling_face_with_halo.gif');
+}
+.invalid{
+  width: 128px;
+  height: 128px;
+  background-size: cover;
+  background-image: url('../../../../../assets/Emojis/crying_face.gif');
+}
+.password{
+  width: 128px;
+  height: 128px;
+  background-size: cover;
+  background-image: url('../../../../../assets/Emojis/shushing_face.gif');
+}

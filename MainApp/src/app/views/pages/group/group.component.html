@@ -6,46 +6,6 @@
             <div class="col-lg-3 chat-aside border-lg-right">
               <div class="aside-content">
                 <app-group-sidebar></app-group-sidebar>
-                <!-- <div class="aside-header">
-                  <div class="d-flex justify-content-between align-items-center pb-2 mb-2">
-                    <div class="d-flex align-items-center">
-                      <figure class="mr-2 mb-0">
-                        <img [src]="imageURL" height="43" width="43" class="img-sm rounded-circle" alt="profile">
-                        <div class="status online"></div>
-                      </figure>
-                      <div>
-                        <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
-                        <p class="text-muted tx-13">Software Developer</p>
-                      </div>
-                    </div>
-                    <div class="dropdown" ngbDropdown>
-                      <button class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton" ngbDropdownToggle>
-                        <i class="feather icon-settings icon-md text-muted pb-3px" ngbTooltip="Settings"></i>
-                      </button>
-                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
-                        <a class="dropdown-item d-flex align-items-center" href="" routerLink="/profile/viewProfile"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">View Profile</span></a>
-                        <a class="dropdown-item d-flex align-items-center" href="" routerLink="/profile/editProfile"><i class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Profile</span></a>
-                        <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add status</span></a>
-                        <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
-                      </div>
-                    </div>
-                  </div>
-                  <form class="search-form">
-                    <div class="input-group border rounded-sm" id="searchArea">
-                      <div class="input-group-prepend">
-                        <div class="input-group-text border-0 rounded-sm">
-                          <i class="feather icon-search icon-sm cursor-pointer"></i>
-                        </div>
-                      </div>
-                      <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Enter First 3 Character" (input)="fetchProfile($event)" #searchBar>
-                    </div>
-                  </form>
-                  <app-search-dropdown class="overlap col-xs-0" [items]="profiles" (selectedItem)="loadInbox($event)"></app-search-dropdown>
-                </div>
-                <div class="aside-body navBox" style="padding-top: 2rem;">
-                    <app-chat-sidebar></app-chat-sidebar>
-                </div>
-              </div> -->
             </div>
           </div>
           <app-group-message class="col-lg-9"></app-group-message>

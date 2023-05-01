@@ -6,13 +6,25 @@
               <i class="feather icon-search icon-sm cursor-pointer"></i>
             </div>
           </div>
-          <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Enter First 3 Character" #searchBar>
+          <input type="text" class="form-control  border-0 rounded-sm" id="searchForm" placeholder="Search Group Name Here..." (input)="search($event)">
           <!-- This should popup modal for creating new group -->
           <div class="input-group-text border-0 rounded-sm" (click)="openAddModal(addModal)">
               <i class="feather icon-plus-square icon-sm cursor-pointer"></i>
           </div>
       </div>
     </form>
+    <a class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;" (click)="selectedGroup(group)"  *ngFor="let group of searchList">
+      <div class="mb-0 mr-2">
+        <img [src]="group.profileImage == null?'https://via.placeholder.com/37x37' : getImage(group.profileImage)" class="img-xs rounded-circle" alt="user">
+      </div>
+      <div class="d-flex justify-content-between flex-grow ">
+        <div>
+          <p class="text-body font-weight-bold">{{group.name}}</p>
+        </div>
+        <div class="d-flex flex-column align-items-end">
+        </div>
+      </div>
+    </a>
 </div>
 
 <!-- Group List -->
@@ -20,25 +32,15 @@
   <p class="text-muted mb-1 text-center">Groups</p>
   <ul class="list-unstyled chat-list px-1 py-1">
     <li class="chat-item pr-1 border-bottom" *ngFor="let group of groupList">
-      <a (click)="false" class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;" (click)="selectedGroup(group)">
+      <a class="d-flex align-items-center" style="margin-bottom: 1rem; margin-top:1rem;" (click)="selectedGroup(group)">
         <div class="mb-0 mr-2">
           <img [src]="group.profileImage == null?'https://via.placeholder.com/37x37' : getImage(group.profileImage)" class="img-xs rounded-circle" alt="user">
         </div>
         <div class="d-flex justify-content-between flex-grow ">
           <div>
             <p class="text-body font-weight-bold">{{group.name}}</p>
-            <!-- Add Recent Chat Here -->
-            <!-- <p class="text-muted tx-13">{{contentToDisplay}}</p> -->
           </div>
           <div class="d-flex flex-column align-items-end">
-            <!-- Configure This -->
-            <!-- <p class="text-muted tx-13 mb-1">{{recentChat.chatContent.sentAt | date:'short'}}</p>
-            <div *ngIf="recentChat.unreadCount > 0">
-              <a (click)="markAsRead($event)">
-                <i  class="feather icon-eye icon-md text-muted mr-3" ngbTooltip="Mark as Read"></i>
-              </a>
-              <div class="badge badge-pill badge-primary ml-auto">{{recentChat.unreadCount}}</div>
-            </div> -->
           </div>
         </div>
       </a>

@@ -92,7 +92,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         }
 
-        public GroupDTO AddGroup(GroupModel newGroupModel, string userName)
+        public bool AddGroup(GroupModel newGroupModel, string userName)
         {
             Profile profile = _context.Profiles.FirstOrDefault(e => e.UserName == userName);
             int adminId = profile.Id;
@@ -129,8 +129,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             };
             _context.GroupMember.Add(groupMember);
             _context.SaveChanges();
-            GroupDTO groupDTO  =Mapper.groupToGroupDTO(group);
-            return groupDTO;
+            Connections activeConnection = _context.Connections.AsNoTracking().FirstOrDefault(e => e.User == adminId);
+            if (activeConnection != null)
+            {
+                _hubContext.Clients.Client(activeConnection.ConnectionId).SendAsync("addedToGroup", Mapper.groupToGroupDTO(group));
+            }
+            GroupDTO groupDTO  = Mapper.groupToGroupDTO(group);
+            return true;
         }
 
         public bool addMembers(List<string> userName, string groupName, string adminUser)
@@ -399,6 +404,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             Profile member = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName));
             if(groupProfile != null && member != null)
             {
+                
                 GroupMember leavingMember = _context.GroupMember.FirstOrDefault(e => e.MemberId == member.Id);
                 if(leavingMember!= null)
                 {
@@ -407,7 +413,25 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     string notificationMessage = userName + " has leave " + groupName;
                     if (groupProfile.Admin == member.Id)
                     {
+
                         GroupMember newAdmin = _context.GroupMember.AsNoTracking().Include(e => e.Profile).Where(e => e.GroupId == groupProfile.Id).OrderBy(e => e.AddedDate).FirstOrDefault();
+                        if(newAdmin == null)
+                        {
+                            IEnumerable<GroupMessage> groupMessages = _context.GroupMessage.Where(e => e.GroupID == groupProfile.Id);
+                            _context.GroupMessage.RemoveRange(groupMessages);
+                            IEnumerable<GroupMember> groupMembers = _context.GroupMember.Where(e => e.GroupId == groupProfile.Id);
+                            _context.GroupMember.RemoveRange(groupMembers);
+                            _context.Groups.Remove(groupProfile);
+                            _context.SaveChanges();
+                            //remove Connection from group && clear group (hide inbox if open and remove from group List)
+                            Connections activeConnection = _context.Connections.FirstOrDefault(e => e.User == leavingMember.MemberId);
+                            if (activeConnection != null)
+                            {
+                                _hubContext.Clients.Client(activeConnection.ConnectionId).SendAsync("removedFromGroup", groupName);
+                                _hubContext.Groups.RemoveFromGroupAsync(activeConnection.ConnectionId, groupName);
+                            }
+                            return true;
+                        }
                         groupProfile.Admin = newAdmin.MemberId;
                         notificationMessage += " and new Admin is " + newAdmin.Profile.UserName;
                         _context.Groups.Update(groupProfile);
@@ -467,7 +491,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     groupDataModel.AddRange(list);
                 }
             }
-            List<ChatDataModel> chatData = groupDataModel.GroupBy(e => e.date).Select(e => new ChatDataModel { date=e.Key, value=e.Sum(g => g.value)}).ToList();
+            List<ChatDataModel> chatData = groupDataModel.GroupBy(e => e.date).OrderBy(e => e.Key).Select(e => new ChatDataModel { date=e.Key, value=e.Sum(g => g.value)}).ToList();
             return chatData;
         }
     }

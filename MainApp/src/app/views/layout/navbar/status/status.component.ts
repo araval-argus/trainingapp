@@ -18,7 +18,7 @@ export class StatusComponent implements OnInit {
     { id: 3, status: 'Do Not Disturb', class: 'mdi-bell-cancel hold' },
     { id: 4, status: 'Be Right Back', class: 'mdi-clock away' },
     { id: 5, status: 'Appear Away', class: 'mdi-shoe-sneaker away' },
-    { id: 6, status: 'Appear Away', class: 'mdi-location-exit' },
+    { id: 6, status: 'Appear Offline', class: 'mdi-location-exit' },
   ];
 
   selectedStatus = 1;

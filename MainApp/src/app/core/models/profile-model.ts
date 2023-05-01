@@ -3,5 +3,6 @@ export interface Profile {
     lastName: string,
     imagePath?: string,
     userName: string,
-    status?: number
+    status?: number,
+    email?: string
 }

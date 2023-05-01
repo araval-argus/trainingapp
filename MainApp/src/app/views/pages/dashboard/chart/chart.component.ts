@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 
 import {
   ApexChart,
@@ -19,6 +19,7 @@ import {
   ApexPlotOptions,
   ApexResponsive
 } from "ng-apexcharts";
+import { Subscription } from 'rxjs';
 
 
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
@@ -70,7 +71,11 @@ export class ChartComponent {
 
   groupDataSeries = [];
 
-  constructor(private authService: AuthService, private chatService: ChatService, private groupService: GroupService) { }
+
+  //To manage Subscription
+  getChatDataSub: Subscription;
+  getGroupChatDataSub: Subscription;
+  constructor(private chatService: ChatService, private groupService: GroupService) { }
 
   ngOnInit(): void {
     this.getChatData();
@@ -78,23 +83,29 @@ export class ChartComponent {
     this.initChartData();
   }
 
+
   getChatData() {
-    this.chatService.getChatData().subscribe(
+    this.getChatDataSub = this.chatService.getChatData().subscribe(
       (data: []) => {
         this.dataSeries = data;
+
         this.initChartData();
+
       }
     )
+
   }
 
   GetGroupChatData() {
-    this.groupService.getChatData().subscribe(
+    this.getGroupChatDataSub = this.groupService.getChatData().subscribe(
       (data: []) => {
         this.groupDataSeries = data;
+
         this.initChartData();
 
       }
     )
+
   }
 
   public initChartData(): void {
