@@ -20,9 +20,6 @@ import Swal from 'sweetalert2';
 })
 export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy {
 
-  constructor(private groupService : GroupService , private route: ActivatedRoute , private modalService : NgbModal, private authService:AuthService,
-    private router:Router , private signalRService:SignalRService) { }
-
   groupId : number ;
   imageFile : File;
   loggedInUser : LoggedInUser;
@@ -42,7 +39,10 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
   showEmoji : boolean = false;
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
 
-  ngOnInit(): void {
+  constructor(private groupService : GroupService , private route: ActivatedRoute , private modalService : NgbModal, private authService:AuthService,
+    private router:Router , private signalRService:SignalRService) { }
+
+  ngOnInit() {
   this.groupService.GroupChangedSub.subscribe((groupId:number)=> {
    this.groupId = groupId;
 
@@ -82,7 +82,8 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     });
 
     this.signalRService.hubConnection.on('RecieveMessageGroup',(data:GroupMessageDisplayModel)=>{
-        this.displayMsgList.push(data);
+      console.log(data);
+      this.displayMsgList.push(data);
     });
 
     this.signalRService.hubConnection.on('iAmRemovedFromGroup',(groupId:number)=>{

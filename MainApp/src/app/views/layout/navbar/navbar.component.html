@@ -5,15 +5,46 @@
   <div class="navbar-content">
 
     <ul class="navbar-nav">
+      <!-- NOTIFICATION -->
+    <li class="nav-item dropdown" ngbDropdown>
+      <a class="nav-link dropdown-toggle show" ngbDropdownToggle id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bell"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+        <div *ngIf="notifications.length>0" class="indicator">
+          <div class="circle"></div>
+        </div>
+      </a>
+      <div class="dropdown-menu p-0" ngbDropdownMenu aria-labelledby="notificationDropdown" data-bs-popper="static">
+        <div style="background-color:#ECE5DD ;" class="px-3 py-2 d-flex align-items-center justify-content-between border-bottom">
+          <p *ngIf="notifications.length>0">{{notifications.length}} New Notifications</p>
+          <p *ngIf="notifications.length==0">No New Notifications</p>
+          <a *ngIf="notifications.length>0" (click)="onClearAll()" class="text-muted">Clear all</a>
+        </div>
+        <div class="p-1">
+          <a class="dropdown-item d-flex align-items-center py-2" *ngFor="let item of notifications | slice:0:4; let i=index">
+            <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
+              <img [src]="environment + item.fromImage" width="24" height="24" class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
+            </div>
+            <div class="flex-grow-1 me-2">
+              <p>{{item.content}}</p>
+              <p class="tx-12 text-muted">{{item.createdAt | date:'mediumDate'}} {{item.createdAt | date:'shortTime'}}</p>
+            </div>
+          </a>
+        </div>
+        <div style="background-color:#ECE5DD ;" *ngIf="notifications.length>0" class="px-3 py-2 d-flex align-items-center justify-content-center border-top">
+          <a (click)="openScrollableModal(scrollableModal)">View all</a>
+        </div>
+      </div>
+    </li>
+    <!-- END NOTIFICATION -->
       <li class="nav-item nav-profile" ngbDropdown>
         <a class="nav-link" ngbDropdownToggle id="profileDropdown">
           <img src="https://via.placeholder.com/\30x30" alt="profile" *ngIf="loggedInUser.imagePath == null">
-          <img [src]="imageSource" *ngIf="loggedInUser.imagePath != null">
+          <img [src]="environment + loggedInUser.imagePath" *ngIf="loggedInUser.imagePath != null">
         </a>
         <div ngbDropdownMenu aria-labelledby="profileDropdown">
           <div class="dropdown-header d-flex flex-column align-items-center">
             <div class="figure mb-3">
-              <img [src]="imageSource" class="img-rounded" height="80" width="80" alt="">
+              <img [src]="environment + loggedInUser.imagePath" class="img-rounded" height="80" width="80" alt="">
             </div>
             <div class="info text-center">
               <p class="name font-weight-bold mb-0">{{loggedInUser.firstName}} {{loggedInUser.lastName}}</p>
@@ -43,3 +74,31 @@
     </ul>
   </div>
 </nav>
+
+<!-- MODAL -->
+<ng-template #scrollableModal let-modal>
+  <div style="background-color:#ECE5DD ;" class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">{{notifications.length}} New Notifications</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="p-1">
+      <a class="dropdown-item d-flex align-items-center py-2" *ngFor="let item of notifications">
+        <div class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
+          <img [src]="environment + item.fromImage" width="24" height="24" class="wd-30 ht-30 d-flex align-items-center justify-content-center bg-primary rounded-circle me-3">
+        </div>
+        <div style="margin-left: 1rem;" class="flex-grow-1 me-2">
+          <p>{{item.content}}</p>
+          <p class="tx-12 text-muted">{{item.createdAt | date:'mediumDate'}} {{item.createdAt | date:'shortTime'}}</p>
+        </div>
+      </a>
+    </div>
+  </div>
+  <div style="background-color:#ECE5DD ;" class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="onClearAll();modal.close()">Clear All</button>
+  </div>
+</ng-template>
+<!-- END MODAL -->

@@ -22,5 +22,6 @@ namespace ChatApp.Context
         public virtual DbSet<GroupMembers> GroupMembers { get; set; }
         public virtual DbSet<GroupMessages> GroupMessages { get; set; }
         public virtual DbSet<Groups> Groups { get; set; }
+        public virtual DbSet<Notifications> Notifications { get; set; }
     }
 }

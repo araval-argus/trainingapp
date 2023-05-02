@@ -93,7 +93,7 @@
                   <div class="d-flex justify-content-between flex-grow border-bottom">
                     <div>
                       <p class="text-body font-weight-bold">{{item.groupName}}</p>
-                      <p *ngIf="item.type == null && item.lastMsg!=null" class="text-muted tx-13">{{item.lastMsg | slice:0:30}}{{item.lastMsg.length<30?'':'...'}}</p>
+                      <p *ngIf="item.type == null || item.type=='heading'" class="text-muted tx-13">{{item.lastMsg | slice:0:30}}{{item.lastMsg.length<30?'':'...'}}</p>
                       <p *ngIf="item.type == 'audio'" class="text-muted tx-13">Audio</p>
                       <p *ngIf="item.type == 'video'" class="text-muted tx-13">Video</p>
                       <p *ngIf="item.type == 'image'" class="text-muted tx-13">Photo</p>

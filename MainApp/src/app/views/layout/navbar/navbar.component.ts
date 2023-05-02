@@ -6,6 +6,9 @@ import Swal from 'sweetalert2'
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { environment } from 'src/environments/environment';
 import { SignalRService } from 'src/app/core/service/signalr-service';
+import { NotificationService } from 'src/app/core/service/notification-service';
+import { NotificationsModel } from 'src/app/core/models/notifications-model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-navbar',
@@ -16,23 +19,35 @@ import { SignalRService } from 'src/app/core/service/signalr-service';
 export class NavbarComponent implements OnInit {
 
   loggedInUser: LoggedInUser;
-  imageSource : String;
+  environment = environment.ImageUrl;
+  notifications : NotificationsModel[] = [];
 
   constructor(
-    @Inject(DOCUMENT) private document: Document,
-    private renderer: Renderer2,
-    private router: Router,
-    private authService: AuthService,
-    private signalRService : SignalRService
-  ) { }
+    @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private router: Router, private authService: AuthService,
+    private signalRService : SignalRService,private notificationService: NotificationService, private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
     this.authService.UserProfileChanged.subscribe(()=>{
       this.loggedInUser = this.authService.getLoggedInUserInfo();
-      this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
-    })
+    });
+
+    this.notificationService.getNotifications(this.loggedInUser.userName).subscribe((data:NotificationsModel[])=>{
+      this.notifications = data;
+    });
+
+    this.signalRService.hubConnection.on('notification',(data:NotificationsModel)=>{
+      const index = this.notifications.findIndex(u => u.msgFrom==data.msgFrom && u.msgTo==data.msgTo && u.groupId==data.groupId);
+      if (index !== -1) {
+        this.notifications.splice(index,1);
+      }
+      this.notifications.splice(0,0,data);
+    });
+  }
+
+  onClearAll(){
+    this.notifications = [];
+    this.notificationService.clearNotifications(this.loggedInUser.userName).subscribe();
   }
 
   /**
@@ -60,6 +75,12 @@ export class NavbarComponent implements OnInit {
         this.router.navigate(['/auth/login']);
       });
     })
+  }
+
+  openScrollableModal(content) {
+    this.modalService.open(content, {scrollable: true}).result.then((result) => {
+      console.log("Modal closed" + result);
+    }).catch((res) => {});
   }
 
 }

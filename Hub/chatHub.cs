@@ -4,6 +4,7 @@ using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,13 +16,15 @@ namespace ChatApp
 	{
 		private readonly ChatAppContext context;
 		private readonly IChatService chatService;
-
-		#region OneToOneHub
-		public chatHub(ChatAppContext context, IChatService chatservice )
+		private readonly INotificationServices notificationServices;
+	
+		public chatHub(ChatAppContext context, IChatService chatservice, INotificationServices notificationServices)
 		{
 			this.context = context;
 			this.chatService = chatservice;
+			this.notificationServices = notificationServices;
 		}
+		#region OneToOneHub
 		public async Task ConnectDone(string userName)
 		{
 			string curSignalId = Context.ConnectionId;
@@ -111,7 +114,52 @@ namespace ChatApp
 				Seen = 0,
 				Type = null,
 			};
-			this.chatService.ResponsesToUsersMessage(messageFromId, messageToId, response);
+			//NOTIFICATION
+			var existingNoti = context.Notifications.FirstOrDefault(u => u.ToId == messageToId && u.FromId == messageFromId && u.GroupId == null);
+			if (existingNoti == null)
+			{
+				var Notification = new Notifications
+				{
+					FromId = messageFromId,
+					ToId = messageToId,
+					GroupId = null,
+					Content = message.MessageFrom + " Sent You Text",
+					CreatedAt = DateTime.Now,
+				};
+				context.Notifications.Add(Notification);
+				context.SaveChanges();
+			}
+			else
+			{
+				existingNoti.Content = message.MessageFrom + " Sent You Text";
+				existingNoti.CreatedAt = DateTime.Now;
+				context.Update(existingNoti);
+				context.SaveChanges();
+			}
+			//SIGNALR RESPONSE
+			Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == messageFromId);
+			Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == messageToId);
+			if (Receiver != null)
+			{
+				var profile = context.Profiles.FirstOrDefault(u => u.UserName == message.MessageFrom);
+				var notification = context.Notifications.FirstOrDefault(u => u.ToId == messageToId && u.FromId == messageFromId && u.GroupId == null);
+				var notif = new NotificationsDTO
+				{
+					Id = notification.Id,
+					MsgFrom = profile.UserName,
+					MsgTo = message.MessageTo,
+					GroupId = notification.GroupId,
+					Content = notification.Content,
+					CreatedAt = notification.CreatedAt,
+					FromImage = profile.ImagePath
+				};
+				await Clients.Clients(Sender.SignalId, Receiver.SignalId).SendAsync("recieveMessage", response);
+				await Clients.Client(Receiver.SignalId).SendAsync("notification", notif);
+			}
+			else
+			{
+				await Clients.Client(Sender.SignalId).SendAsync("recieveMessage", response);
+			}
 		}
 
 		public async Task seenMessage(string msgFrom , string msgTo)
@@ -185,6 +233,7 @@ namespace ChatApp
 					await Clients.Clients(connection.SignalId).SendAsync("RecieveMessageGroup", response);
 				}
 			}
+			this.notificationServices.groupMsgNoti(messageFromId, groupId, "groupText");
 		}
 		#endregion
 	}

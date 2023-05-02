@@ -15,6 +15,5 @@ namespace ChatApp.Business.ServiceInterfaces
 		IEnumerable<RecentChatModel> GetRecentUsers(string username);
 		public void MarkAsRead(string username, string selusername);
 		public void SendFileMessage(MessageModel msg);
-		public void ResponsesToUsersMessage(int msgFrom, int msgTo, MessageSendModel response);
 	}
 }

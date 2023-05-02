@@ -20,14 +20,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 		private readonly IWebHostEnvironment webHostEnvironment;
 		private readonly IChatService chatService;
 		private readonly IHubContext<chatHub> hubContext;
+		private readonly INotificationServices notificationServices;
 
 		public GroupService(ChatAppContext context, IWebHostEnvironment webHostEnvironment , 
-			IChatService chatService , IHubContext<chatHub> hubContext)
+			IChatService chatService , IHubContext<chatHub> hubContext , INotificationServices notificationServices)
 		{
 			this.context = context;
 			this.webHostEnvironment = webHostEnvironment;
 			this.chatService = chatService;
 			this.hubContext = hubContext;
+			this.notificationServices = notificationServices;
 		}
 
 		public RecentGroupModel CreateGroup(string userName, CreateGroupModel grp)
@@ -57,6 +59,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			}
 			context.Groups.Add(newGroup);
 			context.SaveChanges();
+			GroupMessages newMessage = new GroupMessages
+			{
+				GrpId = newGroup.Id,
+				Content = userName + " created Group " + grp.GroupName ,
+				MessageFrom = newGroup.CreatedBy,
+				CreatedAt = DateTime.Now,
+				RepliedTo = -1,
+				Type = "heading",
+			};
+			context.GroupMessages.Add(newMessage);
+			context.SaveChanges();
 			GroupMembers GroupMember = new GroupMembers
 			{
 				GrpId = newGroup.Id,
@@ -70,14 +83,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			{
 				Id = newGroup.Id,
 				GroupName = newGroup.GroupName,
-				Type = null,
-				LastMsg = null,
-				LastMsgAt = null,
+				Type = newMessage.Type,
+				LastMsg = newMessage.Content,
+				LastMsgAt = newMessage.CreatedAt,
 			};
 			if (grp.ImageFile != null)
-			{
-				response.GroupImage = newGroup.ImagePath;
-			}
+			{	response.GroupImage = newGroup.ImagePath;	}
+			else
+			{	response.GroupImage = null;	}
 			return response;
 		}
 
@@ -105,18 +118,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 						GroupName = group.GroupName,		
 					};
 					var msg = sortedMessages.FirstOrDefault(m => m.GrpId == grpId);
-					if(msg!=null)
-					{
-						newObj.Type = msg.Type;
-						newObj.LastMsgAt = msg.CreatedAt;
-						newObj.LastMsg = msg.Content;
-					}
-					else
-					{
-						newObj.Type = null;
-						newObj.LastMsgAt = null;
-						newObj.LastMsg = null;
-					}
+					newObj.Type = msg.Type;
+					newObj.LastMsgAt = msg.CreatedAt;
+					newObj.LastMsg = msg.Content;	
 					recentGroupList.Add(newObj);
 				}
 				var orderedRecentChatList = recentGroupList.OrderByDescending(m => m.LastMsgAt);
@@ -258,6 +262,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 						this.hubContext.Clients.Client(connect.SignalId).SendAsync("iAmAddedToGroup", newGrp);
 					}
 				}
+				this.notificationServices.addToGroup(selUserIds ,userId ,grpId);
 				return allProfiles;
 			}
 			return null;
@@ -366,6 +371,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					{
 						this.hubContext.Clients.Client(connect.SignalId).SendAsync("MadeMeAdmin", groupId);
 					}
+					this.notificationServices.adminNoti(selUserId, userId, groupId);
 				}
 			}
 		}
@@ -385,6 +391,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				{
 					this.hubContext.Clients.Client(connect.SignalId).SendAsync("iAmRemovedFromGroup", groupId);
 				}
+				this.notificationServices.removeNoti(selUserId, userId, groupId);
 			}
 		}
 
@@ -478,6 +485,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			var groupMemberIds = context.GroupMembers.Where(u => u.GrpId == msg.GroupId).Select(u => u.ProfileId).ToList();
 			var connections = context.Connections.Where(u => groupMemberIds.Contains(u.ProfileId)).Select(u => u.SignalId).ToList();
 			this.hubContext.Clients.Clients(connections).SendAsync("RecieveMessageGroup", response);
+			this.notificationServices.groupMsgNoti(message.MessageFrom, msg.GroupId, message.Type);
 		}
 	}
 }

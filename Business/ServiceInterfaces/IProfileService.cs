@@ -19,5 +19,10 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Profile GetUser(Expression<Func<Profile,bool>> Filter);
 
-    }
+        public string GetUserNameFromId(int id);
+
+        public int GetIdFromUserName(string userName);
+
+
+	}
 }

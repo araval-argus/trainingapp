@@ -126,5 +126,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return context.Profiles.Any(x => x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim());
         }
 
+		public int GetIdFromUserName(string userName)
+		{
+			Profile user = context.Profiles.FirstOrDefault(profile => profile.UserName == userName);
+			return user.Id;
+		}
+
+		public string GetUserNameFromId(int id)
+		{
+			Profile user = context.Profiles.FirstOrDefault(profile => profile.Id == id);
+			return user.UserName;
+		}
+
 	}
 }

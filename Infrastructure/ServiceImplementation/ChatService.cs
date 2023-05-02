@@ -10,6 +10,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Cryptography.Xml;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -39,6 +40,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			})
 			.ToList();
 		}
+
 		public string GetUsername(string Authorization)
 		{
 			var handler = new JwtSecurityTokenHandler();
@@ -132,6 +134,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			var orderedRecentChatList = recentChatList.OrderByDescending(m => m.CreatedAt);
 			return orderedRecentChatList;
 		}
+
 		public async void MarkAsRead(string userName, string selUserName)
 		{
 			List<Message> msgs = null;
@@ -220,17 +223,48 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				Type= message.Type,
 			};
 
-			ResponsesToUsersMessage(message.MessageFrom,message.MessageTo,response);
-		}
+			//NOTIFICATION
+			var existingNoti = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId==null);
+			if (existingNoti == null)
+			{
+				var Notification = new Notifications
+				{
+					FromId = GetIdFromUserName(msg.MessageFrom),
+					ToId = GetIdFromUserName(msg.MessageTo),
+					GroupId = null,
+					Content = msg.MessageFrom + " Sent You " + filetype,
+					CreatedAt = DateTime.Now,
+				};
+				context.Notifications.Add(Notification);
+				context.SaveChanges();
+			}
+			else
+			{
+				existingNoti.Content = msg.MessageFrom + " Sent You " + filetype;
+				existingNoti.CreatedAt = DateTime.Now;
+				context.Update(existingNoti);
+				context.SaveChanges();
+			}
 
-		//Signal R Responses
-		public void ResponsesToUsersMessage(int msgFrom , int msgTo , MessageSendModel response)
-		{
-			Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == msgFrom);
-			Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == msgTo);
+			//Sending Response
+			Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageFrom);
+			Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageTo);
 			if (Receiver != null)
 			{
+				var profile = context.Profiles.FirstOrDefault(u => u.UserName == msg.MessageFrom);
+				var notification = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId == null);
+				var notif = new NotificationsDTO
+				{
+					Id = notification.Id,
+					MsgFrom = profile.UserName,
+					MsgTo = msg.MessageTo,
+					GroupId = notification.GroupId,
+					Content = notification.Content,
+					CreatedAt = notification.CreatedAt,
+					FromImage = profile.ImagePath
+				};
 				this.hubContext.Clients.Clients(Sender.SignalId, Receiver.SignalId).SendAsync("recieveMessage", response);
+				this.hubContext.Clients.Client(Receiver.SignalId).SendAsync("notification", notif);
 			}
 			else
 			{

@@ -67,7 +67,12 @@
         {{msg.createdAt| date:'mediumDate'}}
       </div>
     </li>
-    <li *ngIf="msg.messageFrom != this.loggedInUser.userName" class="message-item friend">
+    <li *ngIf="msg.type=='heading'">
+      <div class="text-center">
+        {{msg.content}}
+      </div>
+    </li>
+    <li *ngIf="msg.messageFrom != this.loggedInUser.userName && msg.type!='heading'" class="message-item friend">
       <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
       <div class="content"(dblclick)="toggleReplyMsg(msg)">
         <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
@@ -89,7 +94,7 @@
         </div>
       </div>
     </li>
-    <li *ngIf="msg.messageFrom == this.loggedInUser.userName" class="message-item me">
+    <li *ngIf="msg.messageFrom == this.loggedInUser.userName && msg.type!='heading'" class="message-item me">
       <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
       <div class="content" (dblclick)="toggleReplyMsg(msg)">
         <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
