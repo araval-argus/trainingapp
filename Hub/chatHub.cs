@@ -17,17 +17,29 @@ namespace ChatApp
 		private readonly ChatAppContext context;
 		private readonly IChatService chatService;
 		private readonly INotificationServices notificationServices;
-	
+		private string curSignalId;
+
 		public chatHub(ChatAppContext context, IChatService chatservice, INotificationServices notificationServices)
 		{
 			this.context = context;
 			this.chatService = chatservice;
 			this.notificationServices = notificationServices;
 		}
+
+		public override async Task OnDisconnectedAsync(Exception exception)
+		{
+			var connect = context.Connections.Where(u=>u.SignalId==Context.ConnectionId);
+			if (connect != null){
+				context.RemoveRange(connect);
+				context.SaveChanges();
+			}
+			
+		}
+
 		#region OneToOneHub
 		public async Task ConnectDone(string userName)
 		{
-			string curSignalId = Context.ConnectionId;
+			curSignalId = Context.ConnectionId;
 			Profile user = context.Profiles.FirstOrDefault(p => p.UserName == userName);
 
 			if (user != null) {

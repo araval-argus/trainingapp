@@ -346,6 +346,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			}
 			if(numberOfUsers == 1)
 			{
+				var notifications = context.Notifications.Where(u => u.GroupId == groupId);
+				context.Notifications.RemoveRange(notifications);
+				context.SaveChanges();
 				Groups group = context.Groups.FirstOrDefault(u => u.Id == groupId);
 				context.Groups.RemoveRange(group);
 				context.SaveChanges();

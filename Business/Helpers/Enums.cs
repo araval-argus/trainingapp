@@ -11,13 +11,12 @@ namespace ChatApp.Business.Helpers
         public const string LastNameClaim = "lastName";
         public const string ImagePathClaim = "imagePath";
         public const string DesignationClaim = "designation";
-
 	}
+
     public enum ProfileType
     {
         User = 1,
         Administrator = 2
     }
-
     
 }
