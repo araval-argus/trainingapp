@@ -1,7 +1,8 @@
-import { EventEmitter, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { JwtHelper } from "../helper/jwt-helper";
 import { LoggedInUserModel } from "../models/loggedin-user";
 import { environment } from "src/environments/environment";
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: "root",
@@ -9,18 +10,18 @@ import { environment } from "src/environments/environment";
 export class AuthService {
   constructor(private jwtHelper: JwtHelper) {}
 
-  LoggedInUserChanged = new EventEmitter();
+  LoggedInUserChanged = new Subject();
 
-  login(token, callback) {
+  login(token, callback?) {
     localStorage.setItem("isLoggedin", "true");
     localStorage.setItem("USERTOKEN", token);
 
     if (callback) {
       callback();
     }
-    this.LoggedInUserChanged.emit();
+    this.LoggedInUserChanged.next();
   }
-  logout(callback) {
+  logout(callback?) {
     localStorage.removeItem("isLoggedin");
     localStorage.removeItem("USERTOKEN");
     if (callback) {
@@ -32,8 +33,6 @@ export class AuthService {
     let token = localStorage.getItem("USERTOKEN");
     var user: LoggedInUserModel = this.jwtHelper.decodeToken(token);
     user.imageUrl = environment.apiUrl + "/../Images/Users/" + user.imageUrl
-    //user.designation = this.setDesignation(user.designation)
-    //console.log("user inside getLoggedInUserModelInfo:- ", user)
     return user;
   }
 

@@ -62,9 +62,13 @@ export class SidebarComponent implements OnInit, AfterViewInit {
 
   initializeMenuItems(){
     this.menuItems = MENU.slice();
-    if(this.authService.getLoggedInUserInfo().designation === "Intern" ||
-    this.authService.getLoggedInUserInfo().designation === "Probationer" ){
-      this.menuItems.pop();
+    if(this.authService.getLoggedInUserInfo().designation !== "Intern" &&
+    this.authService.getLoggedInUserInfo().designation !== "Probationer" ){
+      this.menuItems.splice(3,0,{
+        label: "Employees",
+        icon: "list",
+        link: "/employees",
+      });
     }
   }
   ngAfterViewInit() {
@@ -123,9 +127,13 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    */
   iconSidebar(e) {
     if (e.matches) {
-      this.document.body.classList.add('sidebar-folded');
+      if(this.document){
+        this.document.body.classList.add('sidebar-folded');
+      }
     } else {
-      this.document.body.classList.remove('sidebar-folded');
+      if(this.document){
+        this.document.body.classList.remove('sidebar-folded');
+      }
     }
   }
 

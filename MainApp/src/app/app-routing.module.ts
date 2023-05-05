@@ -41,6 +41,13 @@ const routes: Routes = [
             (m) => m.EmployeesModule
           ),
       },
+      {
+        path: "groups",
+        loadChildren: () =>
+          import("./views/pages/groups/groups.module").then(
+            (m) => m.GroupModule
+          ),
+      },
       { path: "", redirectTo: "dashboard", pathMatch: "full" },
     ],
   },

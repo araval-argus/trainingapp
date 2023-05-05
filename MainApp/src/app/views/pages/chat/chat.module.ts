@@ -2,10 +2,9 @@ import { CommonModule } from '@angular/common';
 import { NgModule } from "@angular/core";
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Routes } from '@angular/router';
-import { NgbDropdownModule, NgbNavModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDropdownModule, NgbNavModule,  NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { FeahterIconModule } from 'src/app/core/feather-icon/feather-icon.module';
 import { DropdownDirective } from 'src/app/core/helper/dropdown-directive';
-import { ModalComponent } from '../ui-components/modal/modal.component';
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PickerModule } from '@ctrl/ngx-emoji-mart';
 
@@ -35,8 +34,7 @@ const routes: Routes = [
     FriendsDropdownComponent,
     ChatContentHeaderComponent,
     ChatContentBodyComponent,
-    ChatContentFooterComponent,
-    ModalComponent,
+    ChatContentFooterComponent
   ],
   imports:[
     RouterModule.forChild(routes),
@@ -44,6 +42,7 @@ const routes: Routes = [
     FormsModule,
     FeahterIconModule,
     NgbDropdownModule,
+    NgbTooltipModule,
     PerfectScrollbarModule,
     NgbNavModule,
     PickerModule

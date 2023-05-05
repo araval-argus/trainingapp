@@ -232,5 +232,8 @@ _Pvt_Extensions
 
 # .jfm files are not handled by git anymore
 *.jfm
-*.jfm
-*.jfm
+
+# profile pictures, group icons and shared media
+.wwwroot/Images/Users/*
+.wwwroot/SharedFiles/*
+.wwwroot/GroupIcons/*

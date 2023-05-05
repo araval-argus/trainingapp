@@ -23,9 +23,9 @@ namespace ChatApp.Models
 
         public MessageType MessageType { get; set; } = Business.Helpers.MessageType.Text;
 
-        public DateTime? CreatedAt { get; set; }
+        public DateTime CreatedAt { get; set; }
 
-        public bool? IsSeen { get; set; }
+        public bool? IsSeen { get; set; } 
 
     }
 }

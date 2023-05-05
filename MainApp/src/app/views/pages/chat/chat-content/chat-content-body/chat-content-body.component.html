@@ -1,4 +1,4 @@
-<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 50;" style="position: 'relative'">
+<div class="chat-body" [perfectScrollbar] #scrollbar style="position: 'relative';  min-height: calc(105vh - 385px);">
   <ul class="messages">
 
     <!-- message of sender -->
@@ -8,7 +8,7 @@
           <img [src]="loggedInUser.imageUrl" class="img-xs rounded-circle" alt="avatar">
           <div class="content">
             <div class="message">
-              <div class="bubble">
+              <div class="bubble" style="overflow-wrap: anywhere">
 
                 <p class="text-muted" *ngIf="message.repliedToMsg">
                   {{message.repliedToMsg}}<br>
@@ -35,7 +35,9 @@
                   </video>
                 </div>
               </div>
-              <span>{{message.createdAt | date : "shortTime"}}</span>
+              <span *ngIf=" today - message.createdAt.getDate() === 0 ">{{message.createdAt | date : "shortTime"}}</span>
+              <span *ngIf=" today - message.createdAt.getDate() === 1 ">Yesterday</span>
+              <span *ngIf=" today - message.createdAt.getDate() !== 0 && today - message.createdAt.getDate() !== 1">{{message.createdAt | date : "mediumDate"}}</span>
             </div>
           </div>
         </li>
@@ -47,7 +49,7 @@
           <img [src]="selectedFriend.imageUrl" class="img-xs rounded-circle" alt="avatar">
           <div class="content">
             <div class="message">
-              <div class="bubble">
+              <div class="bubble" style="overflow-wrap: anywhere">
 
                 <p class="text-muted" *ngIf="message.repliedToMsg">
                   {{message.repliedToMsg}}<br>
@@ -74,14 +76,28 @@
                   </video>
                 </div>
               </div>
-              <span>
+              <span *ngIf=" today - message.createdAt.getDate() === 0 ">
                 {{message.createdAt | date : "shortTime"}}
                 <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
                 class="reply" (click)="replyToThisMessage(message)">
                   <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
                 </button>
-
               </span>
+              <span *ngIf=" today - message.createdAt.getDate() === 1 ">
+                Yesterday
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyToThisMessage(message)">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
+              <span *ngIf=" today - message.createdAt.getDate() !== 0 && today - message.createdAt.getDate() !== 1">
+                {{message.createdAt | date : "mediumDate"}}
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyToThisMessage(message)">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
+
             </div>
           </div>
         </li>
@@ -96,7 +112,10 @@
 
 
 
-
+<!--
+<span *ngIf="today.getDate() - message.createdAt.getDate() === 0">{{message.createdAt | date : "shortTime"}}</span>
+<span *ngIf="today.getDate() - message.createdAt.getDate() === 1">Yesterday</span>
+<span *ngIf="today.getDate() - message.createdAt.getDate() !== 0 && today.getDate() - message.createdAt.getDate() !== 1">{{message.createdAt | date : "mediumDate"}}</span> -->
 
 
 <!-- check below code for reference -->

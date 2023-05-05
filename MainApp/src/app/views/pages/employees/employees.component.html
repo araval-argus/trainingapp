@@ -29,15 +29,15 @@
       <td><img [src]="employee.imageUrl" alt="" class="rounded-circle" width="32"></td>
       <td *ngIf="isAdmin">
         <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
-         (click)="selectEmployee(employee); openScrollableModal(scrollableModal)"></button>
-        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning ml-2" (click)="deleteEmployee(employee)"></button>
+         (click)="selectEmployee(employee); openScrollableModal(scrollableModal)" ngbTooltip="Edit"></button>
+        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning ml-2" (click)="deleteEmployee(employee)" ngbTooltip="Delete"></button>
       </td>
     </tr>
   </ng-template>
 </p-table>
 
 
-  <!-- Modal -->
+  <!-- Modal to edit the employee data -->
   <ng-template #scrollableModal let-modal>
     <div class="modal-header">
       <h5 class="modal-title" id="exampleModalLabel">Edit Information</h5>
@@ -51,32 +51,45 @@
         <div class="form-group">
           <label for="firstNameInput">First Name</label>
           <input type="text" class="form-control" id="firstNameInput" [(ngModel)]="selectedEmployee.firstName"
-            #firstNameInput="ngModel" name="firstNameInput" required />
-          <span class="text-danger" *ngIf="firstNameInput.invalid && firstNameInput.touched">*Required field</span>
+            #firstNameInput="ngModel" name="firstNameInput" pattern="^[A-Za-z]{1,}$"/>
+            <span class="text-danger" *ngIf="!firstNameInput.value && firstNameInput.touched ">
+              *Required field
+            </span>
+            <span class="text-danger" *ngIf="firstNameInput.value  && firstNameInput.invalid && firstNameInput.touched ">
+              *Only alphabets are allowed
+            </span>
         </div>
         <div class="form-group">
           <label for="lastNameInput">Last Name</label>
           <input type="text" class="form-control" id="lastNameInput" [(ngModel)]="selectedEmployee.lastName"
-            #lastNameInput="ngModel" name="lastNameInput" required>
-          <span class="text-danger" *ngIf="lastNameInput.invalid && lastNameInput.touched">*Required field</span>
+            #lastNameInput="ngModel" name="lastNameInput" pattern="^[A-Za-z]{1,}$">
+            <span class="text-danger" *ngIf="!lastNameInput.value && lastNameInput.touched ">
+              *Required field
+            </span>
+            <span class="text-danger" *ngIf="lastNameInput.value  && lastNameInput.invalid && lastNameInput.touched ">
+              *Only alphabets are allowed
+            </span>
         </div>
         <div class="form-group">
           <label for="lastNameInput">Username</label>
           <input type="text" class="form-control" id="usernameInput" [(ngModel)]="selectedEmployee.userName"
             #usernameInput="ngModel" name="usernameInput" (input)="onUserNameValueChange($event)" required>
           <span class="text-danger" *ngIf="usernameInput.invalid && usernameInput.touched">*Required field</span>
-          <span class="text-danger" *ngIf="usernameInput.valid && usernameExists">*username already exists</span>
+          <span class="text-danger" *ngIf="usernameInput.valid && usernameExists">*Username already exists</span>
         </div>
         <div class="form-group">
           <label for="emailInput">Email Address</label>
           <input type="text" class="form-control" id="emailInput" [(ngModel)]="selectedEmployee.email" #emailInput="ngModel"
-            name="emailInput" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$">
+            name="emailInput" required pattern="^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" (input)="onEmailCanged($event)">
           <span class="text-danger" *ngIf="emailInput.invalid && emailInput.touched">*Enter an email id</span>
+          <span class="text-danger" *ngIf="usernameInput.valid && emailExists">*Email already exists</span>
         </div>
         <div class="form-group">
           <label for="exampleInputPassword1">Designation</label>
           <select type="text" [(ngModel)]="selectedEmployee.designation.id" name="designationInput" class="form-control" (input)="designationChanged($event)">
-            <option *ngFor="let designation of designations" [value]="designation.id" class="form-control">{{ designation.designation }}</option>
+            <option *ngFor="let designation of designations" [value]="designation.id" class="form-control" [selected]="designation.id === selectedEmployee.designation.id">
+              {{ designation.designation }}
+            </option>
           </select>
         </div>
         <button type="submit" #submitButton class="d-none"></button>
@@ -84,6 +97,6 @@
     </div>
     <div class="modal-footer">
       <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
-      <button type="submit" class="btn btn-primary" [disabled]="formVar.invalid" (click)="submitButton.click(); modal.close('by: submit button')">Save changes</button>
+      <button type="submit" class="btn btn-primary" [disabled]="formVar.invalid || usernameExists || emailExists" (click)="submitButton.click(); modal.close('by: submit button')">Save changes</button>
     </div>
   </ng-template>

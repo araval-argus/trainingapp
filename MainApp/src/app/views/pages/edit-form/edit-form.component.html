@@ -7,14 +7,24 @@
         <div class="form-group">
           <label for="firstNameInput">First Name</label>
           <input type="text" class="form-control" id="firstNameInput" [(ngModel)]="loggedInUser.firstName"
-            #firstNameInput="ngModel" name="firstNameInput" required />
-          <span class="text-danger" *ngIf="firstNameInput.invalid && firstNameInput.touched">*Required field</span>
+            #firstNameInput="ngModel" name="firstNameInput" pattern="^[A-Za-z]{1,}$" />
+            <span class="text-danger" *ngIf="!firstNameInput.value && firstNameInput.touched ">
+              *Required field
+            </span>
+            <span class="text-danger" *ngIf="firstNameInput.value  && firstNameInput.invalid && firstNameInput.touched ">
+              *Only alphabets are allowed
+            </span>
         </div>
         <div class="form-group">
           <label for="lastNameInput">Last Name</label>
           <input type="text" class="form-control" id="lastNameInput" [(ngModel)]="loggedInUser.lastName"
-            #lastNameInput="ngModel" name="lastNameInput" required>
-          <span class="text-danger" *ngIf="lastNameInput.invalid && lastNameInput.touched">*Required field</span>
+            #lastNameInput="ngModel" name="lastNameInput" pattern="^[A-Za-z]{1,}$">
+            <span class="text-danger" *ngIf="!lastNameInput.value && lastNameInput.touched ">
+              *Required field
+            </span>
+            <span class="text-danger" *ngIf="lastNameInput.value  && lastNameInput.invalid && lastNameInput.touched ">
+              *Only alphabets are allowed
+            </span>
         </div>
         <div class="form-group">
           <label for="lastNameInput">Username</label>
@@ -79,7 +89,7 @@
           <label for="newPasswordInput">New Password</label>
           <input type="password" class="form-control" id="newPasswordInput"
           #newPasswordInput="ngModel" [(ngModel)]="passwordModel.newPassword"
-           name="newPasswordInput" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,16}$">
+           name="newPasswordInput" required pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+])[A-Za-z\d!@#$%^&*()_+]{8,16}$">
            <div *ngIf="newPasswordInput.invalid && newPasswordInput.touched" class="text-danger">
             <span class="text-danger">*Password must satistfy following conditions</span>
             <p>1. must have atleast one number</p>
@@ -89,6 +99,8 @@
             <p>5. password length between 8 and 16</p>
           </div>
         </div>
+
+        <!--   (?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})-->
         <div class="form-group">
           <label for="confirmPasswordInput">Confirm New Password</label>
           <input type="password" class="form-control" id="confirmPasswordInput"

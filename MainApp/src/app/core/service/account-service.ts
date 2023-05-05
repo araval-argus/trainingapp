@@ -47,4 +47,11 @@ export class AccountService {
     changePassword(passwordModel: PasswordModel){
       return this.http.post(environment.apiUrl + "/account/changePassword",passwordModel);
     }
+
+    //fetches all other users except logged in user
+    fetchAllUsers(loggedInUsername: string){
+      return this.http.get(environment.apiUrl + "/account/FetchAllUsers", {
+        params: new HttpParams().append("userName", loggedInUsername)
+      });
+    }
 }

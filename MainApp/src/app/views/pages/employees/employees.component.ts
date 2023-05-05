@@ -1,11 +1,13 @@
 import { Component, OnInit } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
 import { DesignationModel } from "src/app/core/models/designation-model";
-import { FriendProfileModel } from "src/app/core/models/friend-profile-model";
+import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
+import { UserModel } from "src/app/core/models/UserModel";
 import { AccountService } from "src/app/core/service/account-service";
 import { AdminService } from "src/app/core/service/admin-service";
 import { AuthService } from 'src/app/core/service/auth-service';
 import { environment } from "src/environments/environment";
+import Swal from 'sweetalert2';
 
 @Component({
   selector: "app-employees",
@@ -13,16 +15,17 @@ import { environment } from "src/environments/environment";
   styleUrls: ["./employees.component.scss"],
 })
 export class EmployeesComponent implements OnInit {
-  employees: FriendProfileModel[] = [];
+  employees: UserModel[] = [];
   isAdmin: Boolean = false;
-  selectedEmployee: FriendProfileModel;
+  selectedEmployee: UserModel;
   //for checking the username exists or not
   selectedEmployeeUserName: string;
+  loggedInUser: LoggedInUserModel;
 
   designations: DesignationModel[];
-  timeOutIdForUsername;
 
   usernameExists: boolean = false;
+  emailExists: boolean = false;
 
   constructor(
     private adminService: AdminService,
@@ -32,76 +35,104 @@ export class EmployeesComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.fetchEmployees();
     this.checkIsAdmin();
   }
 
-  checkIsAdmin(){
-    this.isAdmin = this.authService.getLoggedInUserInfo().designation === "Chief Technical Officer";
+  checkIsAdmin() {
+    this.isAdmin =
+      this.loggedInUser.designation === "Chief Technical Officer" ||
+      this.loggedInUser.designation === "Chief Executive Officer";
   }
 
-  fetchEmployees(){
-     this.adminService
-      .fetchEmployees()
-      .subscribe((data: FriendProfileModel[]) => {
-        this.employees = data;
-        this.employees.forEach((employee) => {
-          employee.imageUrl =
-            environment.apiUrl + "/../Images/Users/" + employee.imageUrl;
-        });
+  fetchEmployees() {
+    this.adminService.fetchEmployees().subscribe((data: UserModel[]) => {
+      this.employees = data;
+      this.employees.forEach((employee) => {
+        employee.imageUrl =
+          environment.apiUrl + "/../Images/Users/" + employee.imageUrl;
       });
+    });
   }
 
-  deleteEmployee(employee: FriendProfileModel) {
-    this.employees.splice(this.employees.indexOf(employee), 1);
+  deleteEmployee(employee: UserModel) {
+    Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire(
+          'Deleted!',
+          'User Deleted',
+          'success'
+        )
+        this.employees.splice(this.employees.indexOf(employee), 1);
+        this.adminService.deleteEmployee(employee.userName).subscribe();
+      }
+    })
 
-    this.adminService.deleteEmployee(employee.userName).subscribe();
   }
 
-  selectEmployee(employee: FriendProfileModel) {
-    this.selectedEmployee = {...employee};
+  selectEmployee(employee: UserModel) {
+    this.selectedEmployee = { ...employee };
     this.selectedEmployeeUserName = this.selectedEmployee.userName;
+    console.log("selected employee", employee)
   }
 
   openScrollableModal(content) {
     this.accountService.fetchDesignations().subscribe((data: any) => {
       this.designations = data.designations;
-    });
-    this.modalService
+      this.modalService
       .open(content, { scrollable: true })
-      .result.then((result) => {
-      })
+      .result.then((result) => {})
       .catch((res) => {});
+    });
+
   }
 
   //update
   updateEmployeeData() {
-    this.adminService.updateEmployeeData(this.selectedEmployee).subscribe(() => {
-      this.fetchEmployees()
-    });
+    //console.log("updated employee data", this.selectedEmployee)
+    this.adminService
+      .updateEmployeeData(this.selectedEmployee, this.selectedEmployeeUserName)
+      .subscribe(() => {
+        this.fetchEmployees();
+      });
   }
 
   //for checking unique username
   onUserNameValueChange(event: Event) {
     const value = (event.target as HTMLInputElement).value;
-    if (this.timeOutIdForUsername) {
-      clearTimeout(this.timeOutIdForUsername);
-    }
 
-    this.timeOutIdForUsername = setTimeout(() => {
 
-      //dont send a request if both are equal
+      //dont find if both are equal
       if (value !== this.selectedEmployeeUserName) {
-        this.accountService.checkUsername(value).subscribe((data) => {
-          console.log(data.usernameExists);
-          this.usernameExists = data.usernameExists;
-        });
+        const employee = this.employees.find(
+          (employee) => employee.userName === value
+        );
+        employee ? (this.usernameExists = true) : (this.usernameExists = false);
       }
-    }, 1000);
   }
 
   //to update the value of dropdown of designations
   designationChanged(event) {
-    this.selectedEmployee.designation = this.designations[event.target.selectedIndex];
+    this.selectedEmployee.designation =
+      this.designations[event.target.selectedIndex];
+  }
+
+  onEmailCanged(event: Event) {
+    const value = (event.target as HTMLInputElement).value;
+
+    const employee = this.employees.find(
+      (employee) => employee.email === value
+    );
+
+    employee ? (this.emailExists = true) : (this.emailExists = false);
   }
 }

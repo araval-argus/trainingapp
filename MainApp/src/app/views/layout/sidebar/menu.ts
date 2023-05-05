@@ -1,26 +1,23 @@
-import { MenuItem } from './menu.model';
+import { MenuItem } from "./menu.model";
 
 export const MENU: MenuItem[] = [
   {
-    label: 'Main',
-    isTitle: true
+    label: "Main",
+    isTitle: true,
   },
   {
-    label: 'Dashboard',
-    icon: 'home',
-    link: '/dashboard'
+    label: "Dashboard",
+    icon: "home",
+    link: "/dashboard",
   },
   {
-    label: 'Chats',
-    icon: 'inbox',
-    link: '/chats'
+    label: "Chats",
+    icon: "inbox",
+    link: "/chats",
   },
   {
-
-    label: 'Employees',
-    icon: 'users',
-    link: '/employees'
-
-}
-
+    label: "Groups",
+    icon: "users",
+    link: "/groups",
+  }
 ];

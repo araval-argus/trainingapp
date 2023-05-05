@@ -5,6 +5,7 @@ import { TableModule } from 'primeng/table'
 import { ButtonModule } from 'primeng/button';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 const routes: Routes = [
   {
@@ -21,7 +22,8 @@ const routes: Routes = [
     TableModule,
     ButtonModule,
     FormsModule,
-    CommonModule
+    CommonModule,
+    NgbTooltipModule
   ]
 })
 export class EmployeesModule{}

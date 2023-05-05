@@ -1,5 +1,6 @@
 ﻿using ChatApp.Context.EntityClasses;
 using ChatApp.Models;
+using System.Collections;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
@@ -10,5 +11,6 @@ namespace ChatApp.Business.ServiceInterfaces
         OnlineUserEntity FetchOnlineUser(string username); 
 
         void RemoveOnlineUser(OnlineUserEntity onlineUserEntity);
+
     }
 }

@@ -1,0 +1,106 @@
+<div class="aside-content mb-auto">
+
+  <div class="aside-header">
+    <div class="d-flex justify-content-between align-items-center pb-2 mb-2 border-bottom">
+      <div class="d-flex align-items-center">
+        <figure class="mr-2 mb-0">
+          <img [src]="loggedInUser.imageUrl" class="img-sm rounded-circle" alt="profile">
+          <div class="status online"></div>
+        </figure>
+        <div>
+          <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
+          <p class="text-muted tx-13">{{loggedInUser.designation}}</p>
+        </div>
+      </div>
+      <button class="btn-primary" (click)="openScrollableModal(createGroupModal)">New Group</button>
+    </div>
+  </div>
+
+  <div class="aside-body mt-3">
+    <div class="ps" style="position: relative; max-width: 600px; max-height: calc(115vh - 385px)" [perfectScrollbar]>
+
+        <ul class="list-unstyled chat-list px-1">
+          <!-- Repeatation start -->
+          <li class="chat-item pr-1" *ngFor="let group of groups">
+            <a (click)="onClickGroup(group)" class="d-flex align-items-center">
+
+              <figure class="mb-1 mr-2">
+                <!-- profile picture -->
+                <img [src]="group.groupIconUrl" class="img-xs rounded-circle" alt="user">
+                <div class="status online"></div>
+              </figure>
+
+              <div class="d-flex justify-content-between flex-grow border-bottom">
+                <div>
+                  <!-- name  -->
+                  <p class="text-body font-weight-bold">{{ group.name }}</p>
+                  <!-- last message -->
+
+                    <p class="text-muted tx-13 mb-1">{{ group.lastMessage? group.lastMessage: " " }}<br></p>
+                </div>
+
+                <div class="d-flex flex-column align-items-end">
+                  <!-- last message time -->
+                  <p class="text-muted tx-13 mb-1 mt-1" *ngIf="today.getDate() - group.lastMessageTimeStamp.getDate() === 0">
+                    {{ group.lastMessageTimeStamp  | date: "shortTime"}}
+                  </p>
+                  <p class="text-muted tx-13 mb-1 mt-1" *ngIf="today.getDate() - group.lastMessageTimeStamp.getDate() === 1">
+                    Yesterday
+                  </p>
+                  <p class="text-muted tx-13 mb-1 mt-1" *ngIf="today.getDate() - group.lastMessageTimeStamp.getDate() !== 0 && today.getDate() - group.lastMessageTimeStamp.getDate() !== 1">
+                    {{ group.lastMessageTimeStamp  | date: "mediumDate"}}
+                  </p>
+                  <!-- unread message count -->
+                  <!-- <div *ngIf="true" class="unread-count-parent"> -->
+                    <!-- <div class="badge badge-pill badge-primary ml-auto">
+                      10
+                    </div> -->
+                    <!-- <div class="mark-as-read-button ml-1 d-inline-block" ngbTooltip="Mark As Read" placement="left">
+                      <i class="pi pi-check"></i>
+                    </div> -->
+                  <!-- </div> -->
+                </div>
+              </div>
+            </a>
+          </li>
+          <!-- Repeatation end -->
+
+        </ul>
+
+    </div>
+  </div>
+</div>
+
+
+
+<!-- Modal to create a group -->
+<ng-template #createGroupModal let-modal>
+  <form #formVar="ngForm" enctype="multipart/form-data" (ngSubmit)="createGroup();modal.close('by: save button')">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Create New Group</h5>
+      <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="groupName">Group Name</label>
+        <input type="text" class="form-control" id="groupName" #groupName="ngModel" ngModel name="groupName" required>
+        <span class="text-danger" *ngIf="groupName.touched && groupName.invalid">*Required Field</span>
+      </div>
+      <div class="form-group">
+        <label for="groupDescription">Group Description</label>
+        <input type="text" class="form-control" id="groupDescription" ngModel name="groupDescription">
+      </div>
+      <div class="form-group">
+        <label for="groupIcon">Group Icon</label>
+        <input type="file" id="groupIcon" class="form-control" accept="image/*">
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+      <button type="submit" class="btn btn-primary" [disabled]="formVar.invalid">Create</button>
+    </div>
+  </form>
+</ng-template>

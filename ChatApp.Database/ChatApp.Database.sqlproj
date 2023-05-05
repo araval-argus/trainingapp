@@ -66,11 +66,17 @@
     <Build Include="Tables\Designations.sql" />
     <Build Include="Tables\Messages.sql" />
     <Build Include="Tables\OnlineUsers.sql" />
+    <Build Include="Tables\Groups.sql" />
+    <Build Include="Tables\GroupMembers.sql" />
+    <Build Include="Tables\GroupMessages.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatApp.local.publish.xml" />
   </ItemGroup>
   <ItemGroup>
     <RefactorLog Include="ChatApp.Database.refactorlog" />
+  </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Tables\Script.PostDeployment1.sql" />
   </ItemGroup>
 </Project>

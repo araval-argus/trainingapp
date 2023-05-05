@@ -57,14 +57,14 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
 
-                newUser = context.Profiles.Include("Designation").FirstOrDefault(p => p.UserName == regModel.UserName);
+                newUser = context.Profiles.Include("Designation").FirstOrDefault(p => p.IsActive && p.UserName == regModel.UserName);
             }
             return newUser;
         }
 
         public Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false)
         {
-            Profile user = FetchProfile(username);
+            Profile user = FetchProfileFromUserName(username);
             if (user != null)
             {
                 user.UserName = updateModel.UserName;
@@ -83,7 +83,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return context.Profiles.Any(x => x.IsActive && (x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim()));
         }
 
-        public Profile FetchProfile(string userName)
+        public Profile FetchProfileFromUserName(string userName)
         {
             Profile user = null;
             if (!string.IsNullOrEmpty(userName))
@@ -105,9 +105,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         private string SetDefaultImage()
         {
             string fileName = Guid.NewGuid().ToString() + ".jpg";
-            
-            var DefaultFileLoc = Path.Combine(_webHostEnvironment.WebRootPath, @"Images/default_profile.jpg");
-            var FileLoc = Path.Combine(DefaultFileLoc, @"../Users", fileName );
+
+            var DefaultFileLoc = Path.Combine(_webHostEnvironment.WebRootPath, @"Default/default_profile.jpg");
+            var FileLoc = Path.Combine(DefaultFileLoc, @"../../Images/Users", fileName);
 
             File.Copy(DefaultFileLoc, FileLoc);
 
@@ -117,12 +117,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public int FetchIdFromUserName(string userName)
         {
-            if(string.IsNullOrEmpty(userName))
+            if (string.IsNullOrEmpty(userName))
             {
                 return 0;
             }
-            return this.context.Profiles.FirstOrDefault(
-                profile => profile.IsActive && profile.UserName.Equals(userName)).Id;
+            Profile profile =  this.context.Profiles.FirstOrDefault(
+                profile => profile.IsActive && profile.UserName.Equals(userName));
+            if(profile == null)
+            {
+                return 0;
+            }
+            return profile.Id;
         }
 
         public string FetchUserNameFromId(int id)
@@ -132,10 +137,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 ).UserName;
         }
 
-       //This method will return a list of users who have interacted with the logged in user
-        public IEnumerable<FriendProfileModel> FetchAllUsers(int userId)
+        //This method will return a list of users who have interacted with the logged in user
+        public IEnumerable<UserModel> FetchAllUsers(int userId)
         {
-            
+
             // Fetch distinct user ids with whome the user with 'userId' had interacted
             IEnumerable<int> Ids = this.context.Messages.Where(
                 m => m.SenderID == userId || m.RecieverID == userId
@@ -144,23 +149,27 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     m => m.SenderID == userId ? m.RecieverID : m.SenderID
                 ).Distinct();
 
-            IList<Profile> friendsProfiles = new List<Profile>(); 
+            IList<Profile> friendsProfiles = new List<Profile>();
 
             //for fetching the profiles
-            foreach(int id in Ids)
+            foreach (int id in Ids)
             {
                 var profile = this.context.Profiles.Include("Designation").FirstOrDefault(p => p.IsActive && p.Id == id);
-                friendsProfiles.Add(profile);
+                if (profile != null)
+                {
+                    friendsProfiles.Add(profile);
+                }
             }
 
             return friendsProfiles
                 .Select(
-                profile => {
-                    
-                     //for counting of unread messages:-
+                profile =>
+                {
+
+                    //for counting of unread messages:-
                     MessageEntity lastMessage = this.context.Messages.OrderBy(m => m.Id).LastOrDefault(m => (m.SenderID == profile.Id && m.RecieverID == userId) || (m.RecieverID == profile.Id && m.SenderID == userId));
 
-                    return new FriendProfileModel()
+                    return new UserModel()
                     {
                         UserName = profile.UserName,
                         Designation = profile.Designation,
@@ -192,7 +201,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public bool ChangePassword(PasswordModel passwordModel)
         {
             Profile profile = this.context.Profiles.FirstOrDefault(p => p.IsActive && p.UserName == passwordModel.UserName && p.Password == passwordModel.OldPassword);
-            if(profile != null)
+            if (profile != null)
             {
                 profile.Password = passwordModel.NewPassword;
                 this.context.Profiles.Update(profile);
@@ -202,7 +211,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return false;
         }
 
-       
+
         public IEnumerable<Profile> FetchAllProfiles()
         {
             var employees = this.context.Profiles.Include("Designation").Where(p => p.IsActive).AsNoTracking();
@@ -221,6 +230,25 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context.Profiles.Update(employee);
             this.context.SaveChanges();
         }
+
+        //fetches all users except the user with given username
+        public IEnumerable<UserModel> FetchAllUsers(string userName)
+        {
+            var users = this.context.Profiles.Include("Designation")
+                .Where(profile => profile.UserName != userName)
+                .Select(profile => new UserModel
+                {
+                    UserName = profile.UserName,
+                    FirstName = profile.FirstName,
+                    LastName = profile.LastName,
+                    Email = profile.Email,
+                    ImageUrl = profile.ImageUrl,
+                    Designation = profile.Designation
+                });
+            return users;
+        }
+
+       
     }
 }
 

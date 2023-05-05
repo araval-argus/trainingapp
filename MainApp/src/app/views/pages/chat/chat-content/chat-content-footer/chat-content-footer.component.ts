@@ -1,6 +1,6 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
+import { UserModel } from 'src/app/core/models/UserModel';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -14,15 +14,13 @@ import { SignalRService } from 'src/app/core/service/signalR-service';
 })
 export class ChatContentFooterComponent implements OnInit {
 
-  @Input() selectedFriend: FriendProfileModel;
+  @Input() selectedFriend: UserModel;
   @Input() messageToBeReplied: MessageModel;
 
   LoggedInUserModel : LoggedInUserModel = this.authService.getLoggedInUserInfo();
 
   @ViewChild('messageInput') messageInput: ElementRef;
-
   @ViewChild('fileInput') fileInput: ElementRef;
-
   @ViewChild('basicModal') basicModal;
 
 
@@ -40,9 +38,13 @@ export class ChatContentFooterComponent implements OnInit {
       senderUserName: this.LoggedInUserModel.sub,
       recieverUserName: this.selectedFriend.userName,
       message: this.messageInput.nativeElement.value,
-      repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1"
+      repliedToMsg: this.messageToBeReplied? "" + this.messageToBeReplied.id : "-1",
+      createdAt: new Date(),
+      messageType: 1
     };
-    this.signalRService.sendMessage(messageModel);
+    if(messageModel.message !== ""){
+      this.signalRService.sendMessage(messageModel);
+    }
     this.messageInput.nativeElement.value = "";
     this.messageToBeReplied = null;
   }
@@ -57,15 +59,11 @@ export class ChatContentFooterComponent implements OnInit {
   sendFile(){
     let file = this.fileInput.nativeElement.files[0];
 
-
     const formData = new FormData();
     formData.append("file",file);
     formData.append("senderUserName", this.LoggedInUserModel.sub);
     formData.append("recieverUserName", this.selectedFriend.userName);
 
-    console.log(formData.get("file"));
-
-    //http request to add file
     this.chatService.sendFile(formData).subscribe(data => {
       console.log(data)
     })

@@ -14,13 +14,15 @@ import { ErrorPageComponent } from './views/pages/error-page/error-page.componen
 import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
 import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
+import { ModalComponent } from './views/pages/ui-components/modal/modal.component';
 
 
 @NgModule({
   declarations: [
     AppComponent,
     ErrorPageComponent,
-    EditFormComponent
+    EditFormComponent,
+    ModalComponent
   ],
   imports: [
     BrowserModule,

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
+import { UserModel } from 'src/app/core/models/UserModel';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
@@ -13,8 +13,9 @@ export class ChatSidebarComponent implements OnInit {
 
   defaultNavActiveId = 1;
   loggedInUser: LoggedInUserModel;
+  today = new Date().getDate();
 
-  @Input() friends: FriendProfileModel[];
+  @Input() friends: UserModel[];
 
   constructor(private authService: AuthService,
     private chatService: ChatService) { }
@@ -25,13 +26,13 @@ export class ChatSidebarComponent implements OnInit {
 
   onClickUser(friend){
     friend.unreadMessageCount = 0;
-    this.chatService.friendSelected.emit(friend);
+    this.chatService.friendSelected.next(friend);
     this.chatService.fetchMessages(this.authService.getLoggedInUserInfo().sub, friend.userName).subscribe((data)=>{
-      this.chatService.messagesRecieved.emit(data);
+      this.chatService.messagesRecieved.next(data);
     });
   }
 
-  markAsRead(event: Event, friend: FriendProfileModel){
+  markAsRead(event: Event, friend: UserModel){
     event.preventDefault();
     event.stopPropagation();
     this.chatService.markMsgAsRead(this.loggedInUser.sub, friend.userName).subscribe(msg=>{

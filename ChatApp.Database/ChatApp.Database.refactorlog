@@ -28,4 +28,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="DesignationID" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="5db7e741-9519-4cee-b4e8-01fbc7c7b3a8" ChangeDateTime="04/21/2023 05:55:27">
+    <Property Name="ElementName" Value="[dbo].[GroupMessages].[RepliedTo]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[GroupMessages]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="RepliedToMsg" />
+  </Operation>
 </Operations>

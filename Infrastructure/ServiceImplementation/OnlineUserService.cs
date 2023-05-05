@@ -26,8 +26,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 this.context.OnlineUsers.RemoveRange(users);
             }
             
-            
-
             this.context.OnlineUsers.Add(onlineUserEntity);
             this.context.SaveChanges();
         }
@@ -41,7 +39,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public void RemoveOnlineUser(OnlineUserEntity onlineUserEntity)
         {
             this.context.OnlineUsers.Remove(onlineUserEntity);
-            Console.WriteLine("user removed");
             this.context.SaveChanges();
         }
     }

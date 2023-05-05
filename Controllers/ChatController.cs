@@ -50,8 +50,8 @@ namespace ChatApp.Controllers
         {
 
             Console.WriteLine(searchTerm);
-            IEnumerable<FriendProfileModel> en = this.chatService.FetchFriendsProfiles(searchTerm);
-            foreach (FriendProfileModel profile in en)
+            IEnumerable<UserModel> en = this.chatService.FetchFriendsProfiles(searchTerm);
+            foreach (UserModel profile in en)
             {
                 Console.WriteLine(profile.FirstName);
             }
@@ -104,7 +104,7 @@ namespace ChatApp.Controllers
             int id = FetchIdFromUserName(loggedInUsername);
 
             //list of friends that have interacted with logged in user before
-            IEnumerable<FriendProfileModel> friends = this.profileService.FetchAllUsers(id);
+            IEnumerable<UserModel> friends = this.profileService.FetchAllUsers(id);
             return Ok(friends);
         }
 
@@ -117,23 +117,26 @@ namespace ChatApp.Controllers
             {
                 SenderUserName = fileModel.SenderUserName,
                 RecieverUserName = fileModel.RecieverUserName,
-                RepliedToMsg = "-1"
+                RepliedToMsg = "-1",
+                CreatedAt = DateTime.UtcNow
             };
+
+            string path = webHostEnvironment.WebRootPath + @"/SharedFiles/";
 
             if (file.ContentType.StartsWith("image"))
             {
                 messageModel.MessageType = MessageType.Image;
-                messageModel.Message = CreateUniqueFile(file,"Images");
+                messageModel.Message = FileManagement.CreateUniqueFile(path + "Images", file);
             }
             else if (file.ContentType.StartsWith("video"))
             {
                 messageModel.MessageType = MessageType.Video;
-                messageModel.Message = CreateUniqueFile(file, "Videos");
+                messageModel.Message = FileManagement.CreateUniqueFile(path + "Videos", file);
             }
             else if (file.ContentType.StartsWith("audio"))
             {
                 messageModel.MessageType = MessageType.Audio;
-                messageModel.Message = CreateUniqueFile(file, "Audios");
+                messageModel.Message = FileManagement.CreateUniqueFile(path + "Audios", file);
             }
             else
             {
@@ -184,6 +187,8 @@ namespace ChatApp.Controllers
             return Ok(new { messages= "message read"});
         }
 
+       
+
         #endregion
 
         #region helpermethods
@@ -200,20 +205,7 @@ namespace ChatApp.Controllers
         string? FetchMessageFromId(int id)
         {
             return this.chatService.FetchMessageFromId(id);
-        }
-
-        //copies all data into newly created unique file and returns the name of it
-        string CreateUniqueFile(IFormFile file, string folderName)
-        {
-            string path = webHostEnvironment.WebRootPath + @"/SharedFiles/" + folderName;
-            string newFileName = Guid.NewGuid().ToString();
-            string extension = Path.GetExtension(file.FileName);
-            using (FileStream fileStream = new FileStream(Path.Combine(path, newFileName + extension), FileMode.Create))
-            {
-                file.CopyTo(fileStream);
-            }
-            return newFileName + extension;
-        }
+        }        
 
         MessageModel ConvertToMessageModel(MessageEntity messageEntity)
         {

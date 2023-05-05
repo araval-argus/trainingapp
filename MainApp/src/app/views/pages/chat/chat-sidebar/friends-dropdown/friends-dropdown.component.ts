@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
+import { UserModel } from 'src/app/core/models/UserModel';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { environment } from 'src/environments/environment';
@@ -13,7 +13,7 @@ export class FriendsDropdownComponent implements OnInit, OnDestroy {
 
   timeOutId;
   apiUrl: string = environment.apiUrl;
-  friendsProfiles: FriendProfileModel[];
+  friendsProfiles: UserModel[];
 
   constructor(private chatService: ChatService,
     private authService: AuthService) { }
@@ -32,7 +32,7 @@ export class FriendsDropdownComponent implements OnInit, OnDestroy {
     this.timeOutId = setTimeout( () => {
       this.chatService.fetchFriendsName(searchTerm).subscribe( (data: any) => {
             //console.log(data)
-            this.friendsProfiles = data.message as FriendProfileModel[]
+            this.friendsProfiles = data.message as UserModel[]
             for(let friend of this.friendsProfiles){
               friend.imageUrl = this.apiUrl + "/../Images/Users/" + friend.imageUrl
             }
@@ -45,11 +45,11 @@ export class FriendsDropdownComponent implements OnInit, OnDestroy {
 
   }
 
-  friendSelected(friend :FriendProfileModel){
-    this.chatService.friendSelected.emit(friend);
+  friendSelected(friend :UserModel){
+    this.chatService.friendSelected.next(friend);
     //console.log("inside dropdown component :- ", friend)
     this.chatService.fetchMessages(this.authService.getLoggedInUserInfo().sub, friend.userName).subscribe((data)=>{
-      this.chatService.messagesRecieved.emit(data);
+      this.chatService.messagesRecieved.next(data);
     });
     this.emptyList();
   }

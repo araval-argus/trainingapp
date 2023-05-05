@@ -1,6 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
-import { ChatService } from 'src/app/core/service/chat-service';
+import { UserModel } from 'src/app/core/models/UserModel';
 
 @Component({
   selector: 'app-chat-content-header',
@@ -9,9 +8,9 @@ import { ChatService } from 'src/app/core/service/chat-service';
 })
 export class ChatContentHeaderComponent implements OnInit {
 
-  @Input() selectedFriend: FriendProfileModel;
+  @Input() selectedFriend: UserModel;
 
-  constructor(private chatService: ChatService) {   }
+  constructor() {   }
 
   ngOnInit(): void {}
 

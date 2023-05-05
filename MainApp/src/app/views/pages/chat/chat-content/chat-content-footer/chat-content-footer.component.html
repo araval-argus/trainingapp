@@ -22,12 +22,12 @@
   <emoji-mart class="d-none" (emojiClick)="addEmoji($event)"></emoji-mart>
 
   <!--reply message-->
-  <div class="reply-message-box mx-2 p-3 d-flex flex-grow bd-highlight" *ngIf="messageToBeReplied">
-    <div class="flex-grow-1">
+  <div class="reply-message-box mx-2 p-3 d-flex flex-grow bd-highlight"  *ngIf="messageToBeReplied">
+    <div class="flex-grow-1" style="cursor: pointer; overflow-wrap: anywhere">
       Reply to this message: <b>{{messageToBeReplied.message}}</b>
     </div>
     <div class="">
-      <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
+      <i class="pi pi-times" style="cursor: pointer" (click)="cancelReply()"></i>
     </div>
   </div>
 

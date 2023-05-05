@@ -13,7 +13,7 @@ namespace ChatApp.Context.EntityClasses
 
         public int RecieverID { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; }
 
         public bool IsSeen { get; set; } = false;
 

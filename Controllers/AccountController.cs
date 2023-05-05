@@ -30,13 +30,18 @@ namespace ChatApp.Controllers
         private readonly IProfileService _profileService;
         private Validations _validations;
         private IWebHostEnvironment _webHostEnvironment;
+        private IChatService chatService;
 
-        public AccountController(IConfiguration config, IProfileService profileService, IWebHostEnvironment webHostEnvironment)
+        public AccountController(IConfiguration config,
+            IProfileService profileService,
+            IWebHostEnvironment webHostEnvironment,
+            IChatService chatService)
         {
             _config = config;
             _profileService = profileService;
             _validations = new Validations();
             _webHostEnvironment = webHostEnvironment;
+            this.chatService = chatService;
         }
 
         [HttpPost("Login")]
@@ -77,9 +82,9 @@ namespace ChatApp.Controllers
         public IActionResult UpdateUserDetails([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
 
-            var usernameFromToken = GetUsernameFromToken(Authorization);
+            var usernameFromToken = CustomAuthorization.GetUsernameFromToken(Authorization);
 
-            var user = _profileService.FetchProfile(usernameFromToken);
+            var user = _profileService.FetchProfileFromUserName(usernameFromToken);
             if (user != null)
             {
                 if (updateModel.ImageFile != null)
@@ -134,9 +139,47 @@ namespace ChatApp.Controllers
             return BadRequest(new { message = "password incorrect" });
         }
 
+        [HttpGet("FetchAllUsers")]
+        [Authorize]
+        public IActionResult FetchAllUsers([FromQuery] string UserName)
+        {
+            if (string.IsNullOrEmpty(UserName))
+            {
+                return BadRequest("enter username");
+            }
+            var users = this._profileService.FetchAllUsers(UserName);
+            return Ok(users);
+        }
+
+        [HttpGet("FetchUser")]
+        [Authorize]
+        public IActionResult FetchUser([FromQuery] string UserName, [FromHeader] string Authorization)
+        {
+            if(string.IsNullOrEmpty(UserName))
+            {
+                return BadRequest("Invalid Username");
+            }
+            var user = this._profileService.FetchProfileFromUserName(UserName);
+            var userModel = EntityToModel.ConvertToUserModel(user);
+
+            string senderUserName = CustomAuthorization.GetUsernameFromToken(Authorization);
+            var sender = this._profileService.FetchProfileFromUserName(senderUserName);
+
+            var messages = this.chatService.FetchMessages(sender.Id, user.Id);
+
+            if(messages.Count() >= 0)
+            {
+                var lastMessage = messages.ToList()[messages.Count() - 1];
+                userModel.LastMessage = lastMessage.Message;
+                userModel.LastMessageTimeStamp = lastMessage.CreatedAt;
+            }
+           
+            return Ok(userModel);
+        }
+
         #region HelperMethods
 
-        private string GenerateJSONWebToken(Profile profileInfo)
+        string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
@@ -160,14 +203,7 @@ namespace ChatApp.Controllers
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        string GetUsernameFromToken(string token)
-        {
-            string newToken = token.Split(" ")[1];
-            var handler = new JwtSecurityTokenHandler();
-            var jsonToken = handler.ReadJwtToken(newToken);
-            return jsonToken.Claims.First(claim => claim.Type == "sub").Value;
-        }
-
+        //stores the image and returns the name of that file
         string createUniqueImgFile(IFormFile imageFile)
         {
 

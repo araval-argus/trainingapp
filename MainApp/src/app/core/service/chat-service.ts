@@ -1,9 +1,10 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
-import { EventEmitter, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import { environment } from "src/environments/environment";
-import { FriendProfileModel } from "../models/friend-profile-model";
+import { UserModel } from "../models/UserModel";
 import { AuthService } from "./auth-service";
 import { MessageModel } from "../models/message-model";
+import { Subject } from 'rxjs';
 
 @Injectable({
   providedIn: "root",
@@ -12,9 +13,9 @@ export class ChatService {
 
   constructor(private http : HttpClient, private authService : AuthService){}
 
-  friendSelected = new EventEmitter<FriendProfileModel>();
-  messagesRecieved = new EventEmitter<MessageModel[]>();
-  messageSent = new EventEmitter<MessageModel>();
+  friendSelected = new Subject<UserModel>();
+  messagesRecieved = new Subject<MessageModel[]>();
+  messageSent = new Subject<MessageModel>();
 
   fetchFriendsName(searchTerm: string) {
     return this.http.get(environment.apiUrl + "/chat/fetchFriends",{
@@ -46,5 +47,11 @@ export class ChatService {
 
   sendFile(formData: FormData){
     return this.http.post(environment.apiUrl + "/chat/addFile", formData);
+  }
+
+  fetchUser(userName: string){
+    return this.http.get(environment.apiUrl + "/account/FetchUser", {
+      params: new HttpParams().append("userName", userName)
+    });
   }
 }

@@ -15,7 +15,7 @@ namespace ChatApp.Business.ServiceInterfaces
 
         Profile RegisterUser(RegisterModel regModel);
 
-        Profile FetchProfile(string UserName);
+        Profile FetchProfileFromUserName(string UserName);
 
         Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false);
 
@@ -24,7 +24,7 @@ namespace ChatApp.Business.ServiceInterfaces
         int FetchIdFromUserName(string userName);
         string FetchUserNameFromId(int id);
 
-        IEnumerable<FriendProfileModel> FetchAllUsers(int id);
+        IEnumerable<UserModel> FetchAllUsers(int id);
 
         IEnumerable<DesignationEntity> FetchAllDesignations();
 
@@ -35,5 +35,7 @@ namespace ChatApp.Business.ServiceInterfaces
         void DeleteProfile(Profile profile);
 
         void UpdateEmployeeProfile(Profile employee);
+
+        IEnumerable<UserModel> FetchAllUsers(string userName);
     }
 }

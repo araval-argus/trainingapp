@@ -20,11 +20,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context = context;
         }
 
-        public IEnumerable<FriendProfileModel> FetchFriendsProfiles(string searchTerm)
+        public IEnumerable<UserModel> FetchFriendsProfiles(string searchTerm)
         {
             return context.Profiles.Include("Designation")
-                .Where(profile => profile.FirstName.ToLower().StartsWith(searchTerm))
-                .Select(profile => new FriendProfileModel()
+                .Where(profile => profile.IsActive && profile.FirstName.ToLower().StartsWith(searchTerm))
+                .Select(profile => new UserModel()
                 {
                     FirstName = profile.FirstName,
                     LastName = profile.LastName,
@@ -43,8 +43,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 SenderID = FetchProfileIdFromUserName(messageModel.SenderUserName),
                 RecieverID = FetchProfileIdFromUserName(messageModel.RecieverUserName),
                 MessageType = messageModel.MessageType,
-                RepliedToMsg = Convert.ToInt32(messageModel.RepliedToMsg)
+                RepliedToMsg = Convert.ToInt32(messageModel.RepliedToMsg),
+                CreatedAt = messageModel.CreatedAt
             };
+
             this.context.Messages.Add(messageEntity);
             this.context.SaveChanges();
 
@@ -80,7 +82,18 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         int FetchProfileIdFromUserName(string userName)
         {
             return this.context.Profiles.FirstOrDefault(
-               profile => profile.UserName.Equals(userName)).Id;
+               profile => profile.IsActive && profile.UserName.Equals(userName)).Id;
+        }
+
+        public void MarkMsgAsSeen(int messageId)
+        {
+            var message = this.context.Messages.FirstOrDefault(message => message.Id == messageId);
+            if(message != null)
+            {
+                message.IsSeen = true;
+                this.context.Messages.Update(message);
+                this.context.SaveChanges();
+            }
         }
     }
 }

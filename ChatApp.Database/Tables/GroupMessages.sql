@@ -1,0 +1,10 @@
+﻿CREATE TABLE [dbo].[GroupMessages]
+(
+	[Id] INT IDENTITY(1,1) PRIMARY KEY, 
+    [Message] NVARCHAR(MAX) NOT NULL, 
+    [MessageType] INT NOT NULL DEFAULT 1, 
+    [SenderID] INT NOT NULL, 
+    [GroupID] INT NOT NULL, 
+    [CreatedAt] DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, 
+    [RepliedToMsg] INT NOT NULL DEFAULT -1
+)

@@ -1,5 +1,5 @@
 import { Component,  Input, OnInit } from '@angular/core';
-import { FriendProfileModel } from 'src/app/core/models/friend-profile-model';
+import { UserModel } from 'src/app/core/models/UserModel';
 import { MessageModel } from 'src/app/core/models/message-model';
 
 
@@ -10,7 +10,7 @@ import { MessageModel } from 'src/app/core/models/message-model';
 })
 export class ChatContentComponent implements OnInit {
 
-  @Input() selectedFriend: FriendProfileModel;
+  @Input() selectedFriend: UserModel;
   @Input() messageToBeReplied: MessageModel;
 
   constructor() { }

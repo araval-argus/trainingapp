@@ -1,8 +1,12 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
+using ChatApp.Context.EntityClasses;
+using ChatApp.Hubs;
+using ChatApp.Infrastructure.ServiceImplementation;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -16,9 +20,17 @@ namespace ChatApp.Controllers
     {
 
         private readonly IProfileService profileService;
-        public AdminController(IProfileService profileService)
+        private readonly IHubContext<ChatHub> hubContext;
+        private readonly IOnlineUserService onlineUserService;
+
+        public AdminController(IProfileService profileService,
+            IHubContext<ChatHub> hubContext,
+            IOnlineUserService onlineUserService
+            )
         {
             this.profileService = profileService;
+            this.hubContext = hubContext;
+            this.onlineUserService = onlineUserService;
         }
 
         [HttpGet("FetchAllEmployees")]
@@ -38,14 +50,20 @@ namespace ChatApp.Controllers
         }
 
 
-        //Doubt :- how to fetch a single string from body without creating model
+        
         [HttpPatch("DeleteEmployee")]
         [Authorize(Policy = "Admin")]
         public IActionResult DeleteEmployees([FromBody] TempModel temp)
         {
-            var employee = this.profileService.FetchProfile(temp.UserName);
+            var employee = this.profileService.FetchProfileFromUserName(temp.UserName);
             if(employee != null )
             {
+                OnlineUserEntity onlineUpdatedUser = this.onlineUserService.FetchOnlineUser(temp.UserName);
+                if (onlineUpdatedUser != null)
+                {
+                    this.hubContext.Clients.Client(onlineUpdatedUser.ConnectionId).SendAsync("ProfileDeleted");
+                }
+
                 this.profileService.DeleteProfile(employee);
                 return Ok(employee);
             }
@@ -55,9 +73,9 @@ namespace ChatApp.Controllers
 
         [HttpPatch("UpdateEmployeeData")]
         [Authorize(Policy ="Admin")]
-        public IActionResult UpdateEmployeeData([FromBody] FriendProfileModel employee)
+        public IActionResult UpdateEmployeeData([FromBody] UserModel employee, [FromQuery] string EmployeeOldUsername)
         {
-            var profileFromDb = this.profileService.FetchProfile(employee.UserName);
+            var profileFromDb = this.profileService.FetchProfileFromUserName(EmployeeOldUsername);
             if(profileFromDb != null )
             {
                 profileFromDb.FirstName = employee.FirstName;
@@ -67,9 +85,15 @@ namespace ChatApp.Controllers
                 profileFromDb.DesignationID = employee.Designation.Id;
 
                 this.profileService.UpdateEmployeeProfile(profileFromDb);
+
+                OnlineUserEntity onlineUpdatedUser = this.onlineUserService.FetchOnlineUser(EmployeeOldUsername);
+                if(onlineUpdatedUser != null)
+                {
+                    this.hubContext.Clients.Client(onlineUpdatedUser.ConnectionId).SendAsync("ProfileUpdated");
+                }
                 return Ok();
             }
-            return BadRequest("No user found");
+            return NotFound("No user found");
         }
     }
 }

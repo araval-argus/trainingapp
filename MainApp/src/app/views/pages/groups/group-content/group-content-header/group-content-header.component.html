@@ -1,0 +1,169 @@
+<div class="chat-header border-bottom pb-2">
+  <div class="d-flex justify-content-between">
+    <div class="d-flex align-items-center">
+      <!-- this icon is for mobile or tablet view-->
+      <i (click)="false" class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
+
+      <figure class="mb-0 mr-2">
+        <img [src]="selectedGroup.groupIconUrl" class="img-sm rounded-circle" alt="image">
+      </figure>
+      <div>
+        <p>{{selectedGroup.name}} </p>
+      </div>
+    </div>
+    <div class="d-flex align-items-center mr-n1">
+      <div class="dropdown" ngbDropdown>
+        <button class="btn p-0 no-dropdown-toggle-icon" type="button" id="dropdownMenuButton" ngbDropdownToggle>
+          <i class="feather icon-more-vertical icon-md text-muted pb-3px" ngbTooltip="Options"></i>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
+          <a class="dropdown-item d-flex align-items-center" (click)="openBasicModal(groupDetailsModal)"><i
+              class="feather icon-eye icon-xs mr-2"></i> <span class="">Group Details</span></a>
+          <a *ngIf="selectedGroup.loggedInUserIsAdmin" class="dropdown-item d-flex align-items-center" (click)="openBasicModal(editGroupModal)"><i
+              class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Group Details</span></a>
+          <a *ngIf="selectedGroup.loggedInUserIsAdmin" class="dropdown-item d-flex align-items-center" (click)="openScrollableModal(addMembersModal)"><i
+              class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add Members</span></a>
+          <a class="dropdown-item d-flex align-items-center" (click)="leaveGroup(loggedInUser.sub)"><i
+              class="mdi mdi-exit-to-app icon-xs mr-2" style="transform: scaleX(-1);"></i> <span class="">Leave Group</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Group Details modal -->
+<ng-template #groupDetailsModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Group Info.</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="d-flex flex-column justify-content-center">
+      <div class="text-center">
+        <img [src]="selectedGroup.groupIconUrl" style="max-height:200px" class="mx-auto mb-2" alt=""><br>
+        {{ selectedGroup.name }}
+      </div>
+      <div class="border-top mb-4 mt-1 border-bottom ">
+        <p class="text-muted text-center" *ngIf="!selectedGroup.description ">
+          No Description
+        </p>
+        <p class="text-muted text-center" *ngIf="selectedGroup.description ">
+          {{selectedGroup.description}}
+        </p>
+      </div>
+      <h6>
+        Members
+      </h6>
+      <div class="ps" [perfectScrollbar] style="max-height: 200px; border: 1px solid rgb(243, 243, 243)">
+        <div class="d-flex flex-row align-items-center  border-bottom mb-1 p-1" *ngFor="let member of joinedUsers">
+          <div class="ml-3  flex-grow-1">
+            <img [src]="member.imageUrl" alt="" class="img-sm rounded-circle mr-1">
+            {{ member.firstName }} {{ member.lastName }}
+          </div>
+
+          <div *ngIf="selectedGroup.loggedInUserIsAdmin">
+            <div class="mr-4" *ngIf="!member.isAdmin">
+              <button type="button"  class="btn btn-outline-info btn-icon btn-sm mr-1"
+                (click)="makeAdmin(member)"
+                *ngIf="member.userName !== loggedInUser.sub"
+                ngbTooltip="Make Admin">
+                <i class="feather icon-award"></i>
+              </button>
+              <button type="button"  class="btn btn-outline-danger btn-icon btn-sm"
+                (click)="removeMember(member)"
+                *ngIf="member.userName !== loggedInUser.sub"
+                ngbTooltip="Remove Member">
+                <i class="feather icon-x-circle"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- <div class="mr-4" *ngIf="member.isAdmin"> -->
+            <div class="text-success mr-4" *ngIf="member.userName === loggedInUser.sub">
+              <h5>You</h5>
+            </div>
+            <div class="text-success mr-4" *ngIf="member.userName !== loggedInUser.sub && member.isAdmin">
+              <h5>Admin</h5>
+            </div>
+          <!-- </div> -->
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+  </div>
+</ng-template>
+
+<!-- Edit group modal-->
+<ng-template #editGroupModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Edit Group Details</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <form #formVar="ngForm" (ngSubmit)="updateGroup()">
+
+  <div class="modal-body">
+    <div class="d-flex flex-column justify-content-center">
+      <img [src]="editGroupModel.groupIconUrl" style="max-height:300px; max-width:400px" class="mx-auto" alt="" ><br>
+      <div class="text-center"><button type="button" class="btn btn-outline-info rounded-circle p-1" (click)="fileInput.click()"><i class="feather icon-upload icon-md"></i></button>
+      </div>
+      <input type="file" hidden (input)="iconChanged($event)" id="fileInput" #fileInput name="fileInput" accept="Image/*" >
+      <div class="form-group">
+        <label for="groupNameInput">Name</label>
+        <input type="text" class="form-control" #groupNameInput="ngModel" [(ngModel)]="editGroupModel.name" name="groupNameInput" required>
+        <span class="text-danger" *ngIf="groupNameInput.touched && groupNameInput.invalid">*Required Field</span>
+      </div>
+      <div class="form-group">
+        <label for="groupNameInput">Description</label>
+        <input type="text" class="form-control" #groupDescriptionInput="ngModel" [(ngModel)]="editGroupModel.description" name="groupDescriptionInput">
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    <button type="submit" class="btn btn-primary" (click)="modal.close()" [disabled]="formVar.invalid">Save Changes</button>
+  </div>
+
+</form>
+</ng-template>
+
+
+<!-- Modal to add members -->
+<ng-template #addMembersModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Add Members</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <ul>
+      <li *ngFor="let user of notJoinedUsers" class="mb-1 mb-2" type="none">
+        <div class="d-flex">
+          <div>
+            <img [src]="user.imageUrl" class="img-sm rounded-circle" />
+          </div>
+          <div class="border-bottom d-flex flex-grow-1">
+            <div class="flex-grow-1">
+              <p class="">{{ user.firstName }} {{ user.lastName }}</p>
+              <p class="text-muted">@{{ user.userName }}</p>
+            </div>
+            <div class="text-center" style="cursor: pointer" ngbTooltip="Add this Member">
+              <button class="btn btn-primary m-1" (click)="addMember(user)">
+                <i class="feather icon-plus-circle icon-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </li>
+    </ul>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+  </div>
+</ng-template>

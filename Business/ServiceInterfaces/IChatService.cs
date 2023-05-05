@@ -6,7 +6,7 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IChatService
     {
-        IEnumerable<FriendProfileModel> FetchFriendsProfiles(string searchTerm);
+        IEnumerable<UserModel> FetchFriendsProfiles(string searchTerm);
 
         MessageEntity AddMessage(MessageModel messageModel);
 
@@ -15,5 +15,7 @@ namespace ChatApp.Business.ServiceInterfaces
         string FetchMessageFromId(int id);
 
         void MarkMsgsAsSeen(IEnumerable<MessageEntity> messages);
+
+        void MarkMsgAsSeen(int messageId);
     }
 }

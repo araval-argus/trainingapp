@@ -63,12 +63,21 @@ namespace ChatApp
             {
                 options.AddPolicy("Employee", policy =>
                 {
-                    policy.RequireClaim(ClaimsConstant.DesignationClaim, "Chief Technical Officer", "Programmer Analyst",
-                        "Solution Analyst", "Lead Solution Analyst", "Quality Analyst");
+                    string[] employees = new string[]
+                    {
+                        "Programmer Analyst",
+                        "Solution Analyst",
+                        "Lead Solution Analyst", 
+                        "Group Lead",
+                        "Group Director",
+                        "Chief Technical Officer",
+                        "Chief Executive Officer"
+                    };
+                    policy.RequireClaim(ClaimsConstant.DesignationClaim, employees);
                 });
                 options.AddPolicy("Admin", policy =>
                 {
-                    policy.RequireClaim(ClaimsConstant.DesignationClaim, "Chief Technical Officer");
+                    policy.RequireClaim(ClaimsConstant.DesignationClaim, "Chief Technical Officer", "Chief Executive Officer");
                 });
             });
 
@@ -112,6 +121,10 @@ namespace ChatApp
             services.AddScoped<IDesignationService, DesignationService>();
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IOnlineUserService, OnlineUserService>();
+            services.AddScoped<IGroupService, GroupService>();
+            services.AddScoped<IGroupMemberService, GroupMemberService>();
+            services.AddScoped<IGroupMessageService, GroupMessageService>();
+            //services.AddScoped<IGroupService, GroupService>();
             services.AddSignalR();
 
             // In production, the Angular files will be served from this directory

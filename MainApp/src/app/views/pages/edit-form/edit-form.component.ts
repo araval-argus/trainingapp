@@ -6,6 +6,7 @@ import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { PasswordModel } from 'src/app/core/models/password-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
+import { SignalRService } from 'src/app/core/service/signalR-service';
 import Swal from 'sweetalert2'
 
 @Component({
@@ -34,7 +35,8 @@ export class EditFormComponent implements OnInit {
       private accountService: AccountService,
       private router: Router,
       private jwtHelper: JwtHelper,
-      private modalService: NgbModal
+      private modalService: NgbModal,
+      private signalRService: SignalRService
     ) {}
 
   ngOnInit(): void {
@@ -148,24 +150,25 @@ export class EditFormComponent implements OnInit {
 
   onPasswordChange(){
     this.accountService.changePassword(this.passwordModel).subscribe( data => {
-      console.log(data)
-      Swal.fire({
-        icon: 'success',
-        title: 'Password Changed',
-        text: 'You password has been changed successfully please login again',
-        timer: 2000,
-        timerProgressBar: true
-      })
-      setTimeout(() => {
-
-      }, 2000);
+      if(this.signalRService.connection){
+        this.signalRService.logout();
+      }
+      this.authService.logout(() => {
+        Swal.fire({
+          title: 'Password Changed',
+          text: 'Please Login Again With New Password',
+          icon: 'success',
+          timer: 2000,
+          timerProgressBar: true,
+        });
+        this.router.navigate(['/auth/login']);
+      });
     }, err => {
       console.log(err)
       Swal.fire({
         icon: 'error',
         title: 'Password Incorrect',
-        text: 'You have entered wrong current password',
-        footer: '<a href="">Why do I have this issue?</a>'
+        text: 'You have entered wrong current password'
       })
     });
   }

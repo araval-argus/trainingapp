@@ -17,11 +17,11 @@ namespace ChatApp.Context
         /// Gets or sets Answers.
         /// </summary>
         public virtual DbSet<Profile> Profiles { get; set; }
-
         public virtual DbSet<DesignationEntity> Designations { get; set; }
-
         public virtual DbSet<MessageEntity> Messages { get; set; }
         public virtual DbSet<OnlineUserEntity> OnlineUsers { get; set; }
-
+        public virtual DbSet<Group> Groups { get; set; }
+        public virtual DbSet<GroupMessage> GroupMessages { get; set; }
+        public virtual DbSet<GroupMember> GroupMembers { get; set; }
     }
 }

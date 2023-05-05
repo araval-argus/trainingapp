@@ -48,6 +48,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="wwwroot\GroupIcons\" />
     <Folder Include="wwwroot\SharedFiles\Images\" />
     <Folder Include="wwwroot\SharedFiles\Audios\" />
     <Folder Include="wwwroot\SharedFiles\Others\" />

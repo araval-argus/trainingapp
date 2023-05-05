@@ -1,0 +1,7 @@
+<div *ngIf="!selectedGroup" class="text-center">
+  <h3>Please Select a Group!</h3>
+</div>
+<div *ngIf="selectedGroup">
+  <app-group-content-header [selectedGroup]="selectedGroup"  [joinedUsers]="joinedUsers"></app-group-content-header>
+  <app-group-content-body [selectedGroup]="selectedGroup"  [joinedUsers]="joinedUsers"></app-group-content-body>
+</div>

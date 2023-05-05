@@ -1,7 +1,7 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from "@angular/core";
 import { environment } from 'src/environments/environment';
-import { FriendProfileModel } from '../models/friend-profile-model';
+import { UserModel } from '../models/UserModel';
 
 @Injectable({
   providedIn: "root"
@@ -20,8 +20,10 @@ export class AdminService{
     });
   }
 
-  updateEmployeeData(employee: FriendProfileModel){
-    return this.http.patch(environment.apiUrl + "/admin/UpdateEmployeeData", employee);
+  updateEmployeeData(employee: UserModel, userName: string){
+    return this.http.patch(environment.apiUrl + "/admin/UpdateEmployeeData", employee, {
+      params: new HttpParams().append("employeeOldUsername", userName)
+    });
   }
 
 }

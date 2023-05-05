@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
 import { DesignationModel } from 'src/app/core/models/designation-model';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
@@ -16,6 +17,8 @@ export class RegisterComponent implements OnInit {
   regModel: RegistrationModel;
   disableRegButtton: boolean = true;
   designations: DesignationModel[];
+  timeoutIdForUserName;
+  userNameExists: boolean;
 
   constructor(private router: Router,
     private accountService: AccountService,
@@ -29,7 +32,7 @@ export class RegisterComponent implements OnInit {
       userName: '',
       email: '',
       password: '',
-      designationID: 2
+      designationID: 1
     }
 
     this.accountService.fetchDesignations().subscribe((data:any) => {
@@ -41,6 +44,16 @@ export class RegisterComponent implements OnInit {
   onRegister(e) {
     e.preventDefault();
     console.log("regModel inside onRegister method :- ",this.regModel);
+    if(this.userNameExists){
+      Swal.fire({
+        icon: 'error',
+        title: 'Username Already Exists',
+        text: 'This username already exists please enter different username',
+        timer: 1500,
+        timerProgressBar: true
+      })
+    }
+    else{
     this.accountService.register(this.regModel)
       .subscribe((data: any) => {
         this.signalRService.makeConnection();
@@ -66,8 +79,23 @@ export class RegisterComponent implements OnInit {
           icon: 'error',
         });
       });
-
+    }
   }
+
+  onUserNameChanged(event: Event){
+    this.userNameExists = false;
+    const value = (event.target as HTMLInputElement).value;
+    if(this.timeoutIdForUserName){
+      clearTimeout(this.timeoutIdForUserName);
+    }
+
+    setTimeout( () => {
+      this.accountService.checkUsername(value).subscribe( data => {
+        this.userNameExists = data.usernameExists;
+      })
+    },800)
+  }
+
 
 
 }

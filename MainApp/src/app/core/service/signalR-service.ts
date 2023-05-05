@@ -1,6 +1,9 @@
-import { EventEmitter, Injectable } from "@angular/core";
+import { Injectable } from "@angular/core";
 import * as signalR from "@microsoft/signalr";
+import { Subject } from 'rxjs';
 import { environment } from "src/environments/environment";
+import { GroupMemberModel } from '../models/group-member-model';
+import { GroupMessageModel } from '../models/group-message-model';
 import { MessageModel } from '../models/message-model';
 import { AuthService } from './auth-service';
 
@@ -8,9 +11,17 @@ import { AuthService } from './auth-service';
   providedIn: "root",
 })
 export class SignalRService {
+
   connection: signalR.HubConnection;
 
-  messageAdded: EventEmitter<MessageModel> = new EventEmitter<MessageModel>();
+  messageAdded: Subject<MessageModel> = new Subject<MessageModel>();
+  groupMessageAdded: Subject<GroupMessageModel> = new Subject<GroupMessageModel>();
+  memberRemoved: Subject<string> = new Subject<string>();
+  newGroupAdded: Subject<Number> = new Subject<Number>();
+  newMemberAdded: Subject<GroupMemberModel> = new Subject<GroupMemberModel>();
+  groupRemoved: Subject<string> = new Subject<string>();
+  profileUpdated: Subject<any> = new Subject<any>();
+  profileDeleted: Subject<any> = new Subject<any>();
 
   constructor(private authService: AuthService) {
     this.connection = new signalR.HubConnectionBuilder()
@@ -28,11 +39,33 @@ export class SignalRService {
           console.log("connected successfully");
           this.registerUser();
           this.connection.on("AddMessageToTheList", (message: MessageModel) => {
-            this.messageAdded.emit(message);
+            this.messageAdded.next(message);
           });
           this.connection.on("StopConnection", () => {
-            this.stopConnection()
+            this.stopConnection();
           });
+          this.connection.on("AddGroupMessageToTheList", (groupMessage: GroupMessageModel) => {
+            this.groupMessageAdded.next(groupMessage);
+          });
+          this.connection.on("NewGroupAdded", (groupId: Number) => {
+            this.newGroupAdded.next(groupId);
+          });
+          this.connection.on("RemoveGroup", (memberUserName: string) => {
+            this.groupRemoved.next(memberUserName);
+          });
+          this.connection.on("AddGroupMember", (newMember: GroupMemberModel) => {
+            this.newMemberAdded.next(newMember);
+          });
+          this.connection.on("MemberRemoved", (memberUserName: string) => {
+            console.log("member removed")
+            this.memberRemoved.next(memberUserName);
+          });
+          this.connection.on("ProfileUpdated", () => {
+            this.profileUpdated.next();
+          })
+          this.connection.on("ProfileDeleted", () => {
+            this.profileDeleted.next();
+          })
         },
         (err) => {
           console.log(err.message);
@@ -53,11 +86,12 @@ export class SignalRService {
     this.connection.send("AddMessage", messageModel);
   }
 
+  markMsgAsSeen(messageModel: MessageModel){
+    this.connection.send("MarkMessageAsSeen", messageModel);
+  }
+
   logout() {
-    console.log("logout method");
     if (this.connection.state === "Connected") {
-      console.log("is in connected");
-      console.log(this.authService.getLoggedInUserInfo());
       this.connection.send(
         "LogoutUser",
         this.authService.getLoggedInUserInfo().sub
@@ -67,9 +101,14 @@ export class SignalRService {
 
   stopConnection(){
     this.connection.stop().then( () => {
-      console.log("connection stopped")
+      console.log("connection stopped");
     }).catch( (err) => {
-      console.log(err)
+      console.log(err);
     })
   }
+
+  sendGroupMessage(groupMessageModel: GroupMessageModel) {
+    this.connection.send("AddGroupMessage", groupMessageModel);
+  }
+
 }

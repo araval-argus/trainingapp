@@ -2,7 +2,7 @@
   <h3>Select a friend to chat</h3>
 </div>
 
-<div *ngIf="selectedFriend" class="chat-content">
+<div *ngIf="selectedFriend">
 
   <!-- contains basic information of selected user for chatting -->
   <app-chat-content-header [selectedFriend]="selectedFriend"></app-chat-content-header>

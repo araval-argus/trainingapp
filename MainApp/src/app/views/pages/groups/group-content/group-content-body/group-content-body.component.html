@@ -1,0 +1,172 @@
+<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 49; position: 'relative'; min-height: calc(105vh - 385px);">
+  <ul class="messages">
+    <!-- message of sender -->
+    <div *ngFor="let message of messages">
+      <div *ngIf="message.senderUserName === loggedInUser.sub">
+        <li class="message-item me">
+          <img [src]="loggedInUser.imageUrl" class="img-xs rounded-circle" alt="avatar">
+          <div class="content">
+            <div class="message">
+              <div class="bubble">
+
+                <p class="text-muted" *ngIf="message.repliedToMsg">
+                  {{message.repliedToMsg}}<br>
+                </p>
+
+                <p class="d-flex justify-content-end" *ngIf="message.messageType == 1 ">
+                  {{message.message}}
+                </p>
+
+                <div *ngIf="message.messageType == 2">
+                  <audio controls>
+                    <source [src]="message.message">
+                  </audio>
+                </div>
+
+                <div *ngIf="message.messageType == 3">
+                  <img [src]="message.message" alt="image not found" height="320px" width="480px">
+                </div>
+
+                <div *ngIf="message.messageType == 4">
+                  <video height="320" width="480" controls>
+                    <source [src]="message.message" type="video/mp4">
+                    your browser doesnot support videos
+                  </video>
+                </div>
+              </div>
+              <span *ngIf=" today - message.createdAt.getDate() === 0 ">{{message.createdAt | date : "shortTime"}}</span>
+              <span *ngIf=" today - message.createdAt.getDate() === 1 ">Yesterday</span>
+              <span *ngIf=" today - message.createdAt.getDate() !== 0 && today - message.createdAt.getDate() !== 1">{{message.createdAt | date : "mediumDate"}}</span>
+            </div>
+          </div>
+        </li>
+      </div>
+
+      <!-- message of reciever -->
+      <div *ngIf="message.senderUserName !== loggedInUser.sub">
+        <li class="message-item friend">
+          <img [src]="message.senderImage" class="img-xs rounded-circle" alt="avatar">
+          <div class="content">
+            <div class="message">
+              <div class="bubble">
+
+                <p class="text-muted" *ngIf="message.repliedToMsg">
+                  {{message.repliedToMsg}}<br>
+                </p>
+
+                <p *ngIf="message.messageType == 1 ">
+                  {{message.message}}
+                </p>
+
+                <div *ngIf="message.messageType == 2">
+                  <audio controls>
+                    <source [src]="message.message">
+                  </audio>
+                </div>
+
+                <div *ngIf="message.messageType == 3">
+                  <img [src]="message.message" alt="image not found" height="320px" width="480px">
+                </div>
+
+                <div *ngIf="message.messageType == 4">
+                  <video height="320" width="480" controls>
+                    <source [src]="message.message">
+                    your browser doesnot support videos
+                  </video>
+                </div>
+              </div>
+              <span *ngIf=" today - message.createdAt.getDate() === 0 ">
+                {{message.createdAt | date : "shortTime"}}
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyTothisMessage(message)">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
+              <span *ngIf=" today - message.createdAt.getDate() === 1 ">
+                Yesterday
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyTothisMessage(message)">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
+              <span *ngIf=" today - message.createdAt.getDate() !== 0 && today - message.createdAt.getDate() !== 1">
+                {{message.createdAt | date : "mediumDate"}}
+                <button style=" background-color: rgba(255, 255, 255, 0); border: 0px solid rgba(0, 0, 0, 0)"
+                class="reply" (click)="replyTothisMessage(message)">
+                  <i class="pi pi-reply reply" style="font-size: 0.8rem;"></i>
+                </button>
+              </span>
+            </div>
+          </div>
+        </li>
+      </div>
+
+    </div>
+
+  </ul>
+
+</div>
+
+<ng-template #basicModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Selected File</h5>
+    <button type="button" class="close" (click)="modal.close('by: close icon')" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <p>{{fileInput.files[0].name}}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close('by: close button')">Close</button>
+    <button type="button" class="btn btn-primary" (click)="modal.close('by: save button'); sendFile()">Send</button>
+  </div>
+</ng-template>
+
+
+
+<div class="chat-footer d-flex mt-auto position-relative">
+
+  <!--emoji pallete-->
+  <emoji-mart class="d-none" (emojiClick)="addEmoji($event)"></emoji-mart>
+
+  <!--reply message-->
+  <div class="reply-message-box mx-2 p-3 d-flex flex-grow bd-highlight" *ngIf="messageToBeReplied">
+    <div class="flex-grow-1">
+      Reply to this message: <b>{{messageToBeReplied.message}}</b>
+    </div>
+    <div class="">
+      <i class="pi pi-times" style="cursor: pointer;" (click)="cancelReply()"></i>
+    </div>
+  </div>
+
+  <div>
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji" (click)="openEmojiMart()">
+      <i class="feather icon-sun text-muted"></i>
+    </button>
+  </div>
+  <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files"
+      (click)="fileInput.click() ">
+      <i class="feather icon-paperclip text-muted"></i>
+    </button>
+  </div>
+
+  <!-- <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">
+      <i class="feather icon-mic text-muted"></i>
+    </button>
+  </div> -->
+
+  <form class="search-form flex-grow" ngForm (ngSubmit)="sendMessage()">
+    <div class="input-group">
+      <input type="file" id="fileInput" #fileInput accept="image/*, audio/*, video/*" (change)="onFileSelected()"
+        hidden>
+      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput
+        required>
+      <button type="submit" class="btn btn-primary btn-icon rounded-circle">
+        <i class="feather icon-send"></i>
+      </button>
+    </div>
+  </form>
+</div>
