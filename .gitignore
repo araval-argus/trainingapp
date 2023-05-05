@@ -235,5 +235,8 @@ _Pvt_Extensions
 
 # profile pictures, group icons and shared media
 .wwwroot/Images/Users/*
-.wwwroot/SharedFiles/*
+.wwwroot/SharedFiles/Audios/*
+.wwwroot/SharedFiles/Images/*
+.wwwroot/SharedFiles/Videos/*
+.wwwroot/SharedFiles/Others/*
 .wwwroot/GroupIcons/*
