@@ -234,9 +234,9 @@ _Pvt_Extensions
 *.jfm
 
 # profile pictures, group icons and shared media
-.wwwroot/Images/Users/*
-.wwwroot/SharedFiles/Audios/*
-.wwwroot/SharedFiles/Images/*
-.wwwroot/SharedFiles/Videos/*
-.wwwroot/SharedFiles/Others/*
-.wwwroot/GroupIcons/*
+wwwroot/Images/Users/*
+wwwroot/SharedFiles/Audios/*
+wwwroot/SharedFiles/Images/*
+wwwroot/SharedFiles/Videos/*
+wwwroot/SharedFiles/Others/*
+wwwroot/GroupIcons/*
