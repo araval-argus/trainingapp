@@ -1,0 +1,123 @@
+
+<div class="card">
+
+    <p-table #dt [value]="employees" styleClass="p-datatable" [globalFilterFields]="['firstName','lastName','userName','status', 'email']">
+        <ng-template pTemplate="caption">
+            <div class="justify-content-between d-flex align-items-center">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="px-3">Employee List</h5>
+                    <button pButton pRipple type="button" label="Add New User" class="p-button-raised p-button-sm" icon="pi pi-plus" (click)="addNewUser(addUserModal)" *ngIf="isAdmin"></button>
+                </div>
+                <span class="p-input-icon-left">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="dt.filterGlobal($event.target.value, 'contains')" placeholder="Search..." />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th width="10%">
+                    Profile
+                </th>
+                <th pSortableColumn="firstName">First Name <p-sortIcon field="firstName"></p-sortIcon></th>
+                <th pSortableColumn="lastName" >Last Name <p-sortIcon field="lastName"></p-sortIcon></th>
+                <th pSortableColumn="userName">UserName <p-sortIcon field="userName"></p-sortIcon></th>
+                <th>Email</th>
+                <th >
+                    <div class="justify-content-between d-flex align-items-center">
+                        <span class="px-2">Profile Type</span>
+                        <p-columnFilter field="profileType" matchMode="equals" [showMenu]="false">
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-dropdown [ngModel]="value" [options]="profileTypes" (onChange)="filter($event.value)"
+                                    placeholder="Any" [showClear]="true">
+                                    <ng-template let-option pTemplate="item">
+                                        <span [class]="'customer-badge status-' + option.value">{{option.label}}</span>
+                                    </ng-template>
+                                </p-dropdown>
+                            </ng-template>
+                        </p-columnFilter>
+    
+                    </div>
+                </th>
+                <th>
+                    <div class="justify-content-between d-flex align-items-center">
+                        <span>Status</span> 
+                        <p-columnFilter field="status" matchMode="equals" [showMenu]="false" >
+                            <ng-template pTemplate="filter" let-value let-filter="filterCallback">
+                                <p-dropdown [ngModel]="value" [options]="statuses" (onChange)="filter($event.value)"
+                                    placeholder="Any" [showClear]="true">
+                                    <ng-template let-option pTemplate="item">
+                                        <span>{{option.label}}</span>
+                                    </ng-template>
+                                </p-dropdown>
+                            </ng-template>
+                        </p-columnFilter>
+    
+                    </div>
+    
+                </th>
+                <th width="5%" ></th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-employee>
+            <tr>
+                <td>
+                    <img [alt]="employee.userName" [src]="fetchImage(employee.imagePath)"style="vertical-align: middle" class="rounded-circle p-shadow-4 img-thumbnail"/>
+                </td>
+                <td>{{ employee.firstName }}</td>
+                <td>{{ employee.lastName }}</td>
+                <td>{{ employee.userName }}</td>
+                <td>{{ employee.email }}</td>
+                <td *ngIf="!isAdmin || employee.profileType == 1 || employee.profileType == 2 || employee.profileType == 3">{{ profileTypeName[employee.profileType - 1 ] }}</td>
+                <td *ngIf="isAdmin && employee.profileType != 1 && employee.profileType != 2 && employee.profileType != 3">
+                  <p-dropdown [ngModel]="availableProfileType[employee.profileType - 4]" [options]="availableProfileType" (onChange)="roleChanged($event.value, employee)">
+                  </p-dropdown>
+                </td>
+                <td>{{ statusCode[employee.status - 1] }}</td>
+                <td *ngIf="isAdmin && employee.profileType != 1 && employee.profileType != 2 && employee.profileType != 3">
+                  <button pButton pRipple type="button" icon="pi pi-times" class="p-button-rounded p-button-danger p-button-text" (click)="deleteEmployee(employee)"></button>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
+<p-confirmDialog header="Confirmation" icon="pi pi-exclamation-triangle"></p-confirmDialog>
+
+<!-- Modal For Add Group -->
+<ng-template #addUserModal let-modal let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" id="exampleModalLabel">Add User</h5>
+      <i class="feather icon-x-circle icon-lg cursor-pointer" (click)="d(); resetForm();" ></i>
+    </div>
+    <div class="modal-body">
+      <!-- All the details go here -->
+  
+      <form #regForm="ngForm" (ngSubmit)="onRegister($event)">
+        <div class="form-group">
+          <label for="exampleInputFirstName">First Name</label>
+          <input type="text" class="form-control" id="exampleInputFirstName" placeholder="First Name" [(ngModel)]="regModel.firstName" name="firstName" required >
+        </div>
+        <div class="form-group">
+          <label for="exampleInputLastName">Last Name</label>
+          <input type="text" class="form-control" id="exampleInputLastName" placeholder="Last Name" [(ngModel)]="regModel.lastName" name="lastName" required>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputUsername1">Username</label>
+          <input type="text" class="form-control" id="exampleInputUsername1" autocomplete="Username" placeholder="Username" [(ngModel)]="regModel.userName" name="userName" required>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Email address</label>
+          <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" [(ngModel)]="regModel.email" name="email" required email>
+        </div>
+        <div class="form-group">
+          <label for="exampleInputEmail1">Select Your Role</label>
+          <ng-select [items]="availableProfileType" bindLabel="name" bindValue="id" [searchable]="false" name="type" [(ngModel)]="regModel.type">
+          </ng-select>
+        </div>
+        <div class="mt-3">
+          <button type="submit" class="btn btn-primary mr-2 mb-2 mb-md-0" [disabled]="disableRegButtton || regForm.invalid">Sign up</button>
+        </div>
+      </form>
+    </div>
+  </ng-template>
+  

@@ -9,13 +9,21 @@ namespace ChatApp.Business.Helpers
     {
         public const string FirstNameClaim = "firstName";
         public const string LastNameClaim = "lastName";
+        public const string DesingnationClaim = "desingnation";
 
     }
     public enum ProfileType
     {
-        User = 1,
-        Administrator = 2
+        Admin,
+        CEO,
+        CTO,
+        GroupLead,
+        SolutionAnalyst,
+        ProgramAnalyst,
+        Probationer,
+        Intern,
+        User,
     }
 
-    
+
 }

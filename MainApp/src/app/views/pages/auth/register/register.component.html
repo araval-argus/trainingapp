@@ -32,9 +32,19 @@
                 <input type="email" class="form-control" id="exampleInputEmail1" placeholder="Email" [(ngModel)]="regModel.email" name="email" required email>
               </div>
               <div class="form-group">
+                <label for="exampleInputEmail1">Select Your Role</label>
+                <ng-select [items]="typeList"
+                bindLabel="name"
+                bindValue="id"
+                [searchable]="false"
+                name="type"
+                [(ngModel)]="regModel.type">
+                </ng-select>
+              </div>
+              <div class="form-group">
                 <label for="exampleInputPassword1">Password</label>
-                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="regModel.password" name="password" required pattern="(?=^.{8,}$)((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" #pwd="ngModel">
-                <span *ngIf="pwd.invalid && pwd.touched" class="error">
+                <input type="password" class="form-control" id="exampleInputPassword1" autocomplete="current-password" placeholder="Password" [(ngModel)]="regModel.password" name="password" required pattern="(?=^.{8,}$)((?=.*\d)(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$" #pwd="ngModel">
+                <span *ngIf="pwd.invalid && pwd.touched" class="error text-red text-muted">
                   *UpperCase, LowerCase, Number/SpecialChar and min 8 Chars
                 </span>
               </div>

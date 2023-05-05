@@ -51,6 +51,10 @@ export class ChatSidebarComponent implements OnInit, OnDestroy {
       })
       this.recentChats.sort((a, b) => b.chatContent.sentAt.getTime() - a.chatContent.sentAt.getTime())
     })
+
+    this.hubService.hubConnection.on("userDeleted", (userName: string) => {
+      this.recentChats = this.recentChats.filter(e => e.to.userName != userName);
+    })
   }
 
   ngOnDestroy(): void {

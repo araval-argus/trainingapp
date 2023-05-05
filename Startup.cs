@@ -1,3 +1,4 @@
+using ChatApp.Business.Helpers;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Hubs;
@@ -52,6 +53,9 @@ namespace ChatApp
                  };
              });
 
+            services.AddAuthorization(options => options.AddPolicy("AdminPolicy", policy => policy.RequireClaim(ClaimsConstant.DesingnationClaim, "Admin", "CEO", "CTO")));
+            services.AddAuthorization(options => options.AddPolicy("EmployeePolicy", policy => policy.RequireClaim(ClaimsConstant.DesingnationClaim, "Admin","CEO", "CTO", "GroupLead", "SolutionAnalyst", "ProgramAnalyst")));
+                
             services.AddControllersWithViews();
 
             // Register the Swagger generator, defining 1 or more Swagger documents
@@ -92,6 +96,7 @@ namespace ChatApp
             services.AddScoped<IChatService, ChatService>();
             services.AddScoped<IGroupService, GroupSerice>();
             services.AddScoped<INotificationService, NotificationService>();
+            services.AddScoped<IEmployeeService, EmployeeService>();
 
             // In production, the Angular files will be served from this directory
 

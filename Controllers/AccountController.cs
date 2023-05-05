@@ -18,7 +18,6 @@ namespace ChatApp.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [AllowAnonymous]
-
     public class AccountController : ControllerBase
     {
         private IConfiguration _config;
@@ -120,10 +119,6 @@ namespace ChatApp.Controllers
         public IActionResult GetImage(string userName) { 
             Profile profile = _profileService.getUserFromUserName(userName);
             string imgPath = _profileService.GetImage(profile.Id);
-            if(imgPath == null)
-            {
-                return BadRequest(new { Message = "Email is already used in different account" });
-            }
             return Ok(new { imgPath = imgPath });
         }
 
@@ -160,6 +155,17 @@ namespace ChatApp.Controllers
             return response;
         }
 
+
+        [HttpGet("checkRoles")]
+        [Authorize]
+        public IActionResult checkRoles()
+        {
+            IActionResult response = Unauthorized(new { Message = "Something Went Wrong." });
+            List<bool> roles = _profileService.checkRoles();
+            response = Ok(roles);
+            return response;
+        }
+
         private string GenerateJSONWebToken(Profile profileInfo)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
@@ -170,13 +176,14 @@ namespace ChatApp.Controllers
                     new Claim(JwtRegisteredClaimNames.Email, profileInfo.Email),
                     new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
+                    new Claim(ClaimsConstant.DesingnationClaim, profileInfo.Designation.Designation),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                     };
 
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
             _config["Jwt:Issuer"],
             claims,
-            expires: DateTime.Now.AddMinutes(120),
+            expires: DateTime.Now.AddMinutes(240),
             signingCredentials: credentials);
 
             return new JwtSecurityTokenHandler().WriteToken(token);

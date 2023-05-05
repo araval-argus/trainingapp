@@ -6,6 +6,9 @@ import MetisMenu from 'metismenujs/dist/metismenujs';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { Router, NavigationEnd } from '@angular/router';
+import { AuthService } from 'src/app/core/service/auth-service';
+import { HubService } from 'src/app/core/service/hub-service';
+import { EmployeeService } from 'src/app/core/service/employee-service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,7 +22,8 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   menuItems = [];
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
 
-  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router) { 
+  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private router: Router, private authService: AuthService, private hubService: HubService, private employeeService: EmployeeService) {
+
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
 
@@ -34,7 +38,6 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         if (window.matchMedia('(max-width: 991px)').matches) {
           this.document.body.classList.remove('sidebar-open');
         }
-
       }
     });
   }
@@ -42,18 +45,37 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   ngOnInit(): void {
     this.menuItems = MENU;
 
+    const desingnation = this.authService.getLoggedInUserInfo().desingnation;
+    if (desingnation == "Intern" || desingnation == "Probationer") {
+      this.menuItems = this.menuItems.filter(e => e.label !== "Employee Table" && e.label !== "Table");
+    }
+
     /**
      * Sidebar-folded on desktop (min-width:992px and max-width: 1199px)
      */
     const desktopMedium = window.matchMedia('(min-width:992px) and (max-width: 1199px)');
     desktopMedium.addListener(this.iconSidebar);
     this.iconSidebar(desktopMedium);
+
+    this.employeeService.roleUpdated.subscribe(() => {
+
+      const desingnation = this.authService.getLoggedInUserInfo().desingnation;
+      if (desingnation == "Intern" || desingnation == "Probationer") {
+        this.menuItems = this.menuItems.filter(e => e.label !== "Employee Table" && e.label !== "Table");
+        if (this.router.url.includes('employee')) {
+          this.router.navigate(['']);
+        }
+      } else {
+        this.menuItems = MENU;
+      }
+    })
+
   }
 
   ngAfterViewInit() {
     // activate menu item
     new MetisMenu(this.sidebarMenu.nativeElement);
-    
+
     this._activateMenuDropdown();
   }
 
@@ -86,7 +108,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    * Open sidebar when hover (in folded folded state)
    */
   operSidebarFolded() {
-    if (this.document.body.classList.contains('sidebar-folded')){
+    if (this.document.body.classList.contains('sidebar-folded')) {
       this.document.body.classList.add("open-sidebar-folded");
     }
   }
@@ -96,7 +118,7 @@ export class SidebarComponent implements OnInit, AfterViewInit {
    * Fold sidebar after mouse leave (in folded state)
    */
   closeSidebarFolded() {
-    if (this.document.body.classList.contains('sidebar-folded')){
+    if (this.document.body.classList.contains('sidebar-folded')) {
       this.document.body.classList.remove("open-sidebar-folded");
     }
   }
@@ -147,42 +169,42 @@ export class SidebarComponent implements OnInit, AfterViewInit {
   resetMenuItems() {
 
     const links = document.getElementsByClassName('nav-link-ref');
-    
+
     for (let i = 0; i < links.length; i++) {
       const menuItemEl = links[i];
       menuItemEl.classList.remove('mm-active');
       const parentEl = menuItemEl.parentElement;
 
       if (parentEl) {
-          parentEl.classList.remove('mm-active');
-          const parent2El = parentEl.parentElement;
-          
-          if (parent2El) {
-            parent2El.classList.remove('mm-show');
-          }
+        parentEl.classList.remove('mm-active');
+        const parent2El = parentEl.parentElement;
 
-          const parent3El = parent2El.parentElement;
-          if (parent3El) {
-            parent3El.classList.remove('mm-active');
+        if (parent2El) {
+          parent2El.classList.remove('mm-show');
+        }
 
-            if (parent3El.classList.contains('side-nav-item')) {
-              const firstAnchor = parent3El.querySelector('.side-nav-link-a-ref');
+        const parent3El = parent2El.parentElement;
+        if (parent3El) {
+          parent3El.classList.remove('mm-active');
 
-              if (firstAnchor) {
-                firstAnchor.classList.remove('mm-active');
-              }
-            }
+          if (parent3El.classList.contains('side-nav-item')) {
+            const firstAnchor = parent3El.querySelector('.side-nav-link-a-ref');
 
-            const parent4El = parent3El.parentElement;
-            if (parent4El) {
-              parent4El.classList.remove('mm-show');
-
-              const parent5El = parent4El.parentElement;
-              if (parent5El) {
-                parent5El.classList.remove('mm-active');
-              }
+            if (firstAnchor) {
+              firstAnchor.classList.remove('mm-active');
             }
           }
+
+          const parent4El = parent3El.parentElement;
+          if (parent4El) {
+            parent4El.classList.remove('mm-show');
+
+            const parent5El = parent4El.parentElement;
+            if (parent5El) {
+              parent5El.classList.remove('mm-active');
+            }
+          }
+        }
       }
     }
   };
@@ -196,52 +218,52 @@ export class SidebarComponent implements OnInit, AfterViewInit {
     const links = document.getElementsByClassName('nav-link-ref');
 
     let menuItemEl = null;
-    
+
     for (let i = 0; i < links.length; i++) {
       // tslint:disable-next-line: no-string-literal
-        if (window.location.pathname === links[i]['pathname']) {
-          
-            menuItemEl = links[i];
-            
-            break;
-        }
+      if (window.location.pathname === links[i]['pathname']) {
+
+        menuItemEl = links[i];
+
+        break;
+      }
     }
 
     if (menuItemEl) {
-        menuItemEl.classList.add('mm-active');
-        const parentEl = menuItemEl.parentElement;
+      menuItemEl.classList.add('mm-active');
+      const parentEl = menuItemEl.parentElement;
 
-        if (parentEl) {
-            parentEl.classList.add('mm-active');
+      if (parentEl) {
+        parentEl.classList.add('mm-active');
 
-            const parent2El = parentEl.parentElement;
-            if (parent2El) {
-                parent2El.classList.add('mm-show');
-            }
-
-            const parent3El = parent2El.parentElement;
-            if (parent3El) {
-                parent3El.classList.add('mm-active');
-
-                if (parent3El.classList.contains('side-nav-item')) {
-                    const firstAnchor = parent3El.querySelector('.side-nav-link-a-ref');
-
-                    if (firstAnchor) {
-                        firstAnchor.classList.add('mm-active');
-                    }
-                }
-
-                const parent4El = parent3El.parentElement;
-                if (parent4El) {
-                    parent4El.classList.add('mm-show');
-
-                    const parent5El = parent4El.parentElement;
-                    if (parent5El) {
-                        parent5El.classList.add('mm-active');
-                    }
-                }
-            }
+        const parent2El = parentEl.parentElement;
+        if (parent2El) {
+          parent2El.classList.add('mm-show');
         }
+
+        const parent3El = parent2El.parentElement;
+        if (parent3El) {
+          parent3El.classList.add('mm-active');
+
+          if (parent3El.classList.contains('side-nav-item')) {
+            const firstAnchor = parent3El.querySelector('.side-nav-link-a-ref');
+
+            if (firstAnchor) {
+              firstAnchor.classList.add('mm-active');
+            }
+          }
+
+          const parent4El = parent3El.parentElement;
+          if (parent4El) {
+            parent4El.classList.add('mm-show');
+
+            const parent5El = parent4El.parentElement;
+            if (parent5El) {
+              parent5El.classList.add('mm-active');
+            }
+          }
+        }
+      }
     }
   };
 

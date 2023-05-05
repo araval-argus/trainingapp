@@ -129,6 +129,13 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
         this.selectedUser.status = statusId
       }
     })
+
+
+    this.hubService.hubConnection.on("userDeleted", (userName: string) => {
+      if (this.selectedUser.userName == userName) {
+        this.selectedUser.userName = '';
+      }
+    })
   }
 
   //To scroll To bottom

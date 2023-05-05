@@ -15,7 +15,9 @@ namespace ChatApp.Context.EntityClasses
         public string UserName { get; set; }
         public string Email { get; set; }
         public string Password { get; set; }
-        public ProfileType ProfileType { get; set; }
+        public int ProfileType { get; set; }
+        [ForeignKey("ProfileType")]
+        public virtual ProfileType Designation { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
         public DateTime? LastUpdatedAt { get; set; }
@@ -24,5 +26,8 @@ namespace ChatApp.Context.EntityClasses
         public int Status { get; set; }
         [ForeignKey("Status")]
         public virtual Status statusCode { get; set; }
+
+        public int isDeleted { get; set; }
+
     }
 }

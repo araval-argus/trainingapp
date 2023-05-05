@@ -13,23 +13,55 @@ import Swal from 'sweetalert2'
 export class RegisterComponent implements OnInit {
   regModel: RegistrationModel;
   disableRegButtton: boolean = false;
+
+  //Type List
+  typeList: any[] = [{
+    id: 2, name: 'CEO'
+  }, {
+    id: 3, name: 'CTO'
+  }, {
+    id: 4, name: 'GroupLead'
+  }, {
+    id: 5, name: 'SolutionAnalyst'
+  }, {
+    id: 6, name: 'ProgramAnalyst'
+  }, {
+    id: 7, name: 'Probationer'
+  }, {
+    id: 8, name: 'Intern'
+  }];
+
   constructor(private router: Router,
     private accountService: AccountService,
     private authService: AuthService) { }
 
   ngOnInit(): void {
+    this.accountService.getRoles().subscribe(data => {
+      console.log(data);
+
+      if (data[0]) {
+        this.typeList = this.typeList.filter(e => e.id != 2);
+      }
+      if (data[1]) {
+        this.typeList = this.typeList.filter(e => e.id != 3);
+      }
+    })
+
+    console.log(this.typeList);
     this.regModel = {
       firstName: '',
       lastName: '',
       userName: '',
       email: '',
       password: '',
+      type: 8
     }
   }
 
   onRegister(e) {
     e.preventDefault();
     console.log(this.regModel);
+
     this.disableRegButtton = true;
     this.accountService.register(this.regModel)
       .subscribe((data: any) => {

@@ -27,5 +27,7 @@ namespace ChatApp.Business.ServiceInterfaces
         bool setStatus(string userName, int id);
 
         bool changePassword(ChangePasswordModel newPasswordModel, string userName);
+
+        List<bool> checkRoles();
     }
 }

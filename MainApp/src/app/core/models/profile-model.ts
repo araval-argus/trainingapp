@@ -4,5 +4,6 @@ export interface Profile {
     imagePath?: string,
     userName: string,
     status?: number,
-    email?: string
+    email?: string,
+    profileType?: number
 }

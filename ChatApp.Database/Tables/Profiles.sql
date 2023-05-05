@@ -13,6 +13,8 @@
     [LastUpdatedBy] INT NULL, 
     [imagePath] NVARCHAR(1000) NULL, 
     [status] INT NOT NULL DEFAULT 6, 
+    [isDeleted] INT NOT NULL DEFAULT 0, 
     CONSTRAINT [PK_Profiles] PRIMARY KEY ([Id]), 
-    CONSTRAINT [FK_Profiles_To_Status] FOREIGN KEY ([status]) REFERENCES dbo.Status(Id)
+    CONSTRAINT [FK_Profiles_To_Status] FOREIGN KEY ([status]) REFERENCES dbo.Status(Id), 
+    CONSTRAINT [FK_Profiles_To_ProfileType] FOREIGN KEY ([ProfileType]) REFERENCES dbo.ProfileType(Id)
 )

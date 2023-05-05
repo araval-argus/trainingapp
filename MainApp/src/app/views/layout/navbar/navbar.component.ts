@@ -104,7 +104,8 @@ export class NavbarComponent implements OnInit {
    */
   onLogout(e) {
     e.preventDefault();
-    this.accountService.setStatus(6).subscribe(data => { });
+    this.accountService.setStatus(6).subscribe((data) => {
+    })
     this.authService.logout(() => {
       Swal.fire({
         title: 'Success!',

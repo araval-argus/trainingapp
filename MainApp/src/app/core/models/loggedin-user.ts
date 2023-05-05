@@ -3,5 +3,6 @@ export interface LoggedInUser {
     lastName?: string,
     email?: string,
     sub?: string,
-    imageURL?: string;
+    imageURL?: string,
+    desingnation?: string
 }

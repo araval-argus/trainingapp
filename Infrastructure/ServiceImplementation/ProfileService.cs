@@ -33,7 +33,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
         public Profile CheckPassword(LoginModel model)
         {
-            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == model.Username);
+            Profile profile = context.Profiles.FirstOrDefault(e => (e.UserName == model.Username || e.Email == model.EmailAddress) && e.isDeleted == 0);
             if (profile == null)
             {
                 return null;
@@ -42,6 +42,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             string hashedPWD = getHash(model.Password, salt);
             if(hashedPWD == profile.Password)
             {
+                profile.Designation = context.ProfileType.AsNoTracking().FirstOrDefault(e => e.Id == profile.ProfileType);
+                profile.Status = 1;
+                context.Profiles.Update(profile);
                 return profile;
             }
             return null;
@@ -64,8 +67,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Password = hashPassword,
                     UserName = regModel.UserName,
                     Email = regModel.Email,
-                    CreatedAt = DateTime.UtcNow,
-                    ProfileType = ProfileType.User,
+                    CreatedAt = DateTime.Now,
+                    ProfileType = regModel.Type,
                     Status = 1
                 };
                 context.Profiles.Add(newUser);
@@ -74,6 +77,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 //saving salt
                 context.Salt.Add(new Salt { UserId = newUser.Id, HashSalt = salt });
                 context.SaveChanges();
+                newUser.Designation = context.ProfileType.AsNoTracking().FirstOrDefault(e => e.Id == regModel.Type);
             }
             return newUser;
         }
@@ -123,6 +127,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             }
             context.Profiles.Update(profile);
             context.SaveChanges();
+            profile.Designation = context.ProfileType.AsNoTracking().FirstOrDefault(e => e.Id == profile.ProfileType);
             return profile;
         }
 
@@ -139,23 +144,23 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<profileDTO> getAll()
         {
-            List<Profile> profiles =  context.Profiles.ToList();
+            List<Profile> profiles =  context.Profiles.Where(e => e.isDeleted == 0).ToList();
             List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
         }
 
         public Profile getUserFromUserName(string userName)
         {
-            return context.Profiles.FirstOrDefault(x => x.UserName == userName);
+            return context.Profiles.FirstOrDefault(x => x.UserName == userName && x.isDeleted == 0);
         }
         public Profile getUser(int userId)
         {
-            return context.Profiles.FirstOrDefault(x => x.Id == userId);
+            return context.Profiles.FirstOrDefault(x => x.Id == userId && x.isDeleted == 0);
         }
 
         public List<profileDTO> GetProfileDTOs(string s, string user)
         {
-            List<Profile> profiles = context.Profiles.Where(e => (e.FirstName.Contains(s) || e.LastName.Contains(s)) && e.UserName != user ).ToList();
+            List<Profile> profiles = context.Profiles.Where(e => (e.FirstName.Contains(s) || e.LastName.Contains(s)) && e.UserName != user && e.isDeleted == 0).ToList();
             List<profileDTO> profileDTOs = Mapper.profilesMapper(profiles);
             return profileDTOs;
         }
@@ -172,7 +177,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool setStatus(string userName, int id)
         {
-            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
+            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName && p.isDeleted == 0);
             if(profile != null)
             {
                 profile.Status = id;
@@ -187,7 +192,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool changePassword(ChangePasswordModel newPasswordModel, string userName)
         {
-            Profile profile = context.Profiles.FirstOrDefault(e => e.UserName == userName);
+            Profile profile = context.Profiles.FirstOrDefault(e => e.UserName == userName && e.isDeleted == 0);
                 if(profile != null)
             {
                 string salt = context.Salt.AsNoTracking().FirstOrDefault(e => e.UserId == profile.Id).HashSalt;
@@ -204,6 +209,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return false;
         }
 
+
+        public List<bool> checkRoles()
+        {
+            List<bool> roles = new List<bool>
+            {
+                context.Profiles.AsNoTracking().Any(e => e.ProfileType == 2 && e.isDeleted == 0),
+                context.Profiles.AsNoTracking().Any(e => e.ProfileType == 3 && e.isDeleted == 0)
+            };
+            return roles;
+        }
         private string getHash(string password, string salt)
         {
             SHA256 hash = SHA256.Create();

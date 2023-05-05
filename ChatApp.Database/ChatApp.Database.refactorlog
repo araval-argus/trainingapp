@@ -21,4 +21,11 @@
     <Property Name="ParentElementType" Value="SqlTable" />
     <Property Name="NewName" Value="HashSalt" />
   </Operation>
+  <Operation Name="Rename Refactor" Key="9996cb29-7da9-4606-a439-23c7c00d8d1e" ChangeDateTime="05/01/2023 09:48:16">
+    <Property Name="ElementName" Value="[dbo].[ProfileType].[ProfileType]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[ProfileType]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Designation" />
+  </Operation>
 </Operations>

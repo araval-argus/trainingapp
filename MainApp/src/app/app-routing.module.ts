@@ -32,6 +32,10 @@ const routes: Routes = [
         path: 'group',
         loadChildren: () => import('./views/pages/group/group.module').then(m => m.GroupModule)
       },
+      {
+        path: 'employee',
+        loadChildren: () => import('./views/pages/employee/employee.module').then(m => m.EmployeeModule)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ]
   },

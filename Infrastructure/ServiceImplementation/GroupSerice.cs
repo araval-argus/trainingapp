@@ -32,7 +32,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool addFile(GroupChatFileModel message, string senderUserName)
         {
-            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName);
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName && e.isDeleted == 0);
             if (profile != null)
             {
                 Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == int.Parse(message.GroupId));
@@ -94,7 +94,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool AddGroup(GroupModel newGroupModel, string userName)
         {
-            Profile profile = _context.Profiles.FirstOrDefault(e => e.UserName == userName);
+            Profile profile = _context.Profiles.FirstOrDefault(e => e.UserName == userName && e.isDeleted == 0 );
             int adminId = profile.Id;
             string fullFile = null;
             if (newGroupModel.Image != null)
@@ -149,7 +149,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             List<int> presentMembersId = _context.GroupMember.AsNoTracking().Where(e => e.GroupId == group.Id).Select(e => e.MemberId).ToList();
             foreach(string user in userName)
             {
-                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName== user);
+                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user && e.isDeleted == 0);
                 if(profile != null)
                 {
                     if (!presentMembersId.Contains(profile.Id)){
@@ -175,7 +175,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             }
             if(userName.Count> 0)
             {
-                Profile adminProfile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == adminUser);
+                Profile adminProfile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == adminUser && e.isDeleted == 0 );
                 GroupMessage addedNotification = new()
                 {
                     Content = adminUser + " has added " + memberList,
@@ -206,7 +206,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool addMessage(GroupReceiveChatModel message, string senderUserName)
         {
-            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName);
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == senderUserName && e.isDeleted == 0);
             Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Id == message.GroupId);
             if(profile != null)
             {
@@ -266,7 +266,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 List<GroupMessage> msgs = _context.GroupMessage.AsNoTracking().Where(e => e.GroupID == group.Id).ToList();
                 foreach(GroupMessage msg in msgs)
                 {
-                    Profile temp = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.Id == msg.SenderId);
+                    Profile temp = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.Id == msg.SenderId && e.isDeleted == 0);
                     GroupMessage groupMsg = new();
                     if (msg.ReplyMessageID != -1)
                     {
@@ -306,7 +306,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             //Check if given user is admin
             //if admin is in remove list skip it
             Groups group = _context.Groups.AsNoTracking().FirstOrDefault(e => e.Name == groupName);
-            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName && e.isDeleted == 0);
             if(group != null) { 
                 if(profile != null)
                 {
@@ -401,7 +401,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public bool leaveGroup(string userName, string groupName)
         {
             Groups groupProfile = _context.Groups.FirstOrDefault(e => e.Name == groupName);
-            Profile member = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName));
+            Profile member = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName) && e.isDeleted == 0);
             if(groupProfile != null && member != null)
             {
                 
@@ -480,7 +480,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<ChatDataModel> getData(string userName)
         {
-            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
+            Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName && e.isDeleted == 0);
             List<ChatDataModel> groupDataModel = new List<ChatDataModel>();
             if (profile != null)
             {

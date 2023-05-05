@@ -37,5 +37,14 @@ export const MENU: MenuItem[] = [
     label: 'Group',
     icon: 'users',
     link: '/group'
-  }
+  },
+  {
+    label: 'Employee Table',
+    isTitle: true
+  },
+  {
+    label: 'Table',
+    icon: 'user-check',
+    link: '/employee'
+  },
 ];

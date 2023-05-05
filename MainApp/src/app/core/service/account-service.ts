@@ -49,4 +49,8 @@ export class AccountService {
     changePassword(formData: FormData) {
         return this.http.post(environment.apiUrl + "/account/changePassword", formData)
     }
+
+    getRoles() {
+        return this.http.get(environment.apiUrl + "/account/checkRoles")
+    }
 }

@@ -58,7 +58,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool deleteAll(string userName)
         {
-            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName));
+            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(userName) && e.isDeleted == 0);
             if (profile != null)
             {
                 IEnumerable<Notifications> notifications = context.Notification.Where(e => e.User == profile.Id);
@@ -70,7 +70,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
         public bool markAsSeen(string userName) {
-            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault( e => e.UserName.Equals(userName));
+            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault( e => e.UserName.Equals(userName) && e.isDeleted == 0);
             if(profile != null)
             {
                 IEnumerable<Notifications> notifications = context.Notification.Where(e => e.User == profile.Id && e.isSeen == 0);

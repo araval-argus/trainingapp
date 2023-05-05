@@ -46,7 +46,7 @@ namespace ChatApp.Hubs
 
             if (claim != null)
             {
-                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(claim.Value));
+                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName.Equals(claim.Value) && e.isDeleted == 0);
                 if (profile == null) {
                     return;
                 }
@@ -89,8 +89,8 @@ namespace ChatApp.Hubs
             
             if (claim != null)
             {
-                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName == claim.Value);
-                int Id = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == claim.Value).Id;
+                Profile profile = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName == claim.Value && e.isDeleted == 0 );
+                int Id = profile.Id;
                 Connections connection = _context.Connections.FirstOrDefault(e => e.User == Id);
                 _context.Connections.Remove(connection);
                 _context.SaveChanges();
@@ -116,8 +116,8 @@ namespace ChatApp.Hubs
             string connectionId = Context.ConnectionId;
             //In this scenario receiver is just who have received the chat on the screen
             Connections receiverConnection = _context.Connections.AsNoTracking().FirstOrDefault(e => e.ConnectionId == connectionId);
-            Profile receiver = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.Id == receiverConnection.User);
-            Profile sender = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName== senderUserName);
+            Profile receiver = _context.Profiles.AsNoTracking().FirstOrDefault(e => e.Id == receiverConnection.User && e.isDeleted == 0);
+            Profile sender = _context.Profiles.AsNoTracking().FirstOrDefault(e=> e.UserName == senderUserName && e.isDeleted == 0 );
             Connections sendersConnectiom = _context.Connections.AsNoTracking().FirstOrDefault(e => e.User == sender.Id);
             IEnumerable<Chat> chats = _context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id && e.isRead == 0);
             foreach (Chat chat in chats)

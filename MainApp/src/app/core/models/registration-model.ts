@@ -1,8 +1,8 @@
-export interface RegistrationModel
-{
+export interface RegistrationModel {
     firstName: string,
     lastName: string,
     email: string,
     userName: string,
-    password:string
+    password: string,
+    type: number
 }

@@ -34,8 +34,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public chatFormat AddChat(ChatModel chatModel, string userName)
         {
-            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
-            Profile receiver = context.Profiles.FirstOrDefault(p => p.UserName == chatModel.To);
+            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName && p.isDeleted == 0);
+            Profile receiver = context.Profiles.FirstOrDefault(p => p.UserName == chatModel.To && p.isDeleted == 0);
             if(chatModel == null)
             {
                 return null;
@@ -77,8 +77,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<ChatDTO> GetAllChats(string userName, string to)
         {
-            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
-            Profile receiver = context.Profiles.FirstOrDefault(p => p.UserName == to);
+            Profile profile = context.Profiles.FirstOrDefault(p => p.UserName == userName && p.isDeleted == 0);
+            Profile receiver = context.Profiles.FirstOrDefault(p => p.UserName == to && p.isDeleted == 0);
             List<Chat> sentChats = context.Chats.Where(e => e.From == profile.Id && e.To == receiver.Id).ToList();
             List<Chat> receivedChats = context.Chats.Where(e => e.From == receiver.Id && e.To == profile.Id).ToList();
             List<ChatDTO> chatDTOs = new();
@@ -97,7 +97,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<recentChatDTO> recent(string user)
         {
-            var id = context.Profiles.AsNoTracking().FirstOrDefault(p => p.UserName == user).Id;
+            var id = context.Profiles.AsNoTracking().FirstOrDefault(p => p.UserName == user && p.isDeleted == 0).Id;
             IEnumerable<Chat> sentChats = context.Chats.AsNoTracking().Where(e => e.From == id || e.To == id ).ToList();
             IEnumerable<IGrouping<int, Chat>> recentChatsGroups = sentChats.GroupBy(chat => chat.From == id ? chat.To : chat.From);
             IDictionary<int, int> unreadCountDictionary = new Dictionary<int, int>();
@@ -137,8 +137,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public chatFormat addFile(string userName, ChatFileModel chatFile)
         {
-            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName);
-            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == chatFile.to);
+            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == userName && e.isDeleted == 0 );
+            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == chatFile.to && e.isDeleted == 0);
             if(sender != null && receiver != null) { 
                 if(chatFile.file != null)
                 {
@@ -195,8 +195,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public bool markAsRead(string user, string markAsRead)
         {
-            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user);
-            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == markAsRead);
+            Profile receiver = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user && e.isDeleted == 0 );
+            Profile sender = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == markAsRead && e.isDeleted == 0);
             if (sender != null && receiver != null)
             {
                 IEnumerable<Chat> chatsToMarkRead = context.Chats.Where(e => e.From == sender.Id && e.To == receiver.Id && e.isRead == 0);
@@ -216,7 +216,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public List<ChatDataModel> getData(string user)
         {
-            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user);
+            Profile profile = context.Profiles.AsNoTracking().FirstOrDefault(e => e.UserName == user && e.isDeleted == 0);
             List<ChatDataModel> chatDataModel = new();
             if (profile != null)
             {
