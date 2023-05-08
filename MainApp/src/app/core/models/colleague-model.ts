@@ -6,4 +6,5 @@ export interface ColleagueModel
   email?: string,
   imagePath?: string,
   designation?: string
+  status?: string
 }

@@ -1,9 +1,11 @@
 import { Component, OnInit} from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { ColleagueModel } from 'src/app/core/models/colleague-model';
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { MessageDisplayModel } from 'src/app/core/models/message-display-model';
 import { RecentChatModel } from 'src/app/core/models/recent-chat-model';
+import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { ChatService } from 'src/app/core/service/chat-service';
 import { SignalRService } from 'src/app/core/service/signalr-service';
@@ -16,15 +18,15 @@ import { environment } from 'src/environments/environment';
 })
 export class ChatSidebarComponent implements OnInit {
 
-  defaultNavActiveId = 1;
   loggedInUser : LoggedInUser;
   imageSource : string;
   colleagues : ColleagueModel [] = [] ;
   recentChatList : RecentChatModel[] =[];
   ImageStartUrl = environment.ImageUrl;
   showDropDown : boolean = false;
+  statusList : {id : number, status : string}[] = [];
 
-  constructor(private authService : AuthService ,private router : Router ,
+  constructor(private authService : AuthService ,private router : Router , private accountService : AccountService,
     private route : ActivatedRoute , private chatService : ChatService  , private signalRService : SignalRService) { }
 
   ngOnInit(): void {
@@ -32,6 +34,14 @@ export class ChatSidebarComponent implements OnInit {
     //console.log(this.loggedInUser);
     this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
     this.fetchRecentChat();
+
+    this.accountService.getAllStatus().subscribe((data:any)=>{
+      this.statusList = data;
+    });
+
+    this.accountService.getUserStatus(this.loggedInUser.userName).subscribe((data:{id : number, status : string})=>{
+      this.loggedInUser.status=data.status;
+    });
 
     this.chatService.DidAMessage.subscribe(()=>{
       this.fetchRecentChat();
@@ -41,11 +51,11 @@ export class ChatSidebarComponent implements OnInit {
        this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
         this.recentChatList = data;
        })
-    })
+    });
 
     this.signalRService.hubConnection.on('msgSeen',(msgFrom:string)=>{
       this.removeMarkCount(msgFrom);
-    })
+    });
   }
 
   fetchRecentChat(){
@@ -126,6 +136,11 @@ export class ChatSidebarComponent implements OnInit {
     }
   }
 
+  statusChange(i:number,status:string){
+    this.loggedInUser.status = status;
+    this.accountService.changeStatus(i,this.loggedInUser.userName).subscribe();
+  }
+
   ngAfterViewInit(): void {
     // Show chat-content when clicking on chat-item for tablet and mobile devices
     document.querySelectorAll('.chat-list .chat-item').forEach(item => {
@@ -142,6 +157,13 @@ export class ChatSidebarComponent implements OnInit {
 
   save() {
     console.log('passs');
+  }
+
+  over(drop:NgbDropdown){
+    drop.open()
+  }
+  out(drop:NgbDropdown){
+    drop.close()
   }
 
 }

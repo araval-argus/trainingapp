@@ -33,6 +33,7 @@ export class AuthService {
         let token = localStorage.getItem('USERTOKEN');
         var user: LoggedInUser = this.jwtHelper.decodeToken(token);
         user.userName = user.sub;
+        console.log(user);
         return user;
     }
 

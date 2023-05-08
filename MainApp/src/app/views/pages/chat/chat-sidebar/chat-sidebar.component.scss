@@ -2,3 +2,20 @@
   cursor: pointer;
 }
 
+.mdi.active{
+  color:#10B759 !important;
+}
+
+.mdi.red{
+  color:red !important;
+}
+
+.mdi.yellow{
+  color: rgb(255, 191, 0) !important;
+}
+
+.stat.mdi::before{
+  position: absolute !important;
+  bottom: -4px !important;
+  right: -2px !important;
+}

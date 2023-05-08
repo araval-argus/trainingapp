@@ -64,6 +64,13 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
           this.isHimself = true;
         }
 
+        this.signalRService.hubConnection.on('userStatusChanged',(userName:string,statusString:string)=>{
+          if(this.selUser.userName==userName){
+           this.selUser.status = statusString;
+          }
+          console.log('hi');
+        });
+
         this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
 
         this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{

@@ -36,6 +36,7 @@ namespace ChatApp.Controllers
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user);
+                _profileService.ChangeStatus(user.UserName, 1);
                 response = Ok(new { token = tokenString });
             }
 
@@ -85,8 +86,29 @@ namespace ChatApp.Controllers
             model.LastName = user.LastName;
             model.Email = user.Email;
             model.ImagePath = user.ImagePath;
-            model.Designation = user.Designation;
+            model.Designation = _profileService.GetDesignationFromId(user.Designation);
+            model.Status = _profileService.getUserStatus(user.UserName).Status;
             return Ok(model);
+        }
+
+        [HttpGet("GetStatusList")]
+        public IActionResult StatusList()
+        {
+            return Ok(_profileService.GetAllStatus());
+        }
+
+        [HttpGet("Status/{userName}")]
+        public IActionResult UserStatus(string userName)
+        {
+            var h = _profileService.getUserStatus(userName);
+			return Ok(h);
+        }
+
+        [HttpPost("ChangeStatus/{userName}")]
+        public IActionResult ChangeStatus(string userName , [FromBody] int statusCode )
+        {
+            _profileService.ChangeStatus(userName, statusCode);
+            return Ok();
         }
 
         private string GenerateJSONWebToken(Profile profileInfo)
@@ -101,7 +123,7 @@ namespace ChatApp.Controllers
                     new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
                     new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                     new Claim(ClaimsConstant.ImagePathClaim, profileInfo.ImagePath),
-                    new Claim(ClaimsConstant.DesignationClaim,profileInfo.Designation)
+                    new Claim(ClaimsConstant.DesignationClaim,_profileService.GetDesignationFromId(profileInfo.Designation)),
 		    };
             var token = new JwtSecurityToken(_config["Jwt:Issuer"],
             _config["Jwt:Issuer"],
@@ -111,7 +133,5 @@ namespace ChatApp.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
-
-
     }
 }

@@ -17,6 +17,7 @@ using static System.Net.Mime.MediaTypeNames;
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.SignalR;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -24,11 +25,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
+		private readonly IHubContext<chatHub> hubContext;
 
-		public ProfileService(ChatAppContext context , IWebHostEnvironment webHostEnvironment )
+		public ProfileService(ChatAppContext context , IWebHostEnvironment webHostEnvironment , IHubContext<chatHub> hubContext)
         {
             this.context = context;          
             this.webHostEnvironment = webHostEnvironment;
+            this.hubContext = hubContext;
         }
 
 		public Profile CheckPassword(LoginModel model)
@@ -36,7 +39,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
             && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()));
         }
-        //Get User Method
+ 
 		public Profile GetUser(Expression<Func<Profile,bool>> Filter)
 		{
             return context.Profiles.FirstOrDefault(Filter);
@@ -54,10 +57,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     Password = regModel.Password,
                     UserName = regModel.UserName,
                     Email = regModel.Email,
-                    Designation = "Employee",
+                    Designation = 1,
 					ImagePath = GenerateDefaultImage(),
 					CreatedAt = DateTime.UtcNow,
-                    ProfileType = ProfileType.User
+                    ProfileType = ProfileType.User,
+                    Status= 1,
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
@@ -104,7 +108,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			updateUser.FirstName = updateModel.FirstName;
 			updateUser.LastName = updateModel.LastName;
 			updateUser.Email = updateModel.Email;
-			updateUser.Designation = updateModel.Designation;
 			updateUser.LastUpdatedAt= DateTime.Now;
 
 			context.Profiles.Update(updateUser);
@@ -137,6 +140,36 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			Profile user = context.Profiles.FirstOrDefault(profile => profile.Id == id);
 			return user.UserName;
 		}
+
+        public string GetDesignationFromId(int Id)
+        {
+           return context.Designation.FirstOrDefault(u => u.Id == Id).Position;
+        }
+
+        public string GetStatusFromId(int Id)
+        {
+            return context.UserStatus.FirstOrDefault(u=>u.Id==Id).Status;
+        }
+
+        public async void ChangeStatus(string userName , int status)
+        {
+            context.Profiles.FirstOrDefault(u=>u.UserName==userName).Status = status;
+            context.SaveChanges();
+            var statusString = context.UserStatus.FirstOrDefault(u => u.Id == status).Status;
+			await this.hubContext.Clients.All.SendAsync("userStatusChanged",userName,statusString);
+		}
+
+        public UserStatus getUserStatus(string userName)
+        {
+            int userId = GetIdFromUserName(userName);
+            int statusId = context.Profiles.FirstOrDefault(u=>u.Id==userId).Status;
+            return context.UserStatus.FirstOrDefault(u=>u.Id==statusId);
+        }
+
+		public List<UserStatus> GetAllStatus()
+        {
+            return context.UserStatus.ToList();
+        }
 
 	}
 }

@@ -17,7 +17,6 @@ namespace ChatApp
 		private readonly ChatAppContext context;
 		private readonly IChatService chatService;
 		private readonly INotificationServices notificationServices;
-		private string curSignalId;
 
 		public chatHub(ChatAppContext context, IChatService chatservice, INotificationServices notificationServices)
 		{
@@ -28,18 +27,17 @@ namespace ChatApp
 
 		public override async Task OnDisconnectedAsync(Exception exception)
 		{
-			var connect = context.Connections.Where(u=>u.SignalId==Context.ConnectionId);
+			var connect = context.Connections.FirstOrDefault(u=>u.SignalId==Context.ConnectionId);
 			if (connect != null){
 				context.RemoveRange(connect);
 				context.SaveChanges();
 			}
-			
 		}
 
 		#region OneToOneHub
 		public async Task ConnectDone(string userName)
 		{
-			curSignalId = Context.ConnectionId;
+			var curSignalId = Context.ConnectionId;
 			Profile user = context.Profiles.FirstOrDefault(p => p.UserName == userName);
 
 			if (user != null) {
@@ -73,8 +71,12 @@ namespace ChatApp
 		{
 			if (userName != null)
 			{
-				int userId = context.Profiles.FirstOrDefault(u => u.UserName == userName).Id;
-				var connect = context.Connections.FirstOrDefault(u => u.ProfileId == userId);
+				var user = context.Profiles.FirstOrDefault(u => u.UserName == userName);
+				user.Status = 6;
+				context.Profiles.Update(user);
+				context.SaveChanges();
+				Clients.All.SendAsync("userStatusChanged",userName,"Offline");
+				var connect = context.Connections.FirstOrDefault(u => u.ProfileId == user.Id);
 				if (connect != null)
 				{
 					context.Connections.Remove(connect);
@@ -190,8 +192,10 @@ namespace ChatApp
 			if(context.Connections.Any(u => u.ProfileId == msgFromId))
 			{
 				var msgFromSignalId = context.Connections.FirstOrDefault(u => u.ProfileId == msgFromId).SignalId;
-				var msgToSignalId = context.Connections.FirstOrDefault(u => u.ProfileId== msgToId).SignalId;
-				await Clients.Clients(msgFromSignalId , msgToSignalId).SendAsync("msgSeen",msgFrom);
+				var msgToConnect = context.Connections.FirstOrDefault(u => u.ProfileId== msgToId);
+				if(msgToConnect!=null){
+					await Clients.Clients(msgFromSignalId, msgToConnect.SignalId).SendAsync("msgSeen", msgFrom);
+				}
 			}
 		}
 		#endregion

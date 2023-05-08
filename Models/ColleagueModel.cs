@@ -11,5 +11,6 @@ namespace ChatApp.Models
 		public string Email { get; set; }
 		public string? ImagePath { get; set; }
 		public string Designation { get; set; }
+		public string? Status { get; set; }
 	}
 }

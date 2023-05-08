@@ -12,5 +12,8 @@
     [LastUpdatedAt] DATETIME2 NULL, 
     [LastUpdatedBy] INT NULL, 
     [ImagePath] NVARCHAR(1000) NULL, 
-    [Designation] NVARCHAR(50) NULL 
+    [Designation] INT NOT NULL ,
+    [Status] INT NOT NULL,
+    CONSTRAINT [FK_Profiles_Designation_To_Designation] FOREIGN KEY (Designation) REFERENCES dbo.Designation(Id), 
+    CONSTRAINT [FK_Profiles_Status_To_UserStatus] FOREIGN KEY (Status) REFERENCES dbo.UserStatus(Id), 
 )

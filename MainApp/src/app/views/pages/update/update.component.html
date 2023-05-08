@@ -27,12 +27,6 @@
       <span *ngIf="email.invalid && email.touched" class="text-danger"><p>Enter a Valid Email</p></span>
 
       <div class="mb-3">
-        <label for="designation" class="form-label">Designation</label>
-        <input type="text" class="form-control" id="designation"  [(ngModel)]="loggedInUser.designation" name="designation" placeholder="Enter Designation" #designation="ngModel" required >
-      </div>
-      <span *ngIf="designation.invalid && designation.touched" class="text-danger"><p>Enter a Valid Designation</p></span>
-
-      <div class="mb-3">
         <label class="form-label" for="formFile">Profile Image Upload</label>
         <input class="form-control" type="file" id="profileImage" (change)="onFileSelected($event)" name="profileImage" accept="image/*">
       </div>

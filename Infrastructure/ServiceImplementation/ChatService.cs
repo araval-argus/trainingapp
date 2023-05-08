@@ -35,7 +35,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				LastName = colleagues.LastName,
 				Email = colleagues.Email,
 				UserName = colleagues.UserName,
-				Designation = colleagues.Designation,
+				Designation = context.Designation.FirstOrDefault(u=>u.Id==colleagues.Designation).Position,
 				ImagePath = colleagues.ImagePath,
 			})
 			.ToList();

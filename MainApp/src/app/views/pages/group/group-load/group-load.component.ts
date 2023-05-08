@@ -233,7 +233,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
 
   NavigateToChat(userName:string){
     if(userName!=this.loggedInUser.userName){
-    this.router.navigate(['../../chat/'+userName],{relativeTo:this.route});
+    this.router.navigate(['../chat/'+userName],{relativeTo:this.route});
     }
   }
 

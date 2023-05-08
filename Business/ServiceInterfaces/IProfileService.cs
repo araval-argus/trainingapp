@@ -23,6 +23,14 @@ namespace ChatApp.Business.ServiceInterfaces
 
         public int GetIdFromUserName(string userName);
 
+        public string GetDesignationFromId(int Id);
 
+        public string GetStatusFromId(int Id);
+
+        public void ChangeStatus(string userName, int status);
+
+        public List<UserStatus> GetAllStatus();
+
+        public UserStatus getUserStatus(string userName);
 	}
 }

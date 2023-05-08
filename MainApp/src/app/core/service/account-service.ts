@@ -22,4 +22,16 @@ export class AccountService {
     update( formdata : FormData ){
         return this.http.post(environment.apiUrl + "/account/update-profile" , formdata);
     }
+
+    getAllStatus(){
+        return this.http.get(environment.apiUrl + "/account/GetStatusList");
+    }
+
+    getUserStatus(userName : string){
+      return this.http.get(environment.apiUrl + "/account/Status/" + userName)
+    }
+
+    changeStatus(statusCode:number , userName:string){
+      return this.http.post(environment.apiUrl + "/account/ChangeStatus/" + userName , statusCode );
+    }
 }

@@ -75,5 +75,7 @@
     <Build Include="Tables\GroupMembers.sql" />
     <Build Include="Tables\Connections.sql" />
     <Build Include="Tables\Notifications.sql" />
+    <Build Include="Tables\Designation.sql" />
+    <Build Include="Tables\UserStatus.sql" />
   </ItemGroup>
 </Project>

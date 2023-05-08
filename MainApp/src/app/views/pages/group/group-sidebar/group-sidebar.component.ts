@@ -10,6 +10,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SignalRService } from 'src/app/core/service/signalr-service';
 import { GroupModel } from 'src/app/core/models/group-model';
 import { GroupMessageDisplayModel } from 'src/app/core/models/group-message-display-model';
+import { AccountService } from 'src/app/core/service/account-service';
 
 @Component({
   selector: 'app-group-sidebar',
@@ -28,7 +29,7 @@ export class GroupSidebarComponent implements OnInit {
   environment = environment.ImageUrl;
 
   constructor(private modalService: NgbModal , private groupService: GroupService , private authService:AuthService,
-    private router : Router , private route : ActivatedRoute , private signalRService:SignalRService) { }
+    private router : Router , private route : ActivatedRoute , private signalRService:SignalRService , private accountService:AccountService) { }
 
   ngOnInit(): void {
 
@@ -43,6 +44,10 @@ export class GroupSidebarComponent implements OnInit {
 
     this.groupService.loadRecentGroups().subscribe((data:RecentGroupModel[])=>{
       this.recentGroupList = data;
+    });
+
+    this.accountService.getUserStatus(this.loggedInUser.userName).subscribe((data:{id : number, status : string})=>{
+      this.loggedInUser.status=data.status;
     });
 
     // To Remove groupId from groupList in which user pressed remove

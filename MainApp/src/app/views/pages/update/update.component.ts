@@ -38,7 +38,6 @@ export class UpdateComponent implements OnInit {
     formdata.append('firstName' ,this.loggedInUser.firstName);
     formdata.append('lastName' ,this.loggedInUser.lastName);
     formdata.append('email' ,this.loggedInUser.email);
-    formdata.append('designation',this.loggedInUser.designation);
     formdata.append('profileImage',this.imageFile);
     this.accountService.update(formdata)
       .subscribe((data:any) => {

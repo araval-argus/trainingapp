@@ -5,8 +5,12 @@
       <i class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
       <figure class="mb-0 mr-2">
         <img [src]="selUserImage" class="img-sm rounded-circle" alt="image">
-        <div class="status online"></div>
-        <div class="status online"></div>
+        <div *ngIf="selUser.status=='Available'" class="mdi mdi-checkbox-blank-circle active stat"></div>
+          <div *ngIf="selUser.status=='Do Not Disturb'" class="mdi mdi-minus-circle red stat"></div>
+          <div *ngIf="selUser.status=='Busy'" class="mdi mdi-checkbox-blank-circle red stat"></div>
+          <div *ngIf="selUser.status=='Be Right Back'" class="mdi mdi-clock-fast yellow stat"></div>
+          <div *ngIf="selUser.status=='Away'" class="mdi mdi-clock yellow stat"></div>
+          <div *ngIf="selUser.status=='Offline'" class="mdi mdi-close-circle stat"></div>
       </figure>
       <div>
         <p>{{selUser.firstName}} {{selUser.lastName}}</p>

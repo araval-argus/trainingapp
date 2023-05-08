@@ -4,7 +4,12 @@
       <div class="d-flex align-items-center">
         <figure class="mr-2 mb-0">
           <img [src]="imageSource" class="img-sm rounded-circle" alt="profile">
-          <div class="status online"></div>
+          <div *ngIf="loggedInUser.status=='Available'" class="mdi mdi-checkbox-blank-circle active stat"></div>
+          <div *ngIf="loggedInUser.status=='Do Not Disturb'" class="mdi mdi-minus-circle red stat"></div>
+          <div *ngIf="loggedInUser.status=='Busy'" class="mdi mdi-checkbox-blank-circle red stat"></div>
+          <div *ngIf="loggedInUser.status=='Be Right Back'" class="mdi mdi-clock-fast yellow stat"></div>
+          <div *ngIf="loggedInUser.status=='Away'" class="mdi mdi-clock yellow stat"></div>
+          <div *ngIf="loggedInUser.status=='Offline'" class="mdi mdi-close-circle stat"></div>
         </figure>
         <div>
           <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
@@ -18,7 +23,22 @@
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
           <a class="dropdown-item d-flex align-items-center"  (click)="onViewProfile()"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">View Profile</span></a>
           <a class="dropdown-item d-flex align-items-center"  (click)="onEditProfile()"><i class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Profile</span></a>
-          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add status</span></a>
+          <a ngbDropdown placement="right" #drop="ngbDropdown" (mouseover)='over(drop)' (mouseout)='out(drop)' class="dropdown-item d-flex align-items-center" ><i class="feather icon-aperture icon-xs mr-2"></i> <div id="droprightMenu" ngbDropdownToggle>Add status
+          <!-- DROPDOWN -->
+            <div ngbDropdownMenu aria-labelledby="droprightMenu" >
+              <div *ngFor="let item of statusList">
+              <button *ngIf="item.id==1" ngbDropdownItem (click)="statusChange(1,item.status)"><span class="mdi mdi-checkbox-blank-circle active"></span>&nbsp;&nbsp;{{item.status}}</button>
+              <button *ngIf="item.id==2" ngbDropdownItem (click)="statusChange(2,item.status)"><span class="mdi mdi-minus-circle red"></span>&nbsp;&nbsp;{{item.status}}</button>
+              <button *ngIf="item.id==3" ngbDropdownItem (click)="statusChange(3,item.status)"><span class="mdi mdi-checkbox-blank-circle red"></span>&nbsp;&nbsp;{{item.status}}</button>
+              <button *ngIf="item.id==4" ngbDropdownItem (click)="statusChange(4,item.status)"><span class="mdi mdi-clock-fast yellow"></span>&nbsp;&nbsp;{{item.status}}</button>
+              <button *ngIf="item.id==5" ngbDropdownItem (click)="statusChange(5,item.status)"><span class="mdi mdi-clock yellow"></span>&nbsp;&nbsp;{{item.status}}</button>
+              <button *ngIf="item.id==6" ngbDropdownItem (click)="statusChange(6,item.status)"><span class="mdi mdi-close-circle"></span>&nbsp;&nbsp;{{item.status}}</button>
+              </div>
+              <!-- <button ngbDropdownItem>Another Action</button>
+              <button ngbDropdownItem>Something else is here</button> -->
+            </div>
+          <!-- CLOSE DROPDOWN -->
+        </div></a>
           <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
         </div>
       </div>
@@ -49,7 +69,7 @@
     </form>
   </div>
   <div class="aside-body">
-    <ul ngbNav #defaultNav="ngbNav" [(activeId)]="defaultNavActiveId" class="nav-tabs mt-3">
+    <ul ngbNav #defaultNav="ngbNav" class="nav-tabs mt-3">
       <li [ngbNavItem]="1">
         <a ngbNavLink>
           <div class="d-flex flex-row flex-lg-column flex-xl-row align-items-center">

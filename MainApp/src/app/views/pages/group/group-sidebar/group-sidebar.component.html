@@ -4,7 +4,12 @@
       <div class="d-flex align-items-center">
         <figure class="mr-2 mb-0">
           <img [src]="imageSource" class="img-sm rounded-circle" alt="profile">
-          <div class="status online"></div>
+          <div *ngIf="loggedInUser.status=='Available'" class="mdi mdi-checkbox-blank-circle active stat"></div>
+          <div *ngIf="loggedInUser.status=='Do Not Disturb'" class="mdi mdi-minus-circle red stat"></div>
+          <div *ngIf="loggedInUser.status=='Busy'" class="mdi mdi-checkbox-blank-circle red stat"></div>
+          <div *ngIf="loggedInUser.status=='Be Right Back'" class="mdi mdi-clock-fast yellow stat"></div>
+          <div *ngIf="loggedInUser.status=='Away'" class="mdi mdi-clock yellow stat"></div>
+          <div *ngIf="loggedInUser.status=='Offline'" class="mdi mdi-close-circle stat"></div>
         </figure>
         <div>
           <h6>{{loggedInUser.firstName}} {{loggedInUser.lastName}}</h6>
@@ -18,8 +23,6 @@
         <div class="dropdown-menu" aria-labelledby="dropdownMenuButton" ngbDropdownMenu>
           <a class="dropdown-item d-flex align-items-center" (click)="onViewProfile()"><i class="feather icon-eye icon-xs mr-2"></i> <span class="">View Profile</span></a>
           <a class="dropdown-item d-flex align-items-center" (click)="onEditProfile()"><i class="feather icon-edit-2 icon-xs mr-2"></i> <span class="">Edit Profile</span></a>
-          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-aperture icon-xs mr-2"></i> <span class="">Add status</span></a>
-          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
         </div>
       </div>
     </div>

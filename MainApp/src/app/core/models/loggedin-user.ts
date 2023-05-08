@@ -8,4 +8,5 @@ export interface LoggedInUser
     userName?:string,
     designation? : string
     imagePath?:string
+    status:string
 }
