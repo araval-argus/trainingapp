@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { LoginModel } from 'src/app/core/models/login-model';
 import { AccountService } from 'src/app/core/service/account-service';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -11,10 +12,12 @@ import Swal from 'sweetalert2'
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit {
+export class LoginComponent implements OnInit, OnDestroy {
 
   returnUrl: any;
-  loginModel: LoginModel
+  loginModel: LoginModel;
+  subscriptions: Subscription[] = [];
+
   constructor(private router: Router,
     private route: ActivatedRoute,
     private accountService: AccountService,
@@ -36,7 +39,7 @@ export class LoginComponent implements OnInit {
    // console.log(this.loginModel);
 
     // Implementation of API.
-    this.accountService.login(this.loginModel).subscribe((result: any) => {
+    const sub = this.accountService.login(this.loginModel).subscribe((result: any) => {
       this.authService.login(result.token, () => {
 
         Swal.fire({
@@ -63,6 +66,11 @@ export class LoginComponent implements OnInit {
       });
     });
 
+    this.subscriptions.push(sub);
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach( sub => sub.unsubscribe());
   }
 
 }

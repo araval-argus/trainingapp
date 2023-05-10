@@ -1,6 +1,7 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgModel } from '@angular/forms';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { DesignationModel } from 'src/app/core/models/designation-model';
 import { RegistrationModel } from 'src/app/core/models/registration-model';
 import { AccountService } from 'src/app/core/service/account-service';
@@ -13,12 +14,13 @@ import Swal from 'sweetalert2'
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent implements OnInit {
+export class RegisterComponent implements OnInit, OnDestroy {
   regModel: RegistrationModel;
   disableRegButtton: boolean = true;
   designations: DesignationModel[];
   timeoutIdForUserName;
   userNameExists: boolean;
+  subscriptions: Subscription[] = [];
 
   constructor(private router: Router,
     private accountService: AccountService,
@@ -35,10 +37,12 @@ export class RegisterComponent implements OnInit {
       designationID: 1
     }
 
-    this.accountService.fetchDesignations().subscribe((data:any) => {
+    const sub = this.accountService.fetchDesignations().subscribe((data:any) => {
       this.designations = data.designations;
-      //console.log(this.designations)
     })
+
+    this.subscriptions.push(sub);
+
   }
 
   onRegister(e) {
@@ -54,7 +58,7 @@ export class RegisterComponent implements OnInit {
       })
     }
     else{
-    this.accountService.register(this.regModel)
+    const sub = this.accountService.register(this.regModel)
       .subscribe((data: any) => {
         this.signalRService.makeConnection();
         this.authService.login(data.token, ()=>{
@@ -79,7 +83,9 @@ export class RegisterComponent implements OnInit {
           icon: 'error',
         });
       });
+      this.subscriptions.push(sub);
     }
+
   }
 
   onUserNameChanged(event: Event){
@@ -97,5 +103,8 @@ export class RegisterComponent implements OnInit {
   }
 
 
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+  }
 
 }

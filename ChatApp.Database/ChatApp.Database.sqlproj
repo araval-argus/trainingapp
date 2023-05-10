@@ -69,6 +69,8 @@
     <Build Include="Tables\Groups.sql" />
     <Build Include="Tables\GroupMembers.sql" />
     <Build Include="Tables\GroupMessages.sql" />
+    <Build Include="Tables\Notification_Types.sql" />
+    <Build Include="Tables\Notifications.sql" />
   </ItemGroup>
   <ItemGroup>
     <None Include="ChatApp.local.publish.xml" />

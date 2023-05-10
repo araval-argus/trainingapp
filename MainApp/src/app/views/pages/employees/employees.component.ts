@@ -1,5 +1,7 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnDestroy, OnInit } from "@angular/core";
 import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
+import { Subject, Subscription } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { DesignationModel } from "src/app/core/models/designation-model";
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { UserModel } from "src/app/core/models/UserModel";
@@ -14,7 +16,7 @@ import Swal from 'sweetalert2';
   templateUrl: "./employees.component.html",
   styleUrls: ["./employees.component.scss"],
 })
-export class EmployeesComponent implements OnInit {
+export class EmployeesComponent implements OnInit, OnDestroy {
   employees: UserModel[] = [];
   isAdmin: Boolean = false;
   selectedEmployee: UserModel;
@@ -23,9 +25,11 @@ export class EmployeesComponent implements OnInit {
   loggedInUser: LoggedInUserModel;
 
   designations: DesignationModel[];
+  subscriptions: Subscription[] = [];
 
   usernameExists: boolean = false;
   emailExists: boolean = false;
+
 
   constructor(
     private adminService: AdminService,
@@ -36,6 +40,7 @@ export class EmployeesComponent implements OnInit {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
+
     this.fetchEmployees();
     this.checkIsAdmin();
   }
@@ -47,13 +52,14 @@ export class EmployeesComponent implements OnInit {
   }
 
   fetchEmployees() {
-    this.adminService.fetchEmployees().subscribe((data: UserModel[]) => {
+    const sub = this.adminService.fetchEmployees().subscribe((data: UserModel[]) => {
       this.employees = data;
       this.employees.forEach((employee) => {
         employee.imageUrl =
           environment.apiUrl + "/../Images/Users/" + employee.imageUrl;
       });
     });
+    this.subscriptions.push(sub);
   }
 
   deleteEmployee(employee: UserModel) {
@@ -86,24 +92,25 @@ export class EmployeesComponent implements OnInit {
   }
 
   openScrollableModal(content) {
-    this.accountService.fetchDesignations().subscribe((data: any) => {
+    const sub = this.accountService.fetchDesignations().subscribe((data: any) => {
       this.designations = data.designations;
       this.modalService
       .open(content, { scrollable: true })
       .result.then((result) => {})
       .catch((res) => {});
     });
-
+    this.subscriptions.push(sub);
   }
 
   //update
   updateEmployeeData() {
     //console.log("updated employee data", this.selectedEmployee)
-    this.adminService
+    const sub = this.adminService
       .updateEmployeeData(this.selectedEmployee, this.selectedEmployeeUserName)
       .subscribe(() => {
         this.fetchEmployees();
       });
+      this.subscriptions.push(sub);
   }
 
   //for checking unique username
@@ -134,5 +141,9 @@ export class EmployeesComponent implements OnInit {
     );
 
     employee ? (this.emailExists = true) : (this.emailExists = false);
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

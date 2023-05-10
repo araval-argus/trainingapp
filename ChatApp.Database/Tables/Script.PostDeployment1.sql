@@ -9,7 +9,25 @@ Post-Deployment Script Template
                SELECT * FROM [$(TableName)]					
 --------------------------------------------------------------------------------------
 */
-IF NOT EXISTS(SELECT * FROM Designations)
+IF NOT EXISTS(SELECT * FROM [Designations])
 BEGIN
-INSERT INTO Designations (designation) values ('Intern') , ('Probationer'), ('Programmer Analyst'), ('Solution Analyst'), ('Lead Solution Analyst'), ('Group Lead'), ('Group Director'), ('Chief Technical Officer'), ('Chief Executive Officer');
+INSERT INTO [Designations] (designation) values ('Intern') , ('Probationer'), ('Programmer Analyst'), ('Solution Analyst'), ('Lead Solution Analyst'), ('Group Lead'), ('Group Director'), ('Chief Technical Officer'), ('Chief Executive Officer');
+END
+
+
+IF NOT EXISTS(SELECT * FROM [Notification_Types])
+BEGIN
+INSERT INTO [Notification_Types] ([Type]) values 
+('text messsage'),
+('image shared'),
+('video shared'), 
+('Audio Shared'),
+('group text message'),
+('image shared in the group'),
+('video shared in the group'),
+('audio shared in the group'),
+('group member left'),
+('group member removed'),
+('group member added'),
+('new admin')
 END

@@ -65,7 +65,7 @@ export class ChatContentFooterComponent implements OnInit {
     formData.append("recieverUserName", this.selectedFriend.userName);
 
     this.chatService.sendFile(formData).subscribe(data => {
-      console.log(data)
+      //console.log(data)
     })
   }
 

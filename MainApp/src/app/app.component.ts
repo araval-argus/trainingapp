@@ -1,7 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
+import { LoggedInUserModel } from './core/models/loggedin-user';
+import { NotificationModel } from './core/models/Notification-model';
 import { AuthService } from './core/service/auth-service';
+import { NotificationService } from './core/service/notification.service';
 import { SignalRService } from './core/service/signalR-service';
 
 @Component({
@@ -18,21 +21,26 @@ export class AppComponent implements OnInit {
      ){}
 
   ngOnInit(): void {
+
     if(this.authService.getLoggedInUserInfo().sub){
       this.signalRService.makeConnection();
     }
+
+
     this.signalRService.profileUpdated.subscribe( () => {
       if(this.signalRService.connection){
         this.signalRService.logout();
       }
       this.authService.logout(this.profileUpdateSweetAlert);
     });
+
     this.signalRService.profileDeleted.subscribe( () => {
       if(this.signalRService.connection){
         this.signalRService.logout();
       }
       this.authService.logout(this.profileDeletedSweetAlert);
     })
+
   }
 
   profileUpdateSweetAlert = () => {
@@ -54,4 +62,6 @@ export class AppComponent implements OnInit {
     });
     this.router.navigate(["auth/login"]);
   }
+
+
 }

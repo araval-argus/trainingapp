@@ -71,13 +71,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return result;
         }
 
-
         public void MarkMsgsAsSeen(IEnumerable<MessageEntity> messages)
         {
             this.context.Messages.UpdateRange(messages);
             this.context.SaveChanges();
         }
-
 
         int FetchProfileIdFromUserName(string userName)
         {

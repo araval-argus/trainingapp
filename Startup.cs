@@ -16,6 +16,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+
+
 namespace ChatApp
 {
     public class Startup
@@ -30,7 +34,12 @@ namespace ChatApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ChatAppContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("Default")));
+            services.AddDbContext<ChatAppContext>(options => {
+
+                options.UseSqlServer(this.Configuration.GetConnectionString("Default"));
+                options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
+                options.EnableSensitiveDataLogging();
+            });
             // Default Policy
             services.AddCors(options =>
             {
@@ -124,6 +133,7 @@ namespace ChatApp
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<IGroupMemberService, GroupMemberService>();
             services.AddScoped<IGroupMessageService, GroupMessageService>();
+            services.AddScoped<INotificationService, NotificationService>();
             //services.AddScoped<IGroupService, GroupService>();
             services.AddSignalR();
 

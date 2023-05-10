@@ -50,5 +50,18 @@ namespace ChatApp.Business.Helpers
             };
             return groupMessageModel;
         }
+
+        public static NotificationModel ConvertToNotificationModel(Notification notification)
+        {
+            NotificationModel notificationModel = new()
+            {
+                Id = notification.Id,
+                Type = notification.NotificationType,
+                RaisedFor = notification.NotificationReceiver.UserName,
+                RaisedBy = notification.NotificationCreator.UserName,
+                CreatedAt = notification.CreatedAt
+            };
+            return notificationModel;
+        }
     }
 }

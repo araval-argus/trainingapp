@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { GroupModel } from 'src/app/core/models/group-model';
 import { GroupMemberModel } from 'src/app/core/models/group-member-model';
 
@@ -11,8 +11,10 @@ export class GroupContentComponent implements OnInit {
   @Input() selectedGroup: GroupModel;
   @Input() joinedUsers: GroupMemberModel[];
 
+
   constructor() {}
 
   ngOnInit(): void {
   }
+
 }

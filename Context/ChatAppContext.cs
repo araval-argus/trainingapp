@@ -13,9 +13,6 @@ namespace ChatApp.Context
            : base(options)
         {
         }
-        /// <summary>
-        /// Gets or sets Answers.
-        /// </summary>
         public virtual DbSet<Profile> Profiles { get; set; }
         public virtual DbSet<DesignationEntity> Designations { get; set; }
         public virtual DbSet<MessageEntity> Messages { get; set; }
@@ -23,5 +20,7 @@ namespace ChatApp.Context
         public virtual DbSet<Group> Groups { get; set; }
         public virtual DbSet<GroupMessage> GroupMessages { get; set; }
         public virtual DbSet<GroupMember> GroupMembers { get; set; }
+        public virtual DbSet<NotificationType> NotificationTypes { get; set; }
+        public virtual DbSet<Notification> Notifications { get; set; }
     }
 }

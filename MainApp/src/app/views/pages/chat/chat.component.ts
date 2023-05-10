@@ -1,4 +1,5 @@
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { MessageModel } from 'src/app/core/models/message-model';
 import { UserModel } from 'src/app/core/models/UserModel';
@@ -12,35 +13,40 @@ import { environment } from 'src/environments/environment';
   templateUrl: './chat.component.html',
   styleUrls: ['./chat.component.scss']
 })
-export class ChatComponent implements OnInit, AfterViewInit {
+export class ChatComponent implements OnInit, AfterViewInit, OnDestroy {
 
   defaultNavActiveId = 1;
-
+  subscriptions : Subscription[] = [];
   selectedFriend: UserModel;
 
   friends: UserModel[] = [];
 
   loggedInUser: LoggedInUserModel;
 
-  constructor(private chatService: ChatService, private authService: AuthService,private signalRService: SignalRService) { }
+  constructor(private chatService: ChatService, private authService: AuthService,private signalRService: SignalRService) {
+  }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.chatService.friendSelected.subscribe(profile => {
-      this.selectedFriend = profile;
-    })
+    this.subscribeToFriendSelected();
+    this.subscribeToFetchFriends();
+    this.addMessageSubscription();
+  }
 
-    this.chatService.fetchAll(this.authService.getLoggedInUserInfo().sub).subscribe((data: UserModel[]) => {
-      this.friends = data;
-      this.friends.forEach((friend)=>{
-        friend.imageUrl = environment.apiUrl + "/../Images/Users/" + friend.imageUrl;
-        friend.lastMessageTimeStamp = new Date(friend.lastMessageTimeStamp + 'Z');
+  ngAfterViewInit(): void {
+    // Show chat-content when clicking on chat-item for tablet and mobile devices
+    document.querySelectorAll('.chat-list .chat-item').forEach(item => {
+      item.addEventListener('click', event => {
+        document.querySelector('.chat-content').classList.toggle('show');
       })
-    }, err => {
-      console.log(err);
-    })
+    });
 
-    this.signalRService.messageAdded.subscribe((message: MessageModel) => {
+  }
+
+
+
+  addMessageSubscription(){
+    let sub = this.signalRService.messageAdded.subscribe((message: MessageModel) => {
 
       //sender side
       if(message.senderUserName === this.loggedInUser.sub){
@@ -120,20 +126,32 @@ export class ChatComponent implements OnInit, AfterViewInit {
 
     });
 
+    this.subscriptions.push(sub);
   }
 
-  ngAfterViewInit(): void {
-    // Show chat-content when clicking on chat-item for tablet and mobile devices
-    document.querySelectorAll('.chat-list .chat-item').forEach(item => {
-      item.addEventListener('click', event => {
-        document.querySelector('.chat-content').classList.toggle('show');
+  subscribeToFriendSelected(){
+    let sub = this.chatService.friendSelected.subscribe(profile => {
+      this.selectedFriend = profile;
+      this.signalRService.notificationRemoved.next(profile.userName);
+    })
+    this.subscriptions.push(sub);
+  }
+
+  subscribeToFetchFriends(){
+    let sub = this.chatService.fetchAll(this.authService.getLoggedInUserInfo().sub).subscribe((data: UserModel[]) => {
+      this.friends = data;
+      this.friends.forEach((friend)=>{
+        friend.imageUrl = environment.apiUrl + "/../Images/Users/" + friend.imageUrl;
+        friend.lastMessageTimeStamp = new Date(friend.lastMessageTimeStamp + 'Z');
       })
-    });
+    }, err => {
+      console.log(err);
+    })
 
+    this.subscriptions.push(sub);
   }
 
-  save() {
-    console.log('passs');
+  ngOnDestroy(){
+    this.subscriptions.forEach( subscription => subscription.unsubscribe());
   }
-
 }

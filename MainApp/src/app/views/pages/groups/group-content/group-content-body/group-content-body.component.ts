@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { GroupMessageModel } from 'src/app/core/models/group-message-model';
 import { GroupModel } from 'src/app/core/models/group-model';
@@ -8,17 +8,20 @@ import { GroupService } from 'src/app/core/service/group.service';
 import { SignalRService } from 'src/app/core/service/signalR-service';
 import { environment } from 'src/environments/environment';
 import { GroupMemberModel } from 'src/app/core/models/group-member-model';
+import { Subscription } from 'rxjs';
+import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-content-body',
   templateUrl: './group-content-body.component.html',
   styleUrls: ['./group-content-body.component.scss']
 })
-export class GroupContentBodyComponent implements OnInit, AfterViewChecked {
+export class GroupContentBodyComponent implements OnInit, AfterViewChecked, OnDestroy {
 
   @Input() selectedGroup: GroupModel;
   @Input() joinedUsers: GroupMemberModel[];
 
+  subscriptions: Subscription[] = [];
   messages: GroupMessageModel[] = [];
   messageToBeReplied: GroupMessageModel;
   loggedInUser: LoggedInUserModel = this.authService.getLoggedInUserInfo();
@@ -38,21 +41,39 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
 
-    this.signalRService.groupMessageAdded.subscribe((groupMessage: GroupMessageModel) => {
-      groupMessage.senderImage = this.joinedUsers.find( user => user.userName === groupMessage.senderUserName).imageUrl;
-      groupMessage.message = this.setPath(groupMessage.messageType) + groupMessage.message;
-      groupMessage.createdAt = new Date(groupMessage.createdAt)
+    this.subscribeToGroupMessageAdded();
+    this.subscribeToGroupSelected();
+    this.subscribeToNotificationRaised();
+    this.fetchMessages();
+  }
+
+  subscribeToNotificationRaised(){
+    const sub = this.signalRService.notificationRaised.subscribe( notification => {
+      if(notification.raisedInGroup !== this.selectedGroup.name){
+        this.signalRService.addNotification.next(notification);
+      }
+    });
+    this.subscriptions.push(sub);
+  }
+
+  subscribeToGroupMessageAdded(){
+    const sub = this.signalRService.groupMessageAdded.subscribe((groupMessage: GroupMessageModel) => {
       if(groupMessage.groupId === this.selectedGroup.id){
+        groupMessage.senderImage = this.joinedUsers.find( user => user.userName === groupMessage.senderUserName).imageUrl;
+        groupMessage.message = this.setPath(groupMessage.messageType) + groupMessage.message;
+        groupMessage.createdAt = new Date(groupMessage.createdAt)
         this.messages.push(groupMessage);
       }
-    })
+    });
+    this.subscriptions.push(sub);
+  }
 
-    this.groupService.groupSelected.subscribe( group => {
+  subscribeToGroupSelected(){
+    const sub = this.groupService.groupSelected.subscribe( group => {
       this.selectedGroup = group;
       this.fetchMessages();
-    })
-
-    this.fetchMessages();
+    });
+    this.subscriptions.push(sub);
   }
 
   ngAfterViewChecked(){
@@ -94,7 +115,7 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked {
      formData.append("senderUserName", this.loggedInUser.sub);
      formData.append("groupId", this.selectedGroup.id+"");
 
-    this.groupService.sendFile(formData).subscribe(data => {})
+     this.groupService.sendFile(formData).subscribe(data => {})
   }
 
   cancelReply(){
@@ -112,14 +133,20 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked {
   }
 
   fetchMessages(){
-    this.groupService.fetchMessages(this.loggedInUser.sub, this.selectedGroup.id).subscribe( (messages:GroupMessageModel[]) => {
-      messages.forEach( message => {
-        message.senderImage = this.joinedUsers.find( user => user.userName === message.senderUserName).imageUrl;
-        message.message = this.setPath(message.messageType) + message.message;
-        message.createdAt = new Date(message.createdAt + 'Z')
-      })
-      this.messages = messages;
+    const sub = this.groupService.fetchMessages(this.loggedInUser.sub, this.selectedGroup.id).subscribe( (messages:GroupMessageModel[]) => {
+
+      setTimeout( () => {
+        messages.forEach( message => {
+          message.senderImage = this.joinedUsers.find( user => user.userName === message.senderUserName).imageUrl;
+          message.message = this.setPath(message.messageType) + message.message;
+          message.createdAt = new Date(message.createdAt + 'Z')
+        })
+        this.messages = messages;
+      }, 500);
+
+
     })
+    this.subscriptions.push(sub);
   }
 
   replyTothisMessage(message: GroupMessageModel){
@@ -141,5 +168,9 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked {
         return "";
       }
     }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach( sub => sub.unsubscribe());
   }
 }

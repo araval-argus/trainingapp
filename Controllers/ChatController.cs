@@ -28,18 +28,21 @@ namespace ChatApp.Controllers
         private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHubContext<ChatHub> hubContext;
         private readonly IOnlineUserService onlineUserService;
+        private readonly INotificationService notificationService;
 
         public ChatController(IChatService chatService, 
             IProfileService profileService, 
             IWebHostEnvironment webHostEnvironment, 
             IHubContext<ChatHub> hubContext,
-            IOnlineUserService onlineUserService)
+            IOnlineUserService onlineUserService,
+            INotificationService notificationService)
         {
             this.chatService = chatService;
             this.profileService = profileService;
             this.webHostEnvironment = webHostEnvironment;
             this.hubContext = hubContext;
             this.onlineUserService = onlineUserService;
+            this.notificationService = notificationService;
         }
 
 
@@ -49,12 +52,9 @@ namespace ChatApp.Controllers
         public IActionResult FetchFriends(string searchTerm)
         {
 
-            Console.WriteLine(searchTerm);
+            
             IEnumerable<UserModel> en = this.chatService.FetchFriendsProfiles(searchTerm);
-            foreach (UserModel profile in en)
-            {
-                Console.WriteLine(profile.FirstName);
-            }
+            
             return Ok(new { message = en });
         }
 
@@ -89,10 +89,12 @@ namespace ChatApp.Controllers
                     RepliedToMsg = FetchMessageFromId(m.RepliedToMsg),
                     MessageType = m.MessageType
                 }
-                ); ;
+                );
+
+            var notificationModels = this.notificationService.GetMessagesNotifications(loggedInUserId, friendId);
+            this.notificationService.DeleteNotifications(notificationModels);
             return Ok(new { messages = messagesToBeSent });
         }
-
 
         [HttpGet("fetchAll")]
         public IActionResult FetchAllUsers(string loggedInUsername)
@@ -121,22 +123,30 @@ namespace ChatApp.Controllers
                 CreatedAt = DateTime.UtcNow
             };
 
+            Notification notification = new()
+            {
+                CreatedAt = DateTime.UtcNow
+            };
+
             string path = webHostEnvironment.WebRootPath + @"/SharedFiles/";
 
             if (file.ContentType.StartsWith("image"))
             {
                 messageModel.MessageType = MessageType.Image;
                 messageModel.Message = FileManagement.CreateUniqueFile(path + "Images", file);
+                notification.Type = 2;
             }
             else if (file.ContentType.StartsWith("video"))
             {
                 messageModel.MessageType = MessageType.Video;
                 messageModel.Message = FileManagement.CreateUniqueFile(path + "Videos", file);
+                notification.Type = 3;
             }
             else if (file.ContentType.StartsWith("audio"))
             {
                 messageModel.MessageType = MessageType.Audio;
                 messageModel.Message = FileManagement.CreateUniqueFile(path + "Audios", file);
+                notification.Type = 4;
             }
             else
             {
@@ -147,11 +157,17 @@ namespace ChatApp.Controllers
 
             messageModel = ConvertToMessageModel(messageEntity);
 
+            notification.RaisedBy = messageEntity.SenderID;
+            notification.RaisedFor = messageEntity.RecieverID;
+
+            notification = this.notificationService.AddNotification(notification);
+
             string senderConnectionId = this.onlineUserService.FetchOnlineUser(messageModel.SenderUserName).ConnectionId;
             OnlineUserEntity reciever = this.onlineUserService.FetchOnlineUser(messageModel.RecieverUserName);
             if (reciever != null)
             {
                 this.hubContext.Clients.Clients(senderConnectionId, reciever.ConnectionId).SendAsync("AddMessageToTheList", messageModel);
+                this.hubContext.Clients.Client(reciever.ConnectionId).SendAsync("AddNotification", EntityToModel.ConvertToNotificationModel(notification));
             }
             else
             {

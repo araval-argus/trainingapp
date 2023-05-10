@@ -19,19 +19,23 @@ namespace ChatApp.Hubs
     
     public class ChatHub: Hub
     {
-        private IOnlineUserService onlineUserService;
-        private IProfileService profileService;
-        private IChatService chatService;
-        private IWebHostEnvironment webHostEnvironment;
-        private IGroupMessageService groupMessageService;
-        private IGroupMemberService groupMemberService;
+        private readonly IOnlineUserService onlineUserService;
+        private readonly IProfileService profileService;
+        private readonly IChatService chatService;
+        private readonly IWebHostEnvironment webHostEnvironment;
+        private readonly IGroupMessageService groupMessageService;
+        private readonly IGroupMemberService groupMemberService;
+        private readonly INotificationService notificationService;
+        private readonly IGroupService groupService;
 
         public ChatHub(IOnlineUserService onlineUserService,
             IProfileService profileService,
             IChatService chatService,
             IWebHostEnvironment webHostEnvironment,
             IGroupMessageService groupMessageService,
-            IGroupMemberService groupMemberService
+            IGroupMemberService groupMemberService,
+            INotificationService notificationService,
+            IGroupService groupService
             )
         {
             this.onlineUserService = onlineUserService;
@@ -40,6 +44,8 @@ namespace ChatApp.Hubs
             this.webHostEnvironment = webHostEnvironment;
             this.groupMessageService = groupMessageService;
             this.groupMemberService = groupMemberService;
+            this.notificationService = notificationService;
+            this.groupService = groupService;
         }
 
         public override Task OnConnectedAsync()
@@ -81,12 +87,25 @@ namespace ChatApp.Hubs
             MessageEntity messageEntityFromDb = this.chatService.AddMessage(messageModel);
 
             MessageModel message = ConvertToMessageModel(messageEntityFromDb);
+            Notification notification = new()
+            {
+                Type = 1,
+                RaisedBy = messageEntityFromDb.SenderID,
+                RaisedFor = messageEntityFromDb.RecieverID,
+                CreatedAt = messageEntityFromDb.CreatedAt
+                
+            };
+
+            notification = this.notificationService.AddNotification(notification);
 
             string senderConnectionId = this.onlineUserService.FetchOnlineUser(messageModel.SenderUserName).ConnectionId;
             OnlineUserEntity reciever = this.onlineUserService.FetchOnlineUser(messageModel.RecieverUserName);
+
             if (reciever != null)
             {
-                await Clients.Clients(senderConnectionId, reciever.ConnectionId).SendAsync("AddMessageToTheList", message);
+                await Clients.Clients(senderConnectionId, reciever.ConnectionId).SendAsync("AddMessageToTheList", message);               
+                NotificationModel notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                await Clients.Client(reciever.ConnectionId).SendAsync("AddNotification", notificationModel);
             }
             else
             {
@@ -107,7 +126,7 @@ namespace ChatApp.Hubs
 
             GroupMessage groupMessageFromDb = this.groupMessageService.AddGroupMessage(groupMessageModel);
 
-            GroupMessageModel message = EntityToModel.ConvertToGroupMessageModel(groupMessageFromDb);
+            GroupMessageModel message = EntityToModel.ConvertToGroupMessageModel(groupMessageFromDb);            
 
             if (groupMessageFromDb.RepliedToMsg >= 0)
             {
@@ -116,15 +135,39 @@ namespace ChatApp.Hubs
 
             IList<GroupMember> members = this.groupMemberService.ListOfJoinedMembers(groupMessageModel.GroupId);
             IList<string> onlineMembersConnectionIds = new List<string>();
+            Notification notification = new()
+            {
+                Type = 5,
+                RaisedBy = groupMessageFromDb.SenderID,
+                CreatedAt = groupMessageFromDb.CreatedAt,
+                RaisedInGroup = groupMessageModel.GroupId
+            };
 
             foreach (GroupMember member in members)
             {
                 string userName = this.profileService.FetchUserNameFromId(member.ProfileID);
                 OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser(userName);
-                if(onlineUser!= null)
+
+                notification.RaisedFor = member.ProfileID;
+                if(notification.RaisedFor != notification.RaisedBy)
+                {
+                    notification = this.notificationService.AddNotification(notification);
+                }
+                
+                if (onlineUser!= null)
                 {
                     onlineMembersConnectionIds.Add(onlineUser.ConnectionId);
+                    //because each user has his seperate notification
+                    if(onlineUser.UserName != groupMessageModel.SenderUserName)
+                    {
+                        var notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                        notificationModel.RaisedInGroup = this.groupService.FetchGroupFromId(groupMessageModel.GroupId).Name;
+                        await Clients.Client(onlineUser.ConnectionId).SendAsync("AddNotification", notificationModel);
+                    }
+                    
                 }
+                notification.Id = 0;
+
             }
             if(onlineMembersConnectionIds.Count > 0)
             {

@@ -4,6 +4,7 @@ import {
   ElementRef,
   EventEmitter,
   Input,
+  OnDestroy,
   OnInit,
   Output,
   ViewChild,
@@ -15,13 +16,14 @@ import { AuthService } from "src/app/core/service/auth-service";
 import { ChatService } from "src/app/core/service/chat-service";
 import { SignalRService } from "src/app/core/service/signalR-service";
 import { environment } from "src/environments/environment";
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: "app-chat-content-body",
   templateUrl: "./chat-content-body.component.html",
   styleUrls: ["./chat-content-body.component.scss"],
 })
-export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
+export class ChatContentBodyComponent implements OnInit, AfterViewChecked, OnDestroy {
   @Input() selectedFriend: UserModel;
   @Output() replyButtonClicked = new EventEmitter<MessageModel>();
 
@@ -29,6 +31,7 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
   messages: MessageModel[] = [];
   loggedInUser: LoggedInUserModel = this.authService.getLoggedInUserInfo();
   today = new Date().getDate();
+  subscriptions: Subscription[] = [];
 
   @ViewChild("scrollbar") scrollbar: ElementRef;
 
@@ -40,7 +43,15 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.chatService.messagesRecieved.subscribe((data: any) => {
+    this.subscribeToMessageRecieved();
+    this.subscribeToReplyButtonClicked();
+    this.subscribeToFriendSelected();
+    this.subscribeToMessageAdded();
+    this.subscribeToNotificationRaised();
+  }
+
+  subscribeToMessageRecieved(){
+    const sub = this.chatService.messagesRecieved.subscribe((data: any) => {
       //for setting the url of file
       data.messages.forEach((element) => {
         element.message = this.setPath(element.messageType) + element.message;
@@ -48,24 +59,45 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
       });
       this.messages = data.messages;
     });
+    this.subscriptions.push(sub);
+  }
 
-    this.replyButtonClicked.subscribe((message) => {
+  subscribeToReplyButtonClicked(){
+    let sub = this.replyButtonClicked.subscribe((message) => {
       this.messageToBeReplied = message;
     });
 
-    this.chatService.friendSelected.subscribe(() => {
+    this.subscriptions.push(sub);
+  }
+
+  subscribeToFriendSelected(){
+    const sub = this.chatService.friendSelected.subscribe(() => {
       this.scrollToTheBottom();
     });
+    this.subscriptions.push(sub);
+  }
 
-    this.signalRService.messageAdded.subscribe((message: MessageModel) => {
+  subscribeToMessageAdded(){
+    const sub = this.signalRService.messageAdded.subscribe((message: MessageModel) => {
       if(message.senderUserName === this.selectedFriend.userName || message.recieverUserName === this.selectedFriend.userName){
         message.message = this.setPath(message.messageType) + message.message;
         message.createdAt = new Date(message.createdAt);
         this.messages.push(message);
         this.scrollToTheBottom();
         this.messageToBeReplied = null;
+        //this.signalRService.notificationRemoved.next(this.selectedFriend.userName);
       }
     });
+    this.subscriptions.push(sub);
+  }
+
+  subscribeToNotificationRaised(){
+    const sub = this.signalRService.notificationRaised.subscribe( notification => {
+      if(notification.raisedBy !== this.selectedFriend.userName){
+        this.signalRService.addNotification.next(notification);
+      }
+    });
+    this.subscriptions.push(sub);
   }
 
   ngAfterViewChecked() {
@@ -97,5 +129,9 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked {
         return "";
       }
     }
+  }
+
+  ngOnDestroy(){
+    this.subscriptions.forEach(sub => sub.unsubscribe());
   }
 }

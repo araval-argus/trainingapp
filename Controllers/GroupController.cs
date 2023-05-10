@@ -19,13 +19,14 @@ namespace ChatApp.Controllers
     [Authorize]
     public class GroupController : ControllerBase
     {
-        private IGroupService groupService;
-        private IGroupMemberService groupMemberService;
-        private IProfileService profileService;
-        private IGroupMessageService groupMessageService;
-        private IWebHostEnvironment webHostEnvironment;
+        private readonly IGroupService groupService;
+        private readonly IGroupMemberService groupMemberService;
+        private readonly IProfileService profileService;
+        private readonly IGroupMessageService groupMessageService;
+        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IHubContext<ChatHub> hubContext;
         private readonly IOnlineUserService onlineUserService;
+        private readonly INotificationService notificationService;
 
         public GroupController(IGroupService groupService,
             IGroupMemberService groupMemberService,
@@ -33,7 +34,9 @@ namespace ChatApp.Controllers
             IGroupMessageService groupMessageService,
             IWebHostEnvironment webHostEnvironment,
             IHubContext<ChatHub> hubContext,
-            IOnlineUserService onlineUserService)
+            IOnlineUserService onlineUserService,
+            INotificationService notificationService
+            )
         {
             this.groupService = groupService;
             this.groupMemberService = groupMemberService;
@@ -42,6 +45,7 @@ namespace ChatApp.Controllers
             this.webHostEnvironment = webHostEnvironment;
             this.hubContext = hubContext;
             this.onlineUserService = onlineUserService;
+            this.notificationService = notificationService;
         }
 
         [HttpPost("CreateGroup")]
@@ -127,6 +131,14 @@ namespace ChatApp.Controllers
             int memberId = this.profileService.FetchIdFromUserName(User.UserName);
             this.groupMemberService.AddGroupMember(memberId, group.Id, false);
 
+            Notification notification = new()
+            {
+                Type = 11,
+                RaisedBy = senderId,
+                CreatedAt = DateTime.UtcNow,
+                RaisedInGroup = GroupId
+            };
+
             OnlineUserEntity newMember = this.onlineUserService.FetchOnlineUser(User.UserName);
 
             if(newMember != null)
@@ -140,11 +152,24 @@ namespace ChatApp.Controllers
             foreach (GroupMember member in members)
             {
                 string memberUserName = this.profileService.FetchUserNameFromId(member.ProfileID);
+
+                notification.RaisedFor = member.ProfileID;
+                notification = this.notificationService.AddNotification(notification);
+
                 OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser(memberUserName);
                 if (onlineUser != null)
                 {
+                    if(onlineUser.UserName != senderUsername)
+                    {
+                        var notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                        notificationModel.RaisedInGroup = group.Name;
+                        this.hubContext.Clients.Client(onlineUser.ConnectionId).SendAsync("AddNotification",
+                            notificationModel);
+                    }
                     onlineMembersConnectionIds.Add(onlineUser.ConnectionId);
                 }
+                // As id is identity and expects its value as 0 
+                notification.Id = 0;
             }
 
             this.hubContext.Clients.Clients(onlineMembersConnectionIds).SendAsync("AddGroupMember", User);
@@ -156,7 +181,7 @@ namespace ChatApp.Controllers
         public IActionResult RemoveMember([FromQuery] string MemberUserName, [FromQuery] int GroupId, [FromHeader] string Authorization)
         {
             string senderUserName = CustomAuthorization.GetUsernameFromToken(Authorization);
-            int senderId = this.profileService.FetchProfileFromUserName(senderUserName).Id;
+            int senderId = this.profileService.FetchProfileFromUserName(senderUserName).Id;            
 
             if(senderUserName != MemberUserName && !this.groupMemberService.IsAdmin(senderId, GroupId))
             {
@@ -188,7 +213,14 @@ namespace ChatApp.Controllers
                 return BadRequest("Something went wrong");
             }
 
-            if(member.IsAdmin)
+            Notification notification = new()
+            {
+                RaisedBy = senderId,
+                CreatedAt = DateTime.UtcNow,
+                RaisedInGroup = GroupId
+            };
+
+            if (member.IsAdmin)
             {
 
                 IList<GroupMember> joinedMembers = this.groupMemberService.ListOfJoinedMembers(GroupId);
@@ -201,8 +233,10 @@ namespace ChatApp.Controllers
                 if (!this.groupMemberService.IsThereAnyAdminLeftInTheGroup(GroupId))
                 {
                     this.groupMemberService.MakeAdmin(joinedMembers[0]);
-                }
+                }                
             }
+
+            notification.Type = senderUserName == MemberUserName ? 9 : 10;
 
             OnlineUserEntity removedMember = this.onlineUserService.FetchOnlineUser(MemberUserName);
             if(removedMember != null)
@@ -217,17 +251,40 @@ namespace ChatApp.Controllers
             {
                 string memberUserName = this.profileService.FetchUserNameFromId(groupMember.ProfileID);
                 OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser(memberUserName);
+
+                notification.RaisedFor = groupMember.ProfileID;
+                notification = this.notificationService.AddNotification(notification);
+
                 if (onlineUser != null)
                 {
                     onlineMembersConnectionIds.Add(onlineUser.ConnectionId);
+                    if(onlineUser.UserName != senderUserName)
+                    {
+                        var notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                        notificationModel.RaisedInGroup = group.Name;
+                        this.hubContext.Clients.Client(onlineUser.ConnectionId).SendAsync("AddNotification",
+                            notificationModel);
+                    }
                 }
+
+                notification.Id = 0;
             }
 
-            this.hubContext.Clients.Clients(onlineMembersConnectionIds).SendAsync("MemberRemoved", MemberUserName);
+            GroupMemberModel removedMemberToBeSent = new()
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                UserName = user.UserName,
+                ImageUrl = user.ImageUrl,
+                IsAdmin = member.IsAdmin,
+                groupId = GroupId,                
+            };
+
+            this.hubContext.Clients.Clients(onlineMembersConnectionIds).SendAsync("MemberRemoved", removedMemberToBeSent);
 
             string message = senderUserName == MemberUserName ? "You left the group" : "You Removed the user";
 
-            return Ok(new { message = message });
+            return Ok(new { message });
         }
 
         [HttpGet("FetchJoinedMembers")]
@@ -324,6 +381,9 @@ namespace ChatApp.Controllers
 
             IList<GroupMessageModel> messages = this.groupMessageService.FetchGroupMessages(GroupId);
 
+            var groupNotifications = this.notificationService.GetGroupMessagesNotifications(user.Id, GroupId);
+            this.notificationService.DeleteNotifications(groupNotifications);
+
             return Ok(messages);
         }
 
@@ -356,20 +416,28 @@ namespace ChatApp.Controllers
                 CreatedAt = DateTime.Now
             };
 
+            Notification notification = new()
+            {
+                RaisedInGroup = FileModel.GroupId,
+                CreatedAt = DateTime.Now
+            };
             if (file.ContentType.StartsWith("image"))
             {
                 groupMessageModel.MessageType = MessageType.Image;
                 groupMessageModel.Message = FileManagement.CreateUniqueFile(path + "Images", file);
+                notification.Type = 6;
             }
             else if (file.ContentType.StartsWith("video"))
             {
                 groupMessageModel.MessageType = MessageType.Video;
                 groupMessageModel.Message = FileManagement.CreateUniqueFile(path + "Videos", file);
+                notification.Type = 7;
             }
             else if (file.ContentType.StartsWith("audio"))
             {
                 groupMessageModel.MessageType = MessageType.Audio;
                 groupMessageModel.Message = FileManagement.CreateUniqueFile(path + "Audios", file);
+                notification.Type = 8;
             }
             else
             {
@@ -377,18 +445,32 @@ namespace ChatApp.Controllers
             }
 
             GroupMessage groupMessageFromDb = this.groupMessageService.AddGroupMessage(groupMessageModel);
-            GroupMessageModel message = EntityToModel.ConvertToGroupMessageModel(groupMessageFromDb);
+            GroupMessageModel message = EntityToModel.ConvertToGroupMessageModel(groupMessageFromDb);            
 
             IList<GroupMember> members = this.groupMemberService.ListOfJoinedMembers(groupMessageModel.GroupId);
             IList<string> onlineMembersConnectionIds = new List<string>();
 
+            notification.RaisedBy = groupMessageFromDb.SenderID;
             foreach (GroupMember member in members)
             {
                 string memberUserName = this.profileService.FetchUserNameFromId(member.ProfileID);
+                notification.RaisedFor = member.ProfileID;
                 OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser(memberUserName);
                 if (onlineUser != null)
                 {
                     onlineMembersConnectionIds.Add(onlineUser.ConnectionId);
+                    if(onlineUser.UserName != FileModel.SenderUserName)
+                    {
+                        notification = this.notificationService.AddNotification(notification);
+                        var notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                        notificationModel.RaisedInGroup = this.groupService.FetchGroupFromId(FileModel.GroupId).Name;
+                        this.hubContext.Clients.Client(onlineUser.ConnectionId).SendAsync("AddNotification",
+                            notificationModel);
+                        // As id column is set to identity so it expects null value for identity column but
+                        // the data type is integer so 0 is act as a null
+                        notification.Id = 0;
+                    }
+                    
                 }
             }
 
@@ -415,9 +497,44 @@ namespace ChatApp.Controllers
                 return Unauthorized("Only admin can make other members admin");
             }
 
+            Notification notification = new()
+            {
+                Type = 12,
+                RaisedBy = senderId,
+                CreatedAt = DateTime.UtcNow,
+                RaisedInGroup = groupMemberModel.groupId
+            };
+
             var memberProfile = this.profileService.FetchProfileFromUserName(groupMemberModel.UserName);
             var member = this.groupMemberService.FetchMember(memberProfile.Id, groupMemberModel.groupId);
             this.groupMemberService.MakeAdmin(member);
+
+            IList<GroupMember> members = this.groupMemberService.ListOfJoinedMembers(groupMemberModel.groupId);
+            IList<string> onlineMembersConnectionIds = new List<string>();
+
+            foreach (GroupMember groupMember in members)
+            {
+                string memberUserName = this.profileService.FetchUserNameFromId(groupMember.ProfileID);
+                OnlineUserEntity onlineUser = this.onlineUserService.FetchOnlineUser(memberUserName);
+
+                notification.RaisedFor = groupMember.ProfileID;
+                notification = this.notificationService.AddNotification(notification);
+
+                if (onlineUser != null)
+                {
+                    onlineMembersConnectionIds.Add(onlineUser.ConnectionId);
+                    if (onlineUser.UserName != senderUsername)
+                    {
+                        var notificationModel = EntityToModel.ConvertToNotificationModel(notification);
+                        notificationModel.RaisedInGroup = this.groupService.FetchGroupFromId(groupMemberModel.groupId).Name;
+                        this.hubContext.Clients.Client(onlineUser.ConnectionId).SendAsync("AddNotification",
+                            notificationModel);
+                    }
+                }
+
+                notification.Id = 0;
+            }
+
             groupMemberModel.IsAdmin = true;
             return Ok(groupMemberModel);
         }
