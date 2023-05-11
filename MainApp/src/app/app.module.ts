@@ -15,6 +15,7 @@ import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
 import { EditFormComponent } from './views/pages/edit-form/edit-form.component';
 import { ModalComponent } from './views/pages/ui-components/modal/modal.component';
+import { ChartsModule } from 'ng2-charts';
 
 
 @NgModule({
@@ -31,7 +32,8 @@ import { ModalComponent } from './views/pages/ui-components/modal/modal.componen
     LayoutModule,
     HttpClientModule,
     FormsModule,
-    ButtonModule
+    ButtonModule,
+    ChartsModule
   ],
   providers: [
     AuthGuard,

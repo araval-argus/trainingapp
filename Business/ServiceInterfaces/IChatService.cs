@@ -17,5 +17,8 @@ namespace ChatApp.Business.ServiceInterfaces
         void MarkMsgsAsSeen(IEnumerable<MessageEntity> messages);
 
         void MarkMsgAsSeen(int messageId);
+
+        //fetches all messages of all interacted users
+        IList<MessageEntity> FetchAllMessages(int userID);
     }
 }

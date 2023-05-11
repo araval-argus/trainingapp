@@ -12,5 +12,6 @@ namespace ChatApp.Business.ServiceInterfaces
         void DeleteAllGroupMessages(int groupId);
         void RemoveAllGroupMessagesSentByMember(int memberId, int groupId);
         GroupMessage FetchLastMessage(int groupId);
+        IList<GroupMessage> FetchAllGroupMessages(int userId);
     }
 }

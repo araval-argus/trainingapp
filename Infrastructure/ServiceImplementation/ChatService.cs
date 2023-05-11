@@ -93,5 +93,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 this.context.SaveChanges();
             }
         }
+
+        public IList<MessageEntity> FetchAllMessages(int userID)
+        {
+            IList<MessageEntity> messageEntities = new List<MessageEntity>();
+            messageEntities = this.context.Messages
+                .Where(message => message.SenderID == userID || message.RecieverID == userID).ToList();
+            return messageEntities;
+        }
     }
 }

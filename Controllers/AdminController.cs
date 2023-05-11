@@ -1,15 +1,11 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context.EntityClasses;
 using ChatApp.Hubs;
-using ChatApp.Infrastructure.ServiceImplementation;
 using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using System;
 using System.Linq;
-using System.Linq.Expressions;
 
 namespace ChatApp.Controllers
 {

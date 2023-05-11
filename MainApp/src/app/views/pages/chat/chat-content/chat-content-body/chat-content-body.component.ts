@@ -52,12 +52,15 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked, OnDes
 
   subscribeToMessageRecieved(){
     const sub = this.chatService.messagesRecieved.subscribe((data: any) => {
+      console.log(data)
       //for setting the url of file
       data.messages.forEach((element) => {
         element.message = this.setPath(element.messageType) + element.message;
         element.createdAt = new Date(element.createdAt + 'Z')
       });
       this.messages = data.messages;
+      console.log(this.messages);
+      this.scrollToTheBottom();
     });
     this.subscriptions.push(sub);
   }
@@ -105,7 +108,6 @@ export class ChatContentBodyComponent implements OnInit, AfterViewChecked, OnDes
   }
 
   replyToThisMessage(message) {
-    console.log(message);
     this.replyButtonClicked.emit(message);
   }
 

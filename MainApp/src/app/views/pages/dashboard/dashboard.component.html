@@ -1,6 +1,21 @@
-<div class="d-flex justify-content-between align-items-center flex-wrap grid-margin">
+<div class="">
   <div>
-    <h4 class="mb-3 mb-md-0">Welcome to Dashboard</h4>
+    <h3 class="mb-3 mb-md-0">Insights</h3>
+  </div>
+  <div id="chart" class="mt-5">
+    <apx-chart *ngIf="chartOptions"
+    [series]="chartOptions.series"
+    [chart]="chartOptions.chart"
+    [xaxis]="chartOptions.xaxis"
+    [stroke]="chartOptions.stroke"
+    [tooltip]="chartOptions.tooltip"
+    [dataLabels]="chartOptions.dataLabels"
+    [legend]="chartOptions.legend"
+    [markers]="chartOptions.markers"
+    [grid]="chartOptions.grid"
+    [yaxis]="chartOptions.yaxis"
+    [title]="chartOptions.title"
+  ></apx-chart>
   </div>
 
 </div>

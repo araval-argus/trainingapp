@@ -97,5 +97,21 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return this.context.GroupMessages.OrderBy(message => message.Id).LastOrDefault(message => message.GroupID == groupId);
         }
 
+        public IList<GroupMessage> FetchAllGroupMessages(int userId)
+        {
+            IList<GroupMessage> groupMessages = new List<GroupMessage>();
+
+            IEnumerable<GroupMember> groupMembers = this.context.GroupMembers.Where(member => member.ProfileID == userId);
+
+            foreach(GroupMember member in groupMembers)
+            {
+                int groupIdOfGroupMember = member.GroupID;
+                var messages = this.context.GroupMessages.Where(message => message.GroupID == groupIdOfGroupMember);
+                groupMessages = groupMessages.Concat(messages).ToList();
+
+            }
+
+            return groupMessages;
+        }
     }
 }
