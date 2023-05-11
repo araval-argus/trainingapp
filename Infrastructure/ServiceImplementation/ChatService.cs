@@ -28,7 +28,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 		public IEnumerable<ColleagueModel> SearchColleague(string name, string username)
 		{
 			return context.Profiles
-			.Where(profile => (profile.FirstName.ToLower().StartsWith(name) || profile.LastName.ToLower().StartsWith(name)) && profile.UserName != username)
+			.Where(profile => (profile.FirstName.ToLower().StartsWith(name) || profile.LastName.ToLower().StartsWith(name)) && profile.UserName != username &&profile.IsDeleted==0)
 			.Select(colleagues => new ColleagueModel()
 			{
 				FirstName = colleagues.FirstName,
@@ -64,40 +64,42 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId) || (msg.MessageFrom == selUserId && msg.MessageTo == userId));
 			var returnList = new List<MessageSendModel>();
 			var response = new List<MessageSendModel>();
-
-			foreach (var msg in list)
+			if (context.Profiles.FirstOrDefault(u => u.Id == selUserId).IsDeleted == 0)
 			{
-				var newObj = new MessageSendModel
+				foreach (var msg in list)
 				{
-					Id = msg.Id,
-					Content = msg.Content,
-					CreatedAt = msg.CreatedAt,
-					MessageFrom = (msg.MessageFrom == userId) ? userName : selUserName,
-					MessageTo = (msg.MessageTo == userId) ? userName : selUserName,
-					Type = msg.Type,
-				};
-				if(msg.MessageFrom == selUserId && msg.MessageTo == userId)
-				{
-					newObj.Seen = 1;
-					msg.Seen = 1;
+					var newObj = new MessageSendModel
+					{
+						Id = msg.Id,
+						Content = msg.Content,
+						CreatedAt = msg.CreatedAt,
+						MessageFrom = (msg.MessageFrom == userId) ? userName : selUserName,
+						MessageTo = (msg.MessageTo == userId) ? userName : selUserName,
+						Type = msg.Type,
+					};
+					if (msg.MessageFrom == selUserId && msg.MessageTo == userId)
+					{
+						newObj.Seen = 1;
+						msg.Seen = 1;
+					}
+					else
+					{
+						newObj.Seen = msg.Seen;
+					}
+					if (msg.RepliedTo != -1)
+					{
+						var curmsg = context.Messages.FirstOrDefault(e => e.Id == msg.RepliedTo);
+						newObj.RepliedTo = curmsg.Content;
+					}
+					else
+					{
+						newObj.RepliedTo = null;
+					}
+					returnList.Add(newObj);
 				}
-				else
-				{
-					newObj.Seen = msg.Seen;
-				}
-				if (msg.RepliedTo != -1)
-				{
-					var curmsg = context.Messages.FirstOrDefault(e => e.Id == msg.RepliedTo);
-					newObj.RepliedTo = curmsg.Content;
-				}
-				else
-				{
-					newObj.RepliedTo = null;
-				}
-				returnList.Add(newObj);
+				context.SaveChanges();
+				response = returnList.OrderBy(e => e.CreatedAt).ToList();
 			}
-			context.SaveChanges();
-			response = returnList.OrderBy(e => e.CreatedAt).ToList();
 			return response;
 		}
 
@@ -115,21 +117,24 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 			foreach (var userId in userTalkedWith)
 			{
-				Profile userTalked = context.Profiles.FirstOrDefault(profile => profile.Id == userId);
-				var msg = sortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
-				var seenCount = sortedMessages.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == curUserId && msg.Seen == 0)).Count();
-				var newObj = new RecentChatModel
+				Profile userTalked = context.Profiles.FirstOrDefault(profile => profile.Id == userId && profile.IsDeleted==0);
+				if (userTalked != null)
 				{
-					Content = msg.Content,
-					CreatedAt = (DateTime)msg.CreatedAt,
-					FirstName = userTalked.FirstName,
-					LastName = userTalked.LastName,
-					ImagePath = userTalked.ImagePath,
-					UserName = userTalked.UserName,
-					Seen = seenCount,
-					Type = msg.Type,
-				};
-				recentChatList.Add(newObj);
+					var msg = sortedMessages.FirstOrDefault(m => m.MessageFrom == userId || m.MessageTo == userId);
+					var seenCount = sortedMessages.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == curUserId && msg.Seen == 0)).Count();
+					var newObj = new RecentChatModel
+					{
+						Content = msg.Content,
+						CreatedAt = (DateTime)msg.CreatedAt,
+						FirstName = userTalked.FirstName,
+						LastName = userTalked.LastName,
+						ImagePath = userTalked.ImagePath,
+						UserName = userTalked.UserName,
+						Seen = seenCount,
+						Type = msg.Type,
+					};
+					recentChatList.Add(newObj);
+				}
 			}
 			var orderedRecentChatList = recentChatList.OrderByDescending(m => m.CreatedAt);
 			return orderedRecentChatList;
@@ -173,102 +178,106 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 		public void SendFileMessage(MessageModel msg)
 		{
-			var message = new Message();
-			var filename = Guid.NewGuid().ToString(); // new generated image file name
-			var extension = Path.GetExtension(msg.File.FileName);// Get Extension Of the File
-			var filetype = msg.File.ContentType.Split('/')[0];
-			string uploads;
-			if (filetype == "audio")
+			var profile = context.Profiles.Where(u => u.UserName == msg.MessageTo && u.IsDeleted == 0);
+			if (profile != null)
 			{
-				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/audio");
-				message.Content = "/chat/audio/" + filename + extension;
-				message.Type = "audio";
-			}
-			else if (filetype == "video")
-			{
-				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/videos");
-				message.Content = "/chat/videos/" + filename + extension;
-				message.Type = "video";
-			}
-			else
-			{
-				uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/images");
-				message.Content = "/chat/images/" + filename + extension;
-				message.Type = "image";
-			}
-
-			using (var fileStreams = new FileStream(Path.Combine(uploads, filename + extension), FileMode.Create))
-			{
-				msg.File.CopyTo(fileStreams);
-			}			
-
-			message.MessageTo = GetIdFromUserName(msg.MessageTo);
-			message.MessageFrom = GetIdFromUserName(msg.MessageFrom);
-			message.RepliedTo = -1;
-			message.Seen = 0;
-			message.CreatedAt = DateTime.Now;
-
-			context.Messages.Add(message);
-			context.SaveChanges();
-
-			var response = new MessageSendModel()
-			{
-				Id = message.Id,
-				Content = message.Content,
-				CreatedAt = message.CreatedAt,
-				MessageFrom = msg.MessageFrom,
-				MessageTo = msg.MessageTo,
-				RepliedTo = null,
-				Seen = 0,
-				Type= message.Type,
-			};
-
-			//NOTIFICATION
-			var existingNoti = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId==null);
-			if (existingNoti == null)
-			{
-				var Notification = new Notifications
+				var message = new Message();
+				var filename = Guid.NewGuid().ToString(); // new generated image file name
+				var extension = Path.GetExtension(msg.File.FileName);// Get Extension Of the File
+				var filetype = msg.File.ContentType.Split('/')[0];
+				string uploads;
+				if (filetype == "audio")
 				{
-					FromId = GetIdFromUserName(msg.MessageFrom),
-					ToId = GetIdFromUserName(msg.MessageTo),
-					GroupId = null,
-					Content = msg.MessageFrom + " Sent You " + filetype,
-					CreatedAt = DateTime.Now,
-				};
-				context.Notifications.Add(Notification);
-				context.SaveChanges();
-			}
-			else
-			{
-				existingNoti.Content = msg.MessageFrom + " Sent You " + filetype;
-				existingNoti.CreatedAt = DateTime.Now;
-				context.Update(existingNoti);
-				context.SaveChanges();
-			}
-
-			//Sending Response
-			Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageFrom);
-			Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageTo);
-			if (Receiver != null)
-			{
-				var profile = context.Profiles.FirstOrDefault(u => u.UserName == msg.MessageFrom);
-				var notification = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId == null);
-				var notif = new NotificationsDTO
+					uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/audio");
+					message.Content = "/chat/audio/" + filename + extension;
+					message.Type = "audio";
+				}
+				else if (filetype == "video")
 				{
-					Id = notification.Id,
-					MsgFrom = profile.UserName,
-					MsgTo = msg.MessageTo,
-					GroupId = notification.GroupId,
-					Content = notification.Content,
-					CreatedAt = notification.CreatedAt,
-					FromImage = profile.ImagePath
+					uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/videos");
+					message.Content = "/chat/videos/" + filename + extension;
+					message.Type = "video";
+				}
+				else
+				{
+					uploads = Path.Combine(webHostEnvironment.WebRootPath, @"chat/images");
+					message.Content = "/chat/images/" + filename + extension;
+					message.Type = "image";
+				}
+
+				using (var fileStreams = new FileStream(Path.Combine(uploads, filename + extension), FileMode.Create))
+				{
+					msg.File.CopyTo(fileStreams);
+				}
+
+				message.MessageTo = GetIdFromUserName(msg.MessageTo);
+				message.MessageFrom = GetIdFromUserName(msg.MessageFrom);
+				message.RepliedTo = -1;
+				message.Seen = 0;
+				message.CreatedAt = DateTime.Now;
+
+				context.Messages.Add(message);
+				context.SaveChanges();
+
+				var response = new MessageSendModel()
+				{
+					Id = message.Id,
+					Content = message.Content,
+					CreatedAt = message.CreatedAt,
+					MessageFrom = msg.MessageFrom,
+					MessageTo = msg.MessageTo,
+					RepliedTo = null,
+					Seen = 0,
+					Type = message.Type,
 				};
-				this.hubContext.Clients.Clients(Sender.SignalId, Receiver.SignalId).SendAsync("recieveMessage", response);
-				this.hubContext.Clients.Client(Receiver.SignalId).SendAsync("notification", notif);
-			}
-			else
-			{
-				this.hubContext.Clients.Client(Sender.SignalId).SendAsync("recieveMessage", response);
+
+				//NOTIFICATION
+				var existingNoti = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId == null);
+				if (existingNoti == null)
+				{
+					var Notification = new Notifications
+					{
+						FromId = GetIdFromUserName(msg.MessageFrom),
+						ToId = GetIdFromUserName(msg.MessageTo),
+						GroupId = null,
+						Content = msg.MessageFrom + " Sent You " + filetype,
+						CreatedAt = DateTime.Now,
+					};
+					context.Notifications.Add(Notification);
+					context.SaveChanges();
+				}
+				else
+				{
+					existingNoti.Content = msg.MessageFrom + " Sent You " + filetype;
+					existingNoti.CreatedAt = DateTime.Now;
+					context.Update(existingNoti);
+					context.SaveChanges();
+				}
+
+				//Sending Response
+				Connections Sender = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageFrom);
+				Connections Receiver = this.context.Connections.FirstOrDefault(u => u.ProfileId == message.MessageTo);
+				if (Receiver != null)
+				{
+					var fromProfile = context.Profiles.FirstOrDefault(u => u.UserName == msg.MessageFrom);
+					var notification = context.Notifications.FirstOrDefault(u => u.ToId == message.MessageTo && u.FromId == message.MessageFrom && u.GroupId == null);
+					var notif = new NotificationsDTO
+					{
+						Id = notification.Id,
+						MsgFrom = fromProfile.UserName,
+						MsgTo = msg.MessageTo,
+						GroupId = notification.GroupId,
+						Content = notification.Content,
+						CreatedAt = notification.CreatedAt,
+						FromImage = fromProfile.ImagePath
+					};
+					this.hubContext.Clients.Clients(Sender.SignalId, Receiver.SignalId).SendAsync("recieveMessage", response);
+					this.hubContext.Clients.Client(Receiver.SignalId).SendAsync("notification", notif);
+				}
+				else
+				{
+					this.hubContext.Clients.Client(Sender.SignalId).SendAsync("recieveMessage", response);
+				}
 			}
 		}
 	}

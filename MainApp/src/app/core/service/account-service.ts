@@ -34,4 +34,20 @@ export class AccountService {
     changeStatus(statusCode:number , userName:string){
       return this.http.post(environment.apiUrl + "/account/ChangeStatus/" + userName , statusCode );
     }
+
+    getAllUsers(){
+      return this.http.get(environment.apiUrl + "/account/GetUsers");
+    }
+
+    getAllDesignation(){
+      return this.http.get(environment.apiUrl + "/admin/GetDesignation")
+    }
+
+    DeleteUser(userName:string){
+      return this.http.delete(environment.apiUrl + "/admin/DeleteUser/" + userName)
+    }
+
+    updateByAdmin( formdata : FormData ){
+      return this.http.post(environment.apiUrl + "/admin/UpdateProfile" , formdata);
+  }
 }

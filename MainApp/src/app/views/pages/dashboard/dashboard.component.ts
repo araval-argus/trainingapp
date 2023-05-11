@@ -40,8 +40,13 @@ export type ChartOptions = {
   chart: ApexChart;
   xaxis: ApexXAxis;
   stroke: ApexStroke;
-  tooltip: ApexTooltip;
   dataLabels: ApexDataLabels;
+  markers: ApexMarkers;
+  tooltip: any; // ApexTooltip;
+  yaxis: ApexYAxis;
+  grid: ApexGrid;
+  legend: ApexLegend;
+  title: ApexTitleSubtitle;
 };
 
 @Component({
@@ -65,39 +70,89 @@ export class DashboardComponent implements OnInit {
    // })
   // }
     this.dashboardService.getChartDetails().subscribe((data:any)=>{
-      {
-        this.chartOptions = {
-          series: [
+
+      this.chartOptions = {
+        series: [
+          {
+            name: "Total Message",
+            data: data.total
+          },
+          {
+            name: "Chat Message",
+            data: data.chat
+          },
+          {
+            name: "Group Message",
+            data: data.group
+          }
+        ],
+        chart: {
+          height: 350,
+          type: "line"
+        },
+        dataLabels: {
+          enabled: false
+        },
+        stroke: {
+          width: 5,
+          curve: "smooth",
+          dashArray: [0, 8, 5]
+        },
+        title: {
+          text: "Message Statistics",
+          align: "left"
+        },
+        legend: {
+          tooltipHoverFormatter: function(val, opts) {
+            return (
+              val +
+              " - <strong>" +
+              opts.w.globals.series[opts.seriesIndex][opts.dataPointIndex] +
+              "</strong>"
+            );
+          }
+        },
+        markers: {
+          size: 0,
+          hover: {
+            sizeOffset: 6
+          }
+        },
+        xaxis: {
+          labels: {
+            trim: false
+          },
+          categories: data.dates
+        },
+        tooltip: {
+          y: [
             {
-              name: "PersonalChat",
-              data: data.chat,
+              title: {
+                formatter: function(val) {
+                  return val ;
+                }
+              }
             },
             {
-              name: "GroupChat",
-              data: data.group,
+              title: {
+                formatter: function(val) {
+                  return val;
+                }
+              }
             },
-          ],
-          chart: {
-            height: 350,
-            type: "area",
-          },
-          dataLabels: {
-            enabled: false,
-          },
-          stroke: {
-            curve: "smooth",
-          },
-          xaxis: {
-            type: "datetime",
-            categories: data.dates,
-          },
-          tooltip: {
-            x: {
-              format: "dd/MM/yy",
-            },
-          },
-        };
-      }
-    });
-  }
-}
+            {
+              title: {
+                formatter: function(val) {
+                  return val;
+                }
+              }
+            }
+          ]
+        },
+        grid: {
+          borderColor: "#f1f1f1"
+        }
+      };
+    })}}
+
+

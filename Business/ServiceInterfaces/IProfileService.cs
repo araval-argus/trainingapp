@@ -11,13 +11,13 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IProfileService
     {
-        Profile CheckPassword(LoginModel loginModel);
+        string CheckPassword(LoginModel loginModel);
 
-        Profile RegisterUser(RegisterModel regModel);
+        string RegisterUser(RegisterModel regModel);
 
-        Profile UpdateUser(UpdateModel regModel, string username );
+        string UpdateUser(UpdateModel regModel, string username );
 
-        Profile GetUser(Expression<Func<Profile,bool>> Filter);
+        Profile GetUser(string Filter);
 
         public string GetUserNameFromId(int id);
 
@@ -32,5 +32,12 @@ namespace ChatApp.Business.ServiceInterfaces
         public List<UserStatus> GetAllStatus();
 
         public UserStatus getUserStatus(string userName);
+
+        public List<ColleagueModel> getAllUsers(string userName);
+
+        public bool CheckDeleted(string userName);
+
+        public string GenerateJSONWebToken(Profile profileInfo);
+
 	}
 }

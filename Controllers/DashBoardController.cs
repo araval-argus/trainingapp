@@ -20,8 +20,9 @@ namespace ChatApp.Controllers
 		{
 			int[] chat;
 			int[] group;
-			List<DateTime> dates = _dashboardService.chartDetails(out chat, out group);
-			return Ok(new {chat,group,dates});
+			int[] total;
+			List<DateTime> dates = _dashboardService.chartDetails(out chat, out group , out total);
+			return Ok(new {chat,group,dates,total});
 		}
 	}
 }

@@ -63,7 +63,7 @@ namespace ChatApp.Controllers
 		}
 
 		[HttpPost("AllProfiles")]
-		public IActionResult GetAllPRofiles([FromBody] int groupId, [FromHeader] string Authorization)
+		public IActionResult GetAllProfiles([FromBody] int groupId, [FromHeader] string Authorization)
 		{
 			string userName = GetUsernameFromToken(Authorization);
 			if (context.Groups.Any(u => u.Id == groupId))

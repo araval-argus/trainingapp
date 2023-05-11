@@ -14,7 +14,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			this.context = context;
 		}
 
-		public List<DateTime> chartDetails(out int[] chat , out int[] group)
+		public List<DateTime> chartDetails(out int[] chat , out int[] group , out int[] total)
 		{
 			DateTime startDate = new DateTime(2023, 5, 1);
 			DateTime endDate = DateTime.Now.Date;
@@ -22,6 +22,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 			int[] array1 = new int[totalDays.Days + 1];
 			int[] array2 = new int[totalDays.Days + 1];
+			int[] array3 = new int[totalDays.Days + 1];
 
 			List<DateTime> dateList = new List<DateTime>();
 
@@ -34,9 +35,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 				int count2 = context.GroupMessages.Count(m => m.CreatedAt.Date == date);
 
+				array3[(date - startDate).Days] = count1+count2;
 				array1[(date - startDate).Days] = count1;
 				array2[(date - startDate).Days] = count2;
 			}
+			total = array3;
 			chat = array1;
 			group = array2;
 			return dateList;

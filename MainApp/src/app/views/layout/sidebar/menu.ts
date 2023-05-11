@@ -8,7 +8,12 @@ export const MENU: MenuItem[] = [
   {
     label: 'Dashboard',
     icon: 'home',
-    link: '/dashboard'
+    link: '/dashboard',
+  },
+  {
+    label: 'Employees',
+    icon: 'list',
+    link: 'employees'
   },
   {
     label: 'Chat',

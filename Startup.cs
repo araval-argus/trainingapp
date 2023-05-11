@@ -1,3 +1,4 @@
+using ChatApp.Business.Helpers;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Infrastructure.ServiceImplementation;
@@ -44,6 +45,9 @@ namespace ChatApp
                      IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                  };
              });
+
+			services.AddAuthorization(options => options.AddPolicy
+            ("AdminPolicy", policy => policy.RequireClaim(ClaimsConstant.DesignationClaim, "CEO", "CTO")));
 
 			services.AddCors(options =>
 				{
@@ -98,6 +102,7 @@ namespace ChatApp
             services.AddScoped<IGroupService, GroupService>();
             services.AddScoped<INotificationServices, NotificationService>();
             services.AddScoped<IDashBoardService, DashBoardService>();
+            services.AddScoped<IAdminService, AdminService>();
 
 			// In production, the Angular files will be served from this directory
 

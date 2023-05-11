@@ -1,6 +1,7 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import {TableModule} from 'primeng/table';
 
 import { AppRoutingModule } from './app-routing.module';
 
@@ -17,6 +18,8 @@ import { TokenInterceptor } from './core/helper/token-interceptor';
 import { AuthService } from './core/service/auth-service';
 import { UpdateComponent } from './views/pages/update/update.component';
 import { ViewprofileComponent } from './views/pages/viewprofile/viewprofile.component';
+import { EmployeesComponent } from './views/pages/employees/employees.component';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -24,6 +27,7 @@ import { ViewprofileComponent } from './views/pages/viewprofile/viewprofile.comp
     ErrorPageComponent,
     UpdateComponent,
     ViewprofileComponent,
+    EmployeesComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,6 +37,8 @@ import { ViewprofileComponent } from './views/pages/viewprofile/viewprofile.comp
     HttpClientModule,
     FormsModule,
     ReactiveFormsModule,
+    TableModule,
+    NgSelectModule,
   ],
   providers: [
     AuthGuard,

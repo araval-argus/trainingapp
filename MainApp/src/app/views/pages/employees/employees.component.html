@@ -1,0 +1,94 @@
+<div class="card">
+<p-table #dt [value]="users" responsiveLayout [globalFilterFields]="['userName', 'firstName', 'lastName', 'email']" [rows]="10" [class]="'custom-table'">
+  <ng-template pTemplate="caption">
+    <div class="flex align-items-center justify-content-between">
+        <h5 class="m-0">Manage Employees</h5>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="header">
+      <tr>
+          <th pSortableColumn="userName">UserName<p-sortIcon field="userName"></p-sortIcon></th>
+          <th style="max-width:10rem">Image</th>
+          <th pSortableColumn="firstName">First Name<p-sortIcon field="firstName"></p-sortIcon></th>
+          <th pSortableColumn="lastName">Last Name<p-sortIcon field="lastName"></p-sortIcon></th>
+          <th pSortableColumn="email" style="min-width:40rem">Email<p-sortIcon field="email"></p-sortIcon></th>
+          <th pSortableColumn="designation">Designation<p-sortIcon field="designation"></p-sortIcon></th>
+          <th *ngIf="loggedInUser.designation=='CTO'||loggedInUser.designation=='CEO'"></th>
+      </tr>
+  </ng-template>
+  <ng-template pTemplate="body" let-user>
+      <tr>
+          <td>{{user.userName}}</td>
+          <td style="width: 25%;"><img [src]="environment + user.imagePath" [alt]="user.userName" width="35" class="shadow-4" /></td>
+          <td>{{ user.firstName }}</td>
+          <td>{{ user.lastName }}</td>
+          <td>{{ user.email }}</td>
+          <td>{{ user.designation }}</td>
+          <td *ngIf="(loggedInUser.designation=='CTO'||loggedInUser.designation=='CEO')&&user.designation!='CEO'&&loggedInUser.userName!=user.userName">
+            <button icon="pi pi-pencil" (click)="onEdit(user);openBasicModal(basicModal)" class="p-element p-button-rounded p-button-success mr-2 p-button p-component p-button-icon-only" ng-reflect-icon="pi pi-pencil"><span class="p-button-icon pi pi-pencil" aria-hidden="true"></span></button>
+            <button icon="pi pi-trash" (click)="onDelete(user)"  class="p-element p-button-rounded p-button-warning p-button p-component p-button-icon-only" ng-reflect-icon="pi pi-trash"><span class="p-button-icon pi pi-trash" aria-hidden="true"></span></button>
+          </td>
+      </tr>
+  </ng-template>
+  <ng-template pTemplate="summary">
+      <div class="flex align-items-center justify-content-between">
+          In total there are {{users ? users.length : 0 }} users.
+      </div>
+  </ng-template>
+</p-table>
+</div>
+
+<!-- Modal -->
+<ng-template #basicModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Update "{{selUser.firstName}} {{selUser.lastName}}"</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- <form class="form-horizontal" role="form" #f="ngForm"> -->
+      <div class="form-group">
+        <label class="col-lg-12 control-label">First Name :</label>
+        <div class="col-lg-12">
+          <input class="form-control" type="text" value="{{selUser.firstName}}" name="firstName" [(ngModel)]="selUser.firstName" #firstName="ngModel" required>
+        </div>
+        <span *ngIf="firstName.invalid && firstName.touched" class="text-danger"><p>This is a Required Field</p></span>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-12 control-label">Last Name :</label>
+        <div class="col-lg-12">
+          <input class="form-control" type="text" value="{{selUser.lastName}}" name="lastName" [(ngModel)]="selUser.lastName" #lastName="ngModel" required>
+        </div>
+        <span *ngIf="lastName.invalid && lastName.touched" class="text-danger"><p>This is a Required Field</p></span>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-12 control-label">Email :</label>
+        <div class="col-lg-12">
+          <input class="form-control" type="text" value="{{selUser.email}}" name="email" [(ngModel)]="selUser.email" #email="ngModel" required email>
+        </div>
+        <span *ngIf="email.invalid && email.touched" class="text-danger"><p>This is a Required Field</p></span>
+      </div>
+      <div class="form-group">
+        <label class="col-lg-12 control-label">Designation :</label>
+        <ng-select [items]="desigList"
+                   [virtualScroll]="true"
+                   bindLabel="position"
+                   bindValue="position"
+                   placeholder="Select Designation"
+                   [(ngModel)]="selUser.designation"
+                   name="designation"
+                   #designation="ngModel"
+                   required>
+        </ng-select>
+        <span *ngIf="designation.invalid && designation.touched" class="text-danger"><p>This is a Required Field</p></span>
+      </div>
+
+    <!-- </form> -->
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    <button type="button" class="btn btn-primary"  (click)="onUpdate(selUser.userName); modal.close();">Update</button>
+  </div>
+</ng-template>
+<!-- End Modal -->

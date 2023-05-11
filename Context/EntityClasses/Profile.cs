@@ -22,5 +22,6 @@ namespace ChatApp.Context.EntityClasses
         public string? ImagePath { get; set; }
         public int Designation { get; set; }
         public int Status { get; set; }
+        public int? IsDeleted { get; set; }
     }
 }

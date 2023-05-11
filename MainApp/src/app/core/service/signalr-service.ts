@@ -1,6 +1,8 @@
 import { Injectable } from "@angular/core";
 import * as signalR from "@microsoft/signalr";
 import { environment } from "src/environments/environment";
+import { AuthService } from "./auth-service";
+import Swal from "sweetalert2";
 
 @Injectable({
   providedIn:'root'
@@ -8,7 +10,7 @@ import { environment } from "src/environments/environment";
 
 export class SignalRService{
 
-  constructor() {  }
+  constructor() {}
 
   hubConnection : signalR.HubConnection
 
@@ -21,6 +23,19 @@ export class SignalRService{
     .withAutomaticReconnect()
     .build();
 
+    this.hubConnection.on("myProfileChanged", (response: string) => {
+      console.log("Hi");
+      localStorage.setItem("USERTOKEN", response);
+      setTimeout(()=>{window.location.reload()},3050)
+      Swal.fire({
+        title: "Success!",
+        text: "Your Profile has been Changed by Admin.",
+        icon: "success",
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    });
+
     this.hubConnection.start()
     .then(()=>{
 
@@ -30,8 +45,6 @@ export class SignalRService{
       .catch((error)=>{console.log(error)});
 
     }).catch(error=>{console.log(error)})
-
   }
 }
-
 

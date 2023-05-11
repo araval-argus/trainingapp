@@ -15,5 +15,6 @@ namespace ChatApp.Models
 		public string Email { get; set; }
 		public IFormFile? ProfileImage { get; set; }
 		public DateTime? LastUpdatedAt { get; set; }
+		public string? Designation { get; set; }
 	}
 }

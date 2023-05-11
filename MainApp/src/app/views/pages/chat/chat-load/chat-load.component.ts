@@ -23,7 +23,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
   basicModalCode: any;
   isHimself : boolean = false;
   username : string;
-  selUser: ColleagueModel;
+  selUser: ColleagueModel = null;
   selUserImage : string;
   loggedInUser : LoggedInUser;
   imageSource : string;
@@ -64,22 +64,21 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
           this.isHimself = true;
         }
 
+        console.log(this.selUser);
         this.signalRService.hubConnection.on('userStatusChanged',(userName:string,statusString:string)=>{
           if(this.selUser.userName==userName){
            this.selUser.status = statusString;
           }
-          console.log('hi');
         });
-
-        this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
 
         this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
           this.selUser = data;
           this.selUserImage = environment.ImageUrl + data.imagePath;
 
+          this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
+
           this.chatService.fetchMessages(this.selUser.userName).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:MessageDisplayModel[])=>{
             this.displayMsgList = data;
-           // console.log(this.displayMsgList);
           })
         })
       });

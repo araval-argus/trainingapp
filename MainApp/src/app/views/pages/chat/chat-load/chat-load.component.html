@@ -1,6 +1,6 @@
-<div *ngIf="!isHimself">
+<div *ngIf="!isHimself && selUser!=null">
 <div class="chat-header border-bottom pb-2">
-  <div *ngIf="selUser!=null" class="d-flex justify-content-between">
+  <div class="d-flex justify-content-between">
     <div class="d-flex align-items-center ">
       <i class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
       <figure class="mb-0 mr-2">

@@ -12,6 +12,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using System.Net;
+using ChatApp.Infrastructure.ServiceImplementation;
 
 namespace ChatApp.Controllers
 {
@@ -19,11 +21,9 @@ namespace ChatApp.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private IConfiguration _config;
         private readonly IProfileService _profileService;
-        public AccountController(IConfiguration config, IProfileService profileService)
+        public AccountController(IProfileService profileService)
         {
-            _config = config;
             _profileService = profileService;
         }
 
@@ -31,26 +31,22 @@ namespace ChatApp.Controllers
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials." });
-            var user = _profileService.CheckPassword(loginModel);
-
-            if (user != null)
+            var tokenString = _profileService.CheckPassword(loginModel);
+            if (tokenString != null)
             {
-                var tokenString = GenerateJSONWebToken(user);
-                _profileService.ChangeStatus(user.UserName, 1);
+                _profileService.ChangeStatus(loginModel.Username, 1);
                 response = Ok(new { token = tokenString });
             }
-
             return response;
         }
 
         [HttpPost("Register")]
         public IActionResult Register([FromBody] RegisterModel registerModel)
         {
-            var user = _profileService.RegisterUser(registerModel);
-            if (user != null)
+            var tokenString = _profileService.RegisterUser(registerModel);
+            if (tokenString != null)
             {
-                var tokenString = GenerateJSONWebToken(user);
-                return Ok(new { token = tokenString, user = user });
+                return Ok(new { token = tokenString });
             }
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
         }
@@ -59,18 +55,14 @@ namespace ChatApp.Controllers
         [HttpPost("update-profile")]
         public IActionResult UpdateProfile([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
-            var handler = new JwtSecurityTokenHandler();
-            string auth = Authorization.Split(' ')[1];
-            var decodedToken = handler.ReadJwtToken(auth);
-
-            string userName = decodedToken.Claims.First(claim => claim.Type == "sub").Value;
-
-            if (updateModel.UserName == userName)
+            string userName = GetUserNameFromToken(Authorization);
+            var profile = _profileService.GetUser(userName);
+			if (updateModel.UserName == userName || profile.Designation>7)
             {    //Method to update User Profile
-                var user = _profileService.UpdateUser(updateModel, userName);
+                string tokenString = _profileService.UpdateUser(updateModel, userName);
+                if (updateModel.UserName == userName)
                 {
-                    var tokenString = GenerateJSONWebToken(user);
-                    return Ok(new { token = tokenString, user = user });
+                    return Ok(new { token = tokenString });
                 }
             }
             return BadRequest(new { Message = " Cannot Update User " });
@@ -79,16 +71,20 @@ namespace ChatApp.Controllers
         [HttpGet("{userName}")]
         public IActionResult GetUser(string userName)
         {
-            Profile user = _profileService.GetUser(profile => profile.UserName == userName);
-            ColleagueModel model = new ColleagueModel();
-            model.UserName = user.UserName;
-            model.FirstName = user.FirstName;
-            model.LastName = user.LastName;
-            model.Email = user.Email;
-            model.ImagePath = user.ImagePath;
-            model.Designation = _profileService.GetDesignationFromId(user.Designation);
-            model.Status = _profileService.getUserStatus(user.UserName).Status;
-            return Ok(model);
+            Profile user = _profileService.GetUser(userName);
+            if (user != null && user.IsDeleted == 0)
+            {
+                ColleagueModel model = new ColleagueModel();
+                model.UserName = user.UserName;
+                model.FirstName = user.FirstName;
+                model.LastName = user.LastName;
+                model.Email = user.Email;
+                model.ImagePath = user.ImagePath;
+                model.Designation = _profileService.GetDesignationFromId(user.Designation);
+                model.Status = _profileService.getUserStatus(user.UserName).Status;
+                return Ok(model);
+            }
+            return BadRequest();
         }
 
         [HttpGet("GetStatusList")]
@@ -111,27 +107,20 @@ namespace ChatApp.Controllers
             return Ok();
         }
 
-        private string GenerateJSONWebToken(Profile profileInfo)
+        [HttpGet("GetUsers")]
+        public IActionResult GetUsers([FromHeader]string Authorization)
         {
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
-            var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+			string userName = GetUserNameFromToken(Authorization);
+            return Ok(_profileService.getAllUsers(userName));
+		}
 
-            var claims = new[] {
-                    new Claim(JwtRegisteredClaimNames.Sub, profileInfo.UserName),
-                    new Claim(JwtRegisteredClaimNames.Email, profileInfo.Email),
-                    new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
-                    new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(ClaimsConstant.ImagePathClaim, profileInfo.ImagePath),
-                    new Claim(ClaimsConstant.DesignationClaim,_profileService.GetDesignationFromId(profileInfo.Designation)),
-		    };
-            var token = new JwtSecurityToken(_config["Jwt:Issuer"],
-            _config["Jwt:Issuer"],
-            claims,
-            expires: DateTime.Now.AddMinutes(120),
-            signingCredentials: credentials);
+        private string GetUserNameFromToken(string Authorization)
+        {
+			var handler = new JwtSecurityTokenHandler();
+			string auth = Authorization.Split(' ')[1];
+			var decodedToken = handler.ReadJwtToken(auth);
 
-            return new JwtSecurityTokenHandler().WriteToken(token);
-        }
+			return decodedToken.Claims.First(claim => claim.Type == "sub").Value;
+		}
     }
 }

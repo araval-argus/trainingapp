@@ -6,6 +6,8 @@ import MetisMenu from 'metismenujs/dist/metismenujs';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import { Router, NavigationEnd } from '@angular/router';
+import { AuthService } from 'src/app/core/service/auth-service';
+import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,12 +16,13 @@ import { Router, NavigationEnd } from '@angular/router';
 })
 export class SidebarComponent implements OnInit, AfterViewInit {
 
+  loggedInUser : LoggedInUser;
   @ViewChild('sidebarToggler') sidebarToggler: ElementRef;
 
   menuItems = [];
   @ViewChild('sidebarMenu') sidebarMenu: ElementRef;
 
-  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router) {
+  constructor(@Inject(DOCUMENT) private document: Document, private renderer: Renderer2, router: Router , private authService : AuthService) {
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
 
@@ -34,14 +37,16 @@ export class SidebarComponent implements OnInit, AfterViewInit {
         if (window.matchMedia('(max-width: 991px)').matches) {
           this.document.body.classList.remove('sidebar-open');
         }
-
       }
     });
   }
 
   ngOnInit(): void {
+    this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.menuItems = MENU;
-
+    if(this.loggedInUser.designation==='Probationer' || this.loggedInUser.designation==='Intern'){
+      this.menuItems = this.menuItems.filter(u => u.label != 'Employees');
+    }
     /**
      * Sidebar-folded on desktop (min-width:992px and max-width: 1199px)
      */

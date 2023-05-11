@@ -118,9 +118,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 						GroupName = group.GroupName,		
 					};
 					var msg = sortedMessages.FirstOrDefault(m => m.GrpId == grpId);
-					newObj.Type = msg.Type;
-					newObj.LastMsgAt = msg.CreatedAt;
-					newObj.LastMsg = msg.Content;	
+					if (msg != null)
+					{
+						newObj.Type = msg.Type;
+						newObj.LastMsgAt = msg.CreatedAt;
+						newObj.LastMsg = msg.Content;
+					}
 					recentGroupList.Add(newObj);
 				}
 				var orderedRecentChatList = recentGroupList.OrderByDescending(m => m.LastMsgAt);
@@ -180,7 +183,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			List<int> groupMemberId = new List<int>();
 			groupMemberId = context.GroupMembers.Where(u => u.GrpId == groupId).Select(u => u.ProfileId).ToList();
 			int userId = chatService.GetIdFromUserName(userName);
-			var profiles = context.Profiles.Where(u => !groupMemberId.Contains(u.Id) );
+			var profiles = context.Profiles.Where(u => !groupMemberId.Contains(u.Id) && u.IsDeleted==0);
 			if (context.GroupMembers.FirstOrDefault(u => u.GrpId == groupId && u.ProfileId == userId).Admin==1)
 			{
 				foreach (var profile in profiles) {

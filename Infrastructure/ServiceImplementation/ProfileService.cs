@@ -18,6 +18,9 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -26,26 +29,33 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         private readonly ChatAppContext context;
         private readonly IWebHostEnvironment webHostEnvironment;
 		private readonly IHubContext<chatHub> hubContext;
+		private IConfiguration _config;
 
-		public ProfileService(ChatAppContext context , IWebHostEnvironment webHostEnvironment , IHubContext<chatHub> hubContext)
+		public ProfileService(ChatAppContext context , IWebHostEnvironment webHostEnvironment , IHubContext<chatHub> hubContext , IConfiguration config)
         {
-            this.context = context;          
-            this.webHostEnvironment = webHostEnvironment;
+            this.context = context;
+			_config = config;
+			this.webHostEnvironment = webHostEnvironment;
             this.hubContext = hubContext;
         }
 
-		public Profile CheckPassword(LoginModel model)
+		public string CheckPassword(LoginModel model)
         {
-            return this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
-            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()));
+            var user =  this.context.Profiles.FirstOrDefault(x => model.Password == x.Password
+            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim()) && x.IsDeleted == 0);
+            if (user != null)
+            {
+                return GenerateJSONWebToken(user);
+            }
+            return null;
         }
  
-		public Profile GetUser(Expression<Func<Profile,bool>> Filter)
+		public Profile GetUser(string Filter)
 		{
-            return context.Profiles.FirstOrDefault(Filter);
+            return context.Profiles.FirstOrDefault(u=> u.UserName== Filter && u.IsDeleted==0);
 		}
 
-		public Profile RegisterUser(RegisterModel regModel)
+		public string RegisterUser(RegisterModel regModel)
         {
             Profile newUser = null;
             if (!CheckEmailOrUserNameExists(regModel.UserName, regModel.Email))
@@ -62,17 +72,18 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 					CreatedAt = DateTime.UtcNow,
                     ProfileType = ProfileType.User,
                     Status= 1,
+                    IsDeleted = 0
                 };
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
             }
-            return newUser;
+            return GenerateJSONWebToken(newUser);
         }
 
-		public Profile UpdateUser(UpdateModel updateModel, string userName)
+		public string UpdateUser(UpdateModel updateModel, string userName)
 		{
-            Profile updateUser = GetUser(u => u.UserName == userName);
-            if (updateUser == null)
+            Profile updateUser = GetUser(updateModel.UserName);
+			if (updateUser == null)
             {
                 return null;
             }
@@ -109,10 +120,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			updateUser.LastName = updateModel.LastName;
 			updateUser.Email = updateModel.Email;
 			updateUser.LastUpdatedAt= DateTime.Now;
-
+            updateUser.LastUpdatedBy = GetIdFromUserName(userName);
 			context.Profiles.Update(updateUser);
             context.SaveChanges();
-            return updateUser;
+			return GenerateJSONWebToken(updateUser);     
 		}
 
         private string GenerateDefaultImage()
@@ -153,7 +164,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public async void ChangeStatus(string userName , int status)
         {
-            context.Profiles.FirstOrDefault(u=>u.UserName==userName).Status = status;
+            context.Profiles.FirstOrDefault(u=>u.UserName==userName || u.Email == userName).Status = status;
             context.SaveChanges();
             var statusString = context.UserStatus.FirstOrDefault(u => u.Id == status).Status;
 			await this.hubContext.Clients.All.SendAsync("userStatusChanged",userName,statusString);
@@ -171,5 +182,62 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return context.UserStatus.ToList();
         }
 
+		public List<ColleagueModel> getAllUsers(string userName)
+        {
+            var response = new List<ColleagueModel>();
+            var profile = context.Profiles.Where(u => u.UserName == userName && u.IsDeleted==0);
+			if(profile!=null)
+            {
+                var users = context.Profiles.Where(u=>u.IsDeleted==0);
+                foreach(var user in users)
+                {
+                    var newObj = new ColleagueModel
+                    {
+
+                        FirstName = user.FirstName,
+                        LastName = user.LastName,
+                        UserName = user.UserName,
+                        Email = user.Email,
+                        ImagePath = user.ImagePath,
+                        Designation = context.Designation.FirstOrDefault(u => u.Id == user.Designation).Position
+                    };
+                    response.Add(newObj);
+                }
+                return response;
+            }
+            return null;
+        }
+
+        public bool CheckDeleted(string userName)
+        {
+            if(context.Profiles.Any(u=>u.UserName==userName && u.IsDeleted == 0))
+            {
+                return false;
+            }
+            return true;
+        }
+
+		public string GenerateJSONWebToken(Profile profileInfo)
+		{
+			var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+			var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+
+			var claims = new[] {
+					new Claim(JwtRegisteredClaimNames.Sub, profileInfo.UserName),
+					new Claim(JwtRegisteredClaimNames.Email, profileInfo.Email),
+					new Claim(ClaimsConstant.FirstNameClaim, profileInfo.FirstName),
+					new Claim(ClaimsConstant.LastNameClaim, profileInfo.LastName),
+					new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+					new Claim(ClaimsConstant.ImagePathClaim, profileInfo.ImagePath),
+					new Claim(ClaimsConstant.DesignationClaim,GetDesignationFromId(profileInfo.Designation)),
+			};
+			var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+			_config["Jwt:Issuer"],
+			claims,
+			expires: DateTime.Now.AddMinutes(120),
+			signingCredentials: credentials);
+
+			return new JwtSecurityTokenHandler().WriteToken(token);
+		}
 	}
 }

@@ -5,6 +5,6 @@ namespace ChatApp.Business.ServiceInterfaces
 {
 	public interface IDashBoardService
 	{
-		public List<DateTime> chartDetails(out int[] chat, out int[] group);
+		public List<DateTime> chartDetails(out int[] chat, out int[] group , out int[] total);
 	}
 }

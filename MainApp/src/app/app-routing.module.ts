@@ -5,6 +5,8 @@ import { AuthGuard } from './core/guard/auth.guard';
 import { ErrorPageComponent } from './views/pages/error-page/error-page.component';
 import { UpdateComponent } from './views/pages/update/update.component';
 import { ViewprofileComponent } from './views/pages/viewprofile/viewprofile.component';
+import { EmployeesComponent } from './views/pages/employees/employees.component';
+import { EmployeeGuard } from './core/guard/employee.guard';
 
 const routes: Routes = [
   { path:'auth', loadChildren: () => import('./views/pages/auth/auth.module').then(m => m.AuthModule) },
@@ -19,6 +21,7 @@ const routes: Routes = [
       },
       { path: 'update-profile' , component:UpdateComponent  },
       { path: 'view-profile' , component:ViewprofileComponent},
+      { path: 'employees' , component:EmployeesComponent , canActivate:[EmployeeGuard]},
       {
         path: 'group' ,
         loadChildren: () => import('./views/pages/group/group.module').then(m => m.GroupModule)
