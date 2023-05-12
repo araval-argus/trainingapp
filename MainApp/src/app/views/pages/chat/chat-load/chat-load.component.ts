@@ -20,18 +20,12 @@ import { environment } from 'src/environments/environment';
 export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
 
   localPath : string = environment.ImageUrl;
-  basicModalCode: any;
-  isHimself : boolean = false;
   username : string;
   selUser: ColleagueModel = null;
-  selUserImage : string;
   loggedInUser : LoggedInUser;
-  imageSource : string;
-  msg : MessageModel ;
+  msg : MessageModel;
   displayMsgList : MessageDisplayModel[] = [];
-  isReplying : Boolean = false;
-  rplyMsg : string ;
-  rplyMsgLen : number;
+  rplyMsg : string ='';
   rplyMsgId: number;
   imageFile : File;
   showEmoji : boolean = false;
@@ -53,16 +47,12 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
     };
 
     this.loggedInUser = this.authService.getLoggedInUserInfo();
-    this.imageSource = environment.ImageUrl + this.loggedInUser.imagePath;
 
-    this.scrollToBottom();
+   // this.scrollToBottom();
 
     this.route.params.pipe(takeUntil(this.ngUnsubscribe)).subscribe(
       (params : Params) =>{
         this.username = params['username'];
-        if(this.username==this.loggedInUser.userName){
-          this.isHimself = true;
-        }
 
         this.signalRService.hubConnection.on('userStatusChanged',(userName:string,statusString:string)=>{
           if(this.selUser.userName==userName){
@@ -71,9 +61,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
         });
 
         this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
-          console.log('I am Chat Load');
           this.selUser = data;
-          this.selUserImage = environment.ImageUrl + data.imagePath;
 
           this.signalRService.hubConnection.invoke('seenMessage',this.username,this.loggedInUser.userName);
 
@@ -109,7 +97,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
     this.msg.content = message.value;
     this.msg.messageFrom = this.loggedInUser.userName;
     this.msg.messageTo = this.selUser.userName;
-    if(this.isReplying)
+    if(this.rplyMsgId!=null)
     {
       this.msg.repliedTo = this.rplyMsgId;
     }
@@ -121,22 +109,17 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
     this.signalRService.hubConnection.invoke('sendMsg',this.msg).catch((error)=>console.log(error));
     message.value = null;
     this.closeRplyMsg();
-
     }
   }
 
   toggleReplyMsg(popupmessage:MessageDisplayModel){
-    this.isReplying = true;
     this.rplyMsg = popupmessage.content;
     this.rplyMsgId = popupmessage.id;
-    this.rplyMsgLen = popupmessage.content.length;
   }
 
   closeRplyMsg(){
-    this.isReplying = false;
     this.rplyMsg = '';
-    this.rplyMsgId = -1;
-    this.rplyMsgLen = 0;
+    this.rplyMsgId = null;
   }
 
   openBasicModal(content) {

@@ -1,10 +1,9 @@
-﻿using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
+﻿using ChatApp.Models.Group;
 using System.Collections.Generic;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
-	public interface IGroupService
+    public interface IGroupService
 	{
 		public RecentGroupModel CreateGroup(string userName, CreateGroupModel grp);
 		public IEnumerable<RecentGroupModel> GetRecentGroups(string userName);

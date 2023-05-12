@@ -1,10 +1,9 @@
-﻿using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
+﻿using ChatApp.Models.User;
 using System.Collections.Generic;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
-	public interface INotificationServices
+    public interface INotificationServices
 	{
 		public IEnumerable<NotificationsDTO> GetAllNotifications(string userName);
 

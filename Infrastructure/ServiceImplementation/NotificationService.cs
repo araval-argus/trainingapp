@@ -1,19 +1,15 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
-using Microsoft.AspNetCore.Hosting;
+using ChatApp.Models.User;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata;
-using System.Text.RegularExpressions;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
-	public class NotificationService : INotificationServices
+    public class NotificationService : INotificationServices
 	{
 		private readonly ChatAppContext context;
 		private readonly IHubContext<chatHub> hubContext;

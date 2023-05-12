@@ -35,6 +35,130 @@
     </div>
   </div>
 </div>
+<div style="min-height:60vh; display:flex; flex-direction:column;
+            justify-content:space-between;">
+<div class="chat-body" [perfectScrollbar] #scrollMe>
+  <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
+    <li *ngIf="i===0||((displayMsgList[i].createdAt | date:'shortDate') !==(displayMsgList[i-1].createdAt| date:'shortDate'))">
+      <div class="text-center">
+        {{msg.createdAt| date:'mediumDate'}}
+      </div>
+    </li>
+    <li *ngIf="msg.type=='heading'">
+      <div class="text-center">
+        {{msg.content}}
+      </div>
+    </li>
+    <li *ngIf="msg.messageFrom != this.loggedInUser.userName && msg.type!='heading'" class="message-item friend">
+      <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
+      <div class="content">
+        <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
+        <video controls *ngIf="msg.type === 'video'">
+          <source [src]="environment + msg.content" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <audio controls *ngIf="msg.type === 'audio'">
+          <source [src]="environment + msg.content" type="audio/mp3">
+          Your browser does not support the html audio tag.
+        </audio>
+        <div class="message" (dblclick)="toggleReplyMsg(msg)">
+          <div class="bubble" *ngIf="msg.type === null">
+            <div class="overflowrap msgFrom">{{msg.messageFrom}}</div>
+            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
+            <div class="overflowrap">{{msg.content}}</div>
+          </div>
+            <span>{{msg.createdAt | date:'shortTime'}}</span>
+        </div>
+      </div>
+    </li>
+    <li *ngIf="msg.messageFrom == this.loggedInUser.userName && msg.type!='heading'" class="message-item me">
+      <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
+      <div class="content">
+        <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
+        <video controls *ngIf="msg.type === 'video'" width="350px" height="200px">
+          <source [src]="environment + msg.content" type="video/mp4">
+          Your browser does not support the video tag.
+        </video>
+        <audio controls *ngIf="msg.type === 'audio'">
+          <source [src]="environment + msg.content" type="audio/mp3">
+          Your browser does not support the html audio tag.
+        </audio>
+        <div class="message" (dblclick)="toggleReplyMsg(msg)">
+          <div class="bubble" *ngIf="msg.type==null">
+            <div class="overflowrap msgFrom">{{msg.messageFrom}}</div>
+            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
+            <div class="overflowrap">{{msg.content}}</div>
+          </div>
+        </div>
+          <div style="float:right;">
+            <span>{{msg.createdAt | date:'shortTime'}}</span>
+          </div>
+      </div>
+    </li>
+  </ul>
+</div>
+<emoji-mart class="emoji-mart" set="apple" *ngIf="showEmoji" (emojiClick)="Emoji($event, message)" [showPreview]="false">
+</emoji-mart>
+ <!-- REPLY TO SPECIFIC MESSAGE -->
+ <div>
+ <div style="margin-top: auto;" class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="rplyMsgId==null">
+  <div class="input-group">
+    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsg.length<60?'':'...'}}</p>
+    <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="closeRplyMsg()" >
+      <span aria-hidden="true">&times;</span>
+    </span>
+  </div>
+</div>
+<!-- END REPLY MESSAGE -->
+<div class="chat-footer d-flex">
+  <div>
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji" (click)="toggleEmoji(message)">
+      <i class="feather icon-sun text-muted"></i>
+    </button>
+  </div>
+  <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files" (click)="openBasicModal(basicModal)">
+      <i class="feather icon-paperclip text-muted"></i>
+    </button>
+  </div>
+  <div class="d-none d-md-block">
+    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">
+      <i class="feather icon-mic text-muted"></i>
+    </button>
+  </div>
+  <form class="search-form flex-grow mr-2">
+    <div class="input-group">
+      <input type="text" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" (keydown.enter)="onMessage(message)" #message>
+    </div>
+  </form>
+  <div>
+    <button type="button" class="btn btn-primary btn-icon rounded-circle">
+      <i class="feather icon-send" (click)="onMessage(message)"></i>
+    </button>
+  </div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- MODAL To SEND FILE -->
+<ng-template #basicModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel">Select File To Send</h5>
+    <button type="button" class="close" (click)="modal.close()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <input type="file" class="file-upload" (change)="onFileSelected($event)" #File accept="audio/*,video/*,image/*">
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+    <button type="button" class="btn btn-primary" (click)="uploadFile();modal.close()">Send</button>
+  </div>
+</ng-template>
+<!-- CLOSE FILE SEND MODAL -->
+
  <!-- Modal for Add User -->
  <ng-template #verticalCenteredModal let-modal>
   <div class="modal-header">
@@ -58,128 +182,7 @@
   </div>
 </ng-template>
 <!-- END MODAL -->
-<div style="min-height:60vh; display:flex; flex-direction:column;
-            justify-content:space-between;">
-<div class="chat-body" [perfectScrollbar] #scrollMe>
-  <ul class="messages" *ngFor="let msg of displayMsgList , let i = index">
-    <li *ngIf="i===0||((displayMsgList[i].createdAt | date:'shortDate') !==(displayMsgList[i-1].createdAt| date:'shortDate'))">
-      <div class="text-center">
-        {{msg.createdAt| date:'mediumDate'}}
-      </div>
-    </li>
-    <li *ngIf="msg.type=='heading'">
-      <div class="text-center">
-        {{msg.content}}
-      </div>
-    </li>
-    <li *ngIf="msg.messageFrom != this.loggedInUser.userName && msg.type!='heading'" class="message-item friend">
-      <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content"(dblclick)="toggleReplyMsg(msg)">
-        <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
-        <video controls *ngIf="msg.type === 'video'">
-          <source [src]="environment + msg.content" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <audio controls *ngIf="msg.type === 'audio'">
-          <source [src]="environment + msg.content" type="audio/mp3">
-          Your browser does not support the html audio tag.
-        </audio>
-        <div class="message" >
-          <div class="bubble" *ngIf="msg.type === null">
-            <div class="overflowrap">{{msg.messageFrom}}</div>
-            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
-            <div class="overflowrap">{{msg.content}}</div>
-          </div>
-            <span>{{msg.createdAt | date:'shortTime'}}</span>
-        </div>
-      </div>
-    </li>
-    <li *ngIf="msg.messageFrom == this.loggedInUser.userName && msg.type!='heading'" class="message-item me">
-      <img [src]="environment + msg.messageFromImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content" (dblclick)="toggleReplyMsg(msg)">
-        <img *ngIf="msg.type == 'image'" [src]="environment + msg.content" alt="Image" width="350px" height="200px">
-        <video controls *ngIf="msg.type === 'video'" width="350px" height="200px">
-          <source [src]="environment + msg.content" type="video/mp4">
-          Your browser does not support the video tag.
-        </video>
-        <audio controls *ngIf="msg.type === 'audio'">
-          <source [src]="environment + msg.content" type="audio/mp3">
-          Your browser does not support the html audio tag.
-        </audio>
-        <div class="message ">
-          <div class="bubble" *ngIf="msg.type==null">
-            <div class="overflowrap msgFrom">{{msg.messageFrom}}</div>
-            <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
-            <div class="overflowrap">{{msg.content}}</div>
-          </div>
-        </div>
-          <div style="float:right;">
-            <span>{{msg.createdAt | date:'shortTime'}}</span>
-          </div>
-      </div>
-    </li>
-  </ul>
-</div>
-<emoji-mart class="emoji-mart" set="apple" *ngIf="showEmoji" (emojiClick)="Emoji($event, message)" [showPreview]="false">
-</emoji-mart>
- <!-- REPLY TO SPECIFIC MESSAGE -->
- <div>
- <div style="margin-top: auto;" class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!isReplying">
-  <div class="input-group">
-    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsgLen<60?'':'...'}}</p>
-    <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="closeRplyMsg()" >
-      <span aria-hidden="true">&times;</span>
-    </span>
-  </div>
-</div>
-<!-- END REPLY MESSAGE -->
-<div class="chat-footer d-flex">
-  <div>
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Emoji" (click)="toggleEmoji(message)">
-      <i class="feather icon-sun text-muted"></i>
-    </button>
-  </div>
-  <div class="d-none d-md-block">
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Attatch files" (click)="openBasicModal(basicModal)">
-      <i class="feather icon-paperclip text-muted"></i>
-    </button>
-    <!-- MODAL To SEND FILE -->
-    <ng-template #basicModal let-modal>
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Select File To Send</h5>
-        <button type="button" class="close" (click)="modal.close()" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <input type="file" class="file-upload" (change)="onFileSelected($event)" #File accept="audio/*,video/*,image/*">
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
-        <button type="button" class="btn btn-primary" (click)="uploadFile();modal.close()">Send</button>
-      </div>
-    </ng-template>
-    <!-- CLOSE FILE SEND MODAL -->
-  </div>
-  <div class="d-none d-md-block">
-    <button type="button" class="btn border btn-icon rounded-circle mr-2" ngbTooltip="Record you voice">
-      <i class="feather icon-mic text-muted"></i>
-    </button>
-  </div>
-  <form class="search-form flex-grow mr-2">
-    <div class="input-group">
-      <input type="text" class="form-control rounded-pill" id="chatForm" placeholder="Type a message" (keydown.enter)="onMessage(message)" #message>
-    </div>
-  </form>
-  <div>
-    <button type="button" class="btn btn-primary btn-icon rounded-circle">
-      <i class="feather icon-send" (click)="onMessage(message)"></i>
-    </button>
-  </div>
-</div>
-</div>
-</div>
-</div>
+
 <!-- Update Group Modal -->
 <ng-template #editGroupModal let-modal>
   <div class="modal-header">

@@ -1,19 +1,15 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Mvc;
+using ChatApp.Models.User;
 using Microsoft.AspNetCore.SignalR;
 using System;
 using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.IO;
 using System.Linq;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
-	public class AdminService : IAdminService
+    public class AdminService : IAdminService
 	{
 		private readonly ChatAppContext context;
 		private readonly IProfileService profileService;

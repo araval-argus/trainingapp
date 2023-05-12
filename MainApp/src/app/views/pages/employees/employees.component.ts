@@ -26,7 +26,6 @@ export class EmployeesComponent implements OnInit {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
 
     this.accountService.getAllUsers().subscribe((data:ColleagueModel[])=>{
-      console.log(data)
       this.users = data;
     });
   }

@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[UserStatus]
 (
-	[Id] INT NOT NULL PRIMARY KEY, 
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1), 
     [Status] NVARCHAR(14) NOT NULL
 )

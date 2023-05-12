@@ -1,19 +1,16 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
-using ChatApp.Infrastructure.ServiceImplementation;
-using ChatApp.Models;
+using ChatApp.Models.Group;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
-using System.Net;
 
 namespace ChatApp.Controllers
 {
 
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	[Authorize]
 	public class GroupController : ControllerBase

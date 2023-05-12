@@ -7,7 +7,7 @@
     [Email ] NVARCHAR(1000) NOT NULL, 
     [Password] NVARCHAR(MAX) NOT NULL, 
     [ProfileType] INT NOT NULL,
-    [CreatedAt] DATETIME2 NULL, 
+    [CreatedAt] DATETIME2 NULL DEFAULT GETDATE(), 
     [CreatedBy] INT NULL, 
     [LastUpdatedAt] DATETIME2 NULL, 
     [LastUpdatedBy] INT NULL, 

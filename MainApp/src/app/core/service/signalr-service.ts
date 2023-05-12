@@ -1,7 +1,6 @@
 import { Injectable } from "@angular/core";
 import * as signalR from "@microsoft/signalr";
 import { environment } from "src/environments/environment";
-import { AuthService } from "./auth-service";
 import Swal from "sweetalert2";
 
 @Injectable({

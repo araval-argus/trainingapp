@@ -1,10 +1,10 @@
 ﻿using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
+using ChatApp.Models.User;
 using System.Collections.Generic;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
-	public interface IAdminService
+    public interface IAdminService
 	{
 		public List<Designation> getAllDesignation(string userName);
 		public bool DeleteUser(string selUserName, string loginUserName);

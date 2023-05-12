@@ -31,10 +31,8 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
   environment = environment.ImageUrl;
   members : AllGroupMember[] = [];
   displayMsgList : GroupMessageDisplayModel[] = [];
-  isReplying : Boolean = false;
-  rplyMsg : string ;
+  rplyMsg : string='' ;
   msg : GroupMessageModel;
-  rplyMsgLen : number;
   rplyMsgId: number;
   showEmoji : boolean = false;
   @ViewChild('scrollMe') private myScrollContainer: ElementRef;
@@ -114,7 +112,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     this.msg.content = message.value;
     this.msg.messageFrom = this.loggedInUser.userName;
     this.msg.groupId = this.groupDetail.id;
-    if(this.isReplying)
+    if(this.rplyMsgId!=null)
     {
       this.msg.repliedTo = this.rplyMsgId;
     }
@@ -216,17 +214,13 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
   }
 
   toggleReplyMsg(popupmessage:GroupMessageDisplayModel){
-    this.isReplying = true;
     this.rplyMsg = popupmessage.content;
     this.rplyMsgId = popupmessage.id;
-    this.rplyMsgLen = popupmessage.content.length;
   }
 
   closeRplyMsg(){
-    this.isReplying = false;
     this.rplyMsg = '';
-    this.rplyMsgId = -1;
-    this.rplyMsgLen = 0;
+    this.rplyMsgId = null;
   }
 
   onCloseEdit(){

@@ -1,10 +1,10 @@
-<div *ngIf="!isHimself && selUser!=null">
+<div *ngIf="username!=loggedInUser.userName && selUser!=null">
 <div class="chat-header border-bottom pb-2">
   <div class="d-flex justify-content-between">
     <div class="d-flex align-items-center ">
       <i class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
       <figure class="mb-0 mr-2">
-        <img [src]="selUserImage" class="img-sm rounded-circle" alt="image">
+        <img [src]="localPath + selUser.imagePath" class="img-sm rounded-circle" alt="image">
         <div *ngIf="selUser.status=='Available'" class="mdi mdi-checkbox-blank-circle active stat"></div>
           <div *ngIf="selUser.status=='Do Not Disturb'" class="mdi mdi-minus-circle red stat"></div>
           <div *ngIf="selUser.status=='Busy'" class="mdi mdi-checkbox-blank-circle red stat"></div>
@@ -40,8 +40,8 @@
       </div>
     </li>
     <li *ngIf="msg.messageFrom == selUser.userName" class="message-item friend">
-      <img [src]="selUserImage" class="img-xs rounded-circle" alt="avatar">
-      <div class="content"(dblclick)="toggleReplyMsg(msg)">
+      <img [src]="localPath + selUser.imagePath" class="img-xs rounded-circle" alt="avatar">
+      <div class="content">
         <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
         <video controls *ngIf="msg.type === 'video'">
           <source [src]="localPath + msg.content" type="video/mp4">
@@ -51,7 +51,7 @@
           <source [src]="localPath + msg.content" type="audio/mp3">
           Your browser does not support the html audio tag.
         </audio>
-        <div class="message" >
+        <div class="message" (dblclick)="toggleReplyMsg(msg)">
           <div class="bubble" *ngIf="msg.type === null">
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
@@ -61,8 +61,8 @@
       </div>
     </li>
     <li *ngIf="msg.messageFrom == this.loggedInUser.userName" class="message-item me">
-      <img [src]="imageSource" class="img-xs rounded-circle" alt="avatar">
-      <div class="content" (dblclick)="toggleReplyMsg(msg)">
+      <img [src]="localPath + loggedInUser.imagePath" class="img-xs rounded-circle" alt="avatar">
+      <div class="content">
         <img *ngIf="msg.type == 'image'" [src]="localPath + msg.content" alt="Image" width="350px" height="200px">
         <video controls *ngIf="msg.type === 'video'" width="350px" height="200px">
           <source [src]="localPath + msg.content" type="video/mp4">
@@ -72,7 +72,7 @@
           <source [src]="localPath + msg.content" type="audio/mp3">
           Your browser does not support the html audio tag.
         </audio>
-        <div class="message ">
+        <div class="message" (dblclick)="toggleReplyMsg(msg)">
           <div class="bubble" *ngIf="msg.type==null">
             <div class="replymsg overflowrap" *ngIf="msg.repliedTo != null">{{msg.repliedTo}}</div>
             <div class="overflowrap">{{msg.content}}</div>
@@ -89,9 +89,9 @@
 </div>
 <!-- Reply To A SPECIFIC MESSAGE -->
 <div>
-<div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="!isReplying">
+<div class="search-form flex-grow mr-2 margin-to-left-right" [hidden]="rplyMsgId==null">
   <div class="input-group">
-    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsgLen<60?'':'...'}}</p>
+    <p type="text" class="form-control rounded-pill setColor" id="chatForm" readonly><span class="mdi mdi-reply"></span>{{rplyMsg | slice:0:60}}{{rplyMsg.length<60?'':'...'}}</p>
     <span class="close-button onhoverr" aria-label="Close alert" data-close (click)="closeRplyMsg()" >
       <span aria-hidden="true">&times;</span>
     </span>

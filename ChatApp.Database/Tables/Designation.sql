@@ -1,5 +1,5 @@
 ﻿CREATE TABLE [dbo].[Designation]
 (
-	[Id] INT NOT NULL PRIMARY KEY,
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY(1,1),
 	[Position] VARCHAR(18) NOT NULL
 )

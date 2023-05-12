@@ -1,5 +1,4 @@
-﻿using ChatApp.Business.Helpers;
-using System;
+﻿using System;
 
 namespace ChatApp.Context.EntityClasses
 {

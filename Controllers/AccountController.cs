@@ -1,19 +1,10 @@
-﻿using System;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
-using ChatApp.Business.Helpers;
+﻿using System.IdentityModel.Tokens.Jwt;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
 using System.Linq;
-using Microsoft.AspNetCore.Http;
-using System.Net;
-using ChatApp.Infrastructure.ServiceImplementation;
+using ChatApp.Models.User;
 
 namespace ChatApp.Controllers
 {

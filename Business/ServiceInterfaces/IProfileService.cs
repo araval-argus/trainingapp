@@ -1,11 +1,6 @@
 ﻿using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
-using Microsoft.AspNetCore.Http;
-using System;
+using ChatApp.Models.User;
 using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 
 namespace ChatApp.Business.ServiceInterfaces
 {

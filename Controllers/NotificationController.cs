@@ -1,10 +1,6 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
-using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 
 namespace ChatApp.Controllers
 {

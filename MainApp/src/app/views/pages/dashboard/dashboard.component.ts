@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 
-import { ApexAxisChartSeries, ApexNonAxisChartSeries, ApexGrid, ApexChart, ApexXAxis, ApexYAxis, ApexMarkers, ApexStroke, ApexLegend, ApexResponsive, ApexTooltip, ApexFill, ApexDataLabels, ApexPlotOptions, ApexTitleSubtitle, ChartComponent } from 'ng-apexcharts';
+import { ApexAxisChartSeries, ApexGrid, ApexChart, ApexXAxis, ApexYAxis, ApexMarkers, ApexStroke, ApexLegend, ApexDataLabels, ApexTitleSubtitle, ChartComponent } from 'ng-apexcharts';
 
 // import { NgbDateStruct, NgbCalendar } from '@ng-bootstrap/ng-bootstrap';
 
@@ -10,7 +10,6 @@ import { ApexAxisChartSeries, ApexNonAxisChartSeries, ApexGrid, ApexChart, ApexX
 
 // Progressbar.js
 // import ProgressBar from 'progressbar.js';
-import { SampleService } from 'src/app/core/service/sample-service';
 import { SignalRService } from 'src/app/core/service/signalr-service';
 import { AuthService } from 'src/app/core/service/auth-service';
 import { DashBoardService } from 'src/app/core/service/dashboard-service';
@@ -61,7 +60,7 @@ export class DashboardComponent implements OnInit {
   @ViewChild("chart") chart: ChartComponent;
   public chartOptions: Partial<ChartOptions>;
 
-  constructor(private sampleService: SampleService , private signalRService:SignalRService,private authService:AuthService,private dashboardService:DashBoardService) {}
+  constructor(private signalRService:SignalRService,private authService:AuthService,private dashboardService:DashBoardService) {}
   ngOnInit(): void {
    // this.sampleService.runSampleAPI().subscribe((result) => {
      // console.log(result);

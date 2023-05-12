@@ -1,12 +1,10 @@
-﻿using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
-using System;
+﻿using ChatApp.Models.Chat;
+using ChatApp.Models.User;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace ChatApp.Business.ServiceInterfaces
 {
-	public interface IChatService
+    public interface IChatService
 	{
 		IEnumerable<SelectedUserModel> SearchColleague(string name,string username);
 		string GetUsername(string authorization);

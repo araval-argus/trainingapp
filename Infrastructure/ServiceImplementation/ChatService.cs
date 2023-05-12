@@ -9,12 +9,12 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
-using Microsoft.AspNetCore.Mvc;
-using System.Security.Cryptography.Xml;
+using ChatApp.Models.Chat;
+using ChatApp.Models.User;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
-	public class ChatService : IChatService
+    public class ChatService : IChatService
 	{
 		private readonly ChatAppContext context;
 		private readonly IWebHostEnvironment webHostEnvironment;

@@ -69,7 +69,6 @@ export class ChatSidebarComponent implements OnInit {
   fetchRecentChat(){
     this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
       this.recentChatList = data;
-      console.log(this.recentChatList);
     });
   }
 

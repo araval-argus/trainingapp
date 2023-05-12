@@ -78,4 +78,7 @@
     <Build Include="Tables\Designation.sql" />
     <Build Include="Tables\UserStatus.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Tables\InitializeDatabase.sql" />
+  </ItemGroup>
 </Project>

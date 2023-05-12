@@ -1,4 +1,4 @@
-import { Component, OnInit , Inject, Renderer2 } from '@angular/core';
+import { Component, OnInit , Inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { Router } from '@angular/router';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -23,7 +23,7 @@ export class NavbarComponent implements OnInit {
   notifications : NotificationsModel[] = [];
 
   constructor(
-    @Inject(DOCUMENT) private document: Document, private renderer: Renderer2, private router: Router, private authService: AuthService,
+    @Inject(DOCUMENT) private document: Document, private router: Router, private authService: AuthService,
     private signalRService : SignalRService,private notificationService: NotificationService, private modalService: NgbModal) { }
 
   ngOnInit(): void {

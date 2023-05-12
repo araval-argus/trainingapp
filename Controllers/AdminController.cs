@@ -1,16 +1,13 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
-using ChatApp.Context.EntityClasses;
-using ChatApp.Infrastructure.ServiceImplementation;
-using ChatApp.Models;
+using ChatApp.Models.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 
 namespace ChatApp.Controllers
 {
-	[Route("api/[controller]")]
+    [Route("api/[controller]")]
 	[ApiController]
 	[Authorize(Policy ="AdminPolicy")]
 	public class AdminController : ControllerBase

@@ -2,26 +2,18 @@
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Drawing;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
-using System.Net.Mime;
+using ChatApp.Models.User;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -69,7 +61,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     UserName = regModel.UserName,
                     Email = regModel.Email,
                     Designation = 1,
-					ImagePath = GenerateDefaultImage(),
+					ImagePath = "/images/default.png",
 					CreatedAt = DateTime.UtcNow,
                     ProfileType = ProfileType.User,
                     Status= 1,
@@ -101,8 +93,9 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 				//if image for book is already stored then we need to delete it first
 				//Tried but doesn't work || updateuser.ImagePath != "\"/images/default.png" for default image
-				if (updateUser.ImagePath != null)
+				if (updateUser.ImagePath != null && !updateUser.ImagePath.Equals("/images/default.png"))
                 {
+
                     var oldImagePath = Path.Combine(webHostEnvironment.WebRootPath + updateUser.ImagePath );
                     if (System.IO.File.Exists(oldImagePath))
                     {
@@ -125,15 +118,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			context.Profiles.Update(updateUser);
             context.SaveChanges();
 			return GenerateJSONWebToken(updateUser);     
-		}
-
-        private string GenerateDefaultImage()
-        {
-			string fileName = Guid.NewGuid().ToString() + ".png";
-			var defaultLocation = Path.Combine(webHostEnvironment.WebRootPath, @"Images\default.png");
-			var NewLocation = Path.Combine(webHostEnvironment.WebRootPath, @"Images\", fileName);
-			File.Copy(defaultLocation, NewLocation,true);
-			return "/images/"+ fileName ;
 		}
 
 		private bool CheckEmailOrUserNameExists(string userName, string email)

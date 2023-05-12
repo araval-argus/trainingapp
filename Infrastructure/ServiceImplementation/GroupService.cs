@@ -1,20 +1,17 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
-using ChatApp.Models;
 using Microsoft.AspNetCore.Hosting;
 using System.IO;
 using System;
 using ChatApp.Context.EntityClasses;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Configuration.UserSecrets;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.SignalR;
+using ChatApp.Models.Group;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
-	public class GroupService : IGroupService
+    public class GroupService : IGroupService
 	{
 		private readonly ChatAppContext context;
 		private readonly IWebHostEnvironment webHostEnvironment;

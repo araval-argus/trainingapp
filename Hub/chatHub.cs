@@ -1,10 +1,10 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context;
 using ChatApp.Context.EntityClasses;
-using ChatApp.Models;
+using ChatApp.Models.Chat;
+using ChatApp.Models.Group;
+using ChatApp.Models.User;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualBasic.FileIO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ChatApp
 {
-	public class chatHub : Hub
+    public class chatHub : Hub
 	{
 		private readonly ChatAppContext context;
 		private readonly IChatService chatService;
@@ -34,7 +34,7 @@ namespace ChatApp
 			}
 		}
 
-		#region OneToOneHub
+		#region ChatHub
 		public async Task ConnectDone(string userName)
 		{
 			var curSignalId = Context.ConnectionId;
