@@ -92,7 +92,7 @@ namespace ChatApp
 		public async Task sendMsg(MessageModel message)
 		{
 			Message newMessage = null;
-			MessageSendModel response = null;
+			MessageDTO response = null;
 			string replyMessage;
 			int messageFromId = chatService.GetIdFromUserName(message.MessageFrom);
 			int messageToId = chatService.GetIdFromUserName(message.MessageTo);
@@ -117,7 +117,7 @@ namespace ChatApp
 				var msg = context.Messages.FirstOrDefault(msg => msg.Id == message.RepliedTo);
 				replyMessage = msg.Content;
 			}
-			response = new MessageSendModel
+			response = new MessageDTO
 			{
 				Id = newMessage.Id,
 				Content = newMessage.Content,
@@ -205,7 +205,7 @@ namespace ChatApp
 		public async Task sendGroupMsg(GMessageInModel message)
 		{
 			GroupMessages newMessage = null;
-			GMessageSendModel response = null;
+			GMessageDTO response = null;
 			string replyMessage;
 			int messageFromId = chatService.GetIdFromUserName(message.MessageFrom);
 			int groupId = message.GroupId;
@@ -230,7 +230,7 @@ namespace ChatApp
 				replyMessage = msg.Content;
 			}
 			var profile = context.Profiles.FirstOrDefault(p => p.Id == messageFromId);
-			response = new GMessageSendModel
+			response = new GMessageDTO
 			{
 				Id = newMessage.Id,
 				Content = newMessage.Content,

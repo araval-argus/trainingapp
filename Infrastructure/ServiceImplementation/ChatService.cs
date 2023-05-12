@@ -25,11 +25,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			this.webHostEnvironment = webHostEnvironment;
 			this.hubContext = hubContext;
 		}
-		public IEnumerable<ColleagueModel> SearchColleague(string name, string username)
+		public IEnumerable<SelectedUserModel> SearchColleague(string name, string username)
 		{
 			return context.Profiles
 			.Where(profile => (profile.FirstName.ToLower().StartsWith(name) || profile.LastName.ToLower().StartsWith(name)) && profile.UserName != username &&profile.IsDeleted==0)
-			.Select(colleagues => new ColleagueModel()
+			.Select(colleagues => new SelectedUserModel()
 			{
 				FirstName = colleagues.FirstName,
 				LastName = colleagues.LastName,
@@ -56,19 +56,19 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			return user.Id;
 		}
 
-		public IEnumerable<MessageSendModel> GetMsg(string userName, string selUserName)
+		public IEnumerable<MessageDTO> GetMsg(string userName, string selUserName)
 		{		
 			int userId = GetIdFromUserName(userName);
 			int selUserId = GetIdFromUserName(selUserName);
 			var list = context.Messages
 			.Where(msg => (msg.MessageFrom == userId && msg.MessageTo == selUserId) || (msg.MessageFrom == selUserId && msg.MessageTo == userId));
-			var returnList = new List<MessageSendModel>();
-			var response = new List<MessageSendModel>();
+			var returnList = new List<MessageDTO>();
+			var response = new List<MessageDTO>();
 			if (context.Profiles.FirstOrDefault(u => u.Id == selUserId).IsDeleted == 0)
 			{
 				foreach (var msg in list)
 				{
-					var newObj = new MessageSendModel
+					var newObj = new MessageDTO
 					{
 						Id = msg.Id,
 						Content = msg.Content,
@@ -132,6 +132,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 						UserName = userTalked.UserName,
 						Seen = seenCount,
 						Type = msg.Type,
+						Status = context.UserStatus.FirstOrDefault(u => u.Id == userTalked.Status).Status
 					};
 					recentChatList.Add(newObj);
 				}
@@ -219,7 +220,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 				context.Messages.Add(message);
 				context.SaveChanges();
 
-				var response = new MessageSendModel()
+				var response = new MessageDTO()
 				{
 					Id = message.Id,
 					Content = message.Content,

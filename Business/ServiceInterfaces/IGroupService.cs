@@ -17,6 +17,6 @@ namespace ChatApp.Business.ServiceInterfaces
 		public void makeAdmin(int groupId, string selUserName, string userName);
 		public void removeUser(int groupId, string selUserName, string username);
 		public void SendFileMessage(GMessageInModel msg);
-		public IEnumerable<GMessageSendModel> GetAllMessage(int groupId);
+		public IEnumerable<GMessageDTO> GetAllMessage(int groupId);
 	}
 }

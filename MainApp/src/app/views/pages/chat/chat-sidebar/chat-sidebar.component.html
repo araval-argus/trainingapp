@@ -39,7 +39,7 @@
             </div>
           <!-- CLOSE DROPDOWN -->
         </div></a>
-          <a class="dropdown-item d-flex align-items-center" href="" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
+          <a class="dropdown-item d-flex align-items-center" (click)="false"><i class="feather icon-settings icon-xs mr-2"></i> <span class="">Settings</span></a>
         </div>
       </div>
     </div>
@@ -88,7 +88,14 @@
                 <a  class="d-flex align-items-center">
                   <figure class="mb-0 mr-2">
                     <img [src]="ImageStartUrl + recent.imagePath" class="img-xs rounded-circle" alt="user">
-                    <div class="status online"></div>
+                    <div>
+                      <div *ngIf="recent.status=='Available'" class="mdi mdi-checkbox-blank-circle active stat"></div>
+                      <div *ngIf="recent.status=='Do Not Disturb'" class="mdi mdi-minus-circle red stat"></div>
+                      <div *ngIf="recent.status=='Busy'" class="mdi mdi-checkbox-blank-circle red stat"></div>
+                      <div *ngIf="recent.status=='Be Right Back'" class="mdi mdi-clock-fast yellow stat"></div>
+                      <div *ngIf="recent.status=='Away'" class="mdi mdi-clock yellow stat"></div>
+                      <div *ngIf="recent.status=='Offline'" style="color: black;" class="mdi mdi-close-circle stat"></div>
+                    </div>
                   </figure>
                   <div class="d-flex justify-content-between flex-grow border-bottom">
                     <div>

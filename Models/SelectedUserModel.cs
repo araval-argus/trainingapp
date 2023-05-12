@@ -3,7 +3,7 @@ using System;
 
 namespace ChatApp.Models
 {
-	public class ColleagueModel
+	public class SelectedUserModel
 	{
 		public string FirstName { get; set; }
 		public string? LastName { get; set; }

@@ -33,7 +33,6 @@ export class EmployeesComponent implements OnInit {
 
   onEdit(user:ColleagueModel){
     this.selUser = {...user};
-    console.log(this.selUser);
     this.accountService.getAllDesignation().subscribe((data:any)=>{
       this.desigList = data;
     })

@@ -1,4 +1,5 @@
 import { Component, OnInit  } from '@angular/core';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 import { LoggedInUser } from 'src/app/core/models/loggedin-user';
 import { AccountService } from 'src/app/core/service/account-service';
@@ -17,12 +18,18 @@ export class UpdateComponent implements OnInit {
   loggedInUser : LoggedInUser;
   imageFile : File;
   imageUrl : string;
-
-  constructor(private authService : AuthService, private accountService : AccountService) { }
+  changepassword : {old:string,newp:string,verify:string};
+  constructor(private authService : AuthService, private accountService : AccountService , private modalService: NgbModal) { }
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
     this.imageUrl = environment.ImageUrl + this.loggedInUser.imagePath;
+
+    this.changepassword={
+      newp: '',
+      old: '',
+      verify:''
+    };
   }
 
   onFileSelected(event) {
@@ -58,5 +65,31 @@ export class UpdateComponent implements OnInit {
           icon: 'error',
         });
       })
+  }
+
+  change(){
+    this.accountService.changePassword(this.changepassword).subscribe(() => {
+      Swal.fire({
+        title: 'Success!',
+        text: 'Password Changed successfully.',
+        icon: 'success',
+        timer: 2000,
+        timerProgressBar: true,
+      });
+    }, (err) => {
+      Swal.fire({
+        title: 'Error!',
+        text: err.error.message,
+        icon: 'error',
+      });
+    });
+  }
+
+  openBasicModal(content) {
+    this.changepassword.newp='';
+    this.changepassword.old='';
+    this.changepassword.verify='';
+    this.modalService.open(content, {}).result.then((result) => {
+    }).catch((res) => {});
   }
 }

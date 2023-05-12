@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using System.Text;
+using System.Net.Mime;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -182,16 +183,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return context.UserStatus.ToList();
         }
 
-		public List<ColleagueModel> getAllUsers(string userName)
+		public List<SelectedUserModel> getAllUsers(string userName)
         {
-            var response = new List<ColleagueModel>();
+            var response = new List<SelectedUserModel>();
             var profile = context.Profiles.Where(u => u.UserName == userName && u.IsDeleted==0);
 			if(profile!=null)
             {
                 var users = context.Profiles.Where(u=>u.IsDeleted==0);
                 foreach(var user in users)
                 {
-                    var newObj = new ColleagueModel
+                    var newObj = new SelectedUserModel
                     {
 
                         FirstName = user.FirstName,
@@ -239,5 +240,18 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 			return new JwtSecurityTokenHandler().WriteToken(token);
 		}
+
+        public bool ChangePassword(string userName , ChangePasswordModel password)
+        {
+            var profile = context.Profiles.FirstOrDefault(p => p.UserName == userName);
+            if(profile != null && profile.Password==password.Old)
+            {
+                profile.Password = password.Newp;
+                context.Profiles.Update(profile);
+                context.SaveChanges();
+                return true;
+            }
+            return false;
+        }
 	}
 }

@@ -194,9 +194,9 @@
         <!-- left column -->
         <div class="col-md-5">
           <div class="text-center">
-            <img *ngIf="url=='' && groupDetail.imagePath==null" src="assets/images/placeholder.jpg" class="avatar img-circle img-thumbnail" alt="avatar">
+            <img *ngIf="url=='' && groupUpdate.imagePath==null" src="assets/images/placeholder.jpg" class="avatar img-circle img-thumbnail" alt="avatar">
             <img *ngIf="url!=''" [src]="url" class="avatar img-circle img-thumbnail" alt="avatar">
-            <img *ngIf="url=='' && groupDetail.imagePath!=null" [src]="environment + groupDetail.imagePath" class="avatar img-circle img-thumbnail" alt="avatar">
+            <img *ngIf="url=='' && groupUpdate.imagePath!=null" [src]="environment + groupUpdate.imagePath" class="avatar img-circle img-thumbnail" alt="avatar">
             <h6>Upload a different photo...</h6>
             <div class="image-upload">
               <label class="mdi mdi-upload bigg" for="file-input"></label>
@@ -210,14 +210,14 @@
             <div class="form-group">
               <label class="col-lg-12 control-label">Group name:</label>
               <div class="col-lg-12">
-                <input class="form-control" type="text" value="{{groupDetail.groupName}}" name="GroupName" [(ngModel)]="groupDetail.groupName" #GroupName="ngModel" maxlength="50" required>
+                <input class="form-control" type="text" value="{{groupUpdate.groupName}}" name="GroupName" [(ngModel)]="groupUpdate.groupName" #GroupName="ngModel" maxlength="50" required>
               </div>
               <span *ngIf="GroupName.invalid && GroupName.touched" class="text-danger"><p>This is a Required Field</p></span>
             </div>
             <div class="form-group">
               <label class="col-lg-12 control-label">Description:</label>
               <div class="col-lg-12">
-                <textarea rows="5" class="form-control" type="text" value="{{groupDetail.description}}" name="grpDesc" [(ngModel)]="groupDetail.description" #grpDesc="ngModel" maxlength="200"></textarea>
+                <textarea rows="5" class="form-control" type="text" value="{{groupUpdate.description}}" name="grpDesc" [(ngModel)]="groupUpdate.description" #grpDesc="ngModel" maxlength="200"></textarea>
               </div>
             </div>
           </form>

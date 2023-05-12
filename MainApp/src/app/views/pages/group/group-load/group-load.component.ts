@@ -20,12 +20,12 @@ import Swal from 'sweetalert2';
 })
 export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy {
 
-  groupId : number ;
   imageFile : File;
   loggedInUser : LoggedInUser;
   url: any = '';
   isAdmin : number = 0;
   groupDetail : GroupModel;
+  groupUpdate : GroupModel;
   allUsers : AllGroupMember[] = [];
   selectedUsers = [];
   environment = environment.ImageUrl;
@@ -44,12 +44,11 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
 
   ngOnInit() {
   this.groupService.GroupChangedSub.subscribe((groupId:number)=> {
-   this.groupId = groupId;
 
    this.loggedInUser = this.authService.getLoggedInUserInfo();
 
     this.signalRService.hubConnection.on('MadeMeAdmin',(groupId:number)=>{
-        if(this.groupId==groupId){
+        if(groupId==groupId){
            this.isAdmin=1;
         }
     })
@@ -57,20 +56,20 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     this.msg = {
       content: '',
       messageFrom: '',
-      groupId: this.groupId,
+      groupId: groupId,
       repliedTo:-1,
       type:''
     };
 
-    this.groupService.fetchMessages(this.groupId).subscribe((data:GroupMessageDisplayModel[])=>{
+    this.groupService.fetchMessages(groupId).subscribe((data:GroupMessageDisplayModel[])=>{
       this.displayMsgList = data;
     });
 
-    this.groupService.getGroup(this.groupId).subscribe((data:GroupModel)=>{
+    this.groupService.getGroup(groupId).subscribe((data:GroupModel)=>{
       this.groupDetail = data;
     });
 
-    this.groupService.getAllMembers(this.groupId).subscribe((data:AllGroupMember[])=>{
+    this.groupService.getAllMembers(groupId).subscribe((data:AllGroupMember[])=>{
       this.members = data;
       var curUserMember = this.members.find(u=>u.userName==this.loggedInUser.userName);
       this.isAdmin = curUserMember.admin;
@@ -82,12 +81,11 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     });
 
     this.signalRService.hubConnection.on('RecieveMessageGroup',(data:GroupMessageDisplayModel)=>{
-      console.log(data);
       this.displayMsgList.push(data);
     });
 
     this.signalRService.hubConnection.on('iAmRemovedFromGroup',(groupId:number)=>{
-      if(this.groupId==groupId){
+      if(groupId==groupId){
         this.groupDetail=null;
       }
     });
@@ -101,7 +99,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
 
   onSubmit(){
     if(this.selectedUsers!=null){
-      this.groupService.addMemberToGroup(this.selectedUsers,this.groupId).subscribe((data:AllGroupMember[])=>{
+      this.groupService.addMemberToGroup(this.selectedUsers,this.groupDetail.id).subscribe((data:AllGroupMember[])=>{
         data.forEach(element=>{
           this.members.push(element);
         })
@@ -115,7 +113,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     else{
     this.msg.content = message.value;
     this.msg.messageFrom = this.loggedInUser.userName;
-    this.msg.groupId = this.groupId;
+    this.msg.groupId = this.groupDetail.id;
     if(this.isReplying)
     {
       this.msg.repliedTo = this.rplyMsgId;
@@ -132,10 +130,15 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
 
   onEdit(){
     const formdata = new FormData();
-    formdata.append('GroupName',this.groupDetail.groupName);
-    formdata.append('Description',this.groupDetail.description);
+    formdata.append('GroupName',this.groupUpdate.groupName);
+    if(this.groupUpdate.description==null){
+      formdata.append('Description','');
+    }else{
+      formdata.append('Description',this.groupUpdate.description);
+    }
     formdata.append('ImageFile',this.imageFile);
-    this.groupService.editGroup(this.groupId,formdata).subscribe(()=>{})
+    console.log('GL' , this.groupUpdate.description);
+    this.groupService.editGroup(this.groupDetail.id,formdata).subscribe(()=>{})
     this.url='';
     this.imageFile=null;
   }
@@ -166,8 +169,8 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
       confirmButtonText: 'Yes, Remove me!'
     }).then((result) => {
       if (result.isConfirmed) {
-        this.groupService.leaveGroup(this.groupId).subscribe(()=>{
-          this.groupService.UserRemoveGroupSub.next(this.groupId);
+        this.groupService.leaveGroup(this.groupDetail.id).subscribe(()=>{
+          this.groupService.UserRemoveGroupSub.next(this.groupDetail.id);
           this.groupDetail=null;
         });
         Swal.fire(
@@ -175,7 +178,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
           'You Have Exited From Group Successfully',
           'success'
         )
-        this.router.navigate(['../'], { relativeTo: this.route });
+        this.router.navigate(['../group'], { relativeTo: this.route });
       }
     })
   }
@@ -186,14 +189,14 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     if (index !== -1) {
       this.members[index].admin = 1;
     }
-    this.groupService.makeUserasAdmin(this.groupId,userName).subscribe();
+    this.groupService.makeUserasAdmin(this.groupDetail.id,userName).subscribe();
    }
   }
 
   removeUser(userName:string){
     if(this.isAdmin==1){
       this.members = this.members.filter(group => group.userName !== userName);
-      this.groupService.removeUserFromGroup(this.groupId,userName).subscribe();
+      this.groupService.removeUserFromGroup(this.groupDetail.id,userName).subscribe();
      }
   }
 
@@ -208,7 +211,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
     const formdata = new FormData();
     formdata.append('File',this.imageFile);
     formdata.append('MessageFrom',this.loggedInUser.userName),
-    formdata.append('GroupId',''+this.groupId),
+    formdata.append('GroupId',''+this.groupDetail.id),
     this.groupService.sendFileMessage(formdata).subscribe(()=>{})
   }
 
@@ -239,7 +242,7 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
 
   openVerticalCenteredModal(content) {
     //Fetch All Users When Clicked on Add Members
-    this.groupService.getAllUsers(this.groupId).subscribe((data:AllUserModel[])=>{
+    this.groupService.getAllUsers(this.groupDetail.id).subscribe((data:AllUserModel[])=>{
       this.allUsers = data ;
     });
     this.modalService.open(content, {centered: true}).result.then((result) => {
@@ -247,12 +250,13 @@ export class GroupLoadComponent implements OnInit , AfterViewChecked , OnDestroy
   }
 
   openEditGroupModal(content){
+    this.groupUpdate = {...this.groupDetail};
     this.modalService.open(content, {centered: true}).result.then((result) => {
     }).catch((res) => {});
   }
 
   openScrollableModal(content) {
-    this.groupService.getAllMembers(this.groupId).subscribe((data:AllGroupMember[])=>{
+    this.groupService.getAllMembers(this.groupDetail.id).subscribe((data:AllGroupMember[])=>{
       this.members = data;
      });
     this.modalService.open(content, {scrollable: true}).result.then((result) => {

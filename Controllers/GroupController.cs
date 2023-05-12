@@ -2,6 +2,7 @@
 using ChatApp.Context;
 using ChatApp.Infrastructure.ServiceImplementation;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -14,7 +15,7 @@ namespace ChatApp.Controllers
 
 	[Route("api/[controller]")]
 	[ApiController]
-
+	[Authorize]
 	public class GroupController : ControllerBase
 	{
 
@@ -152,7 +153,7 @@ namespace ChatApp.Controllers
 		[HttpPost("GetAllMessage")]
 		public IActionResult GetMessage([FromBody] int groupId)
 		{
-			IEnumerable<GMessageSendModel> msgList = _groupService.GetAllMessage(groupId);
+			IEnumerable<GMessageDTO> msgList = _groupService.GetAllMessage(groupId);
 			if (msgList != null)
 			{
 				return Ok(msgList);

@@ -16,6 +16,7 @@ import { environment } from 'src/environments/environment';
   templateUrl: './chat-sidebar.component.html',
   styleUrls: ['./chat-sidebar.component.scss'],
 })
+
 export class ChatSidebarComponent implements OnInit {
 
   loggedInUser : LoggedInUser;
@@ -56,11 +57,19 @@ export class ChatSidebarComponent implements OnInit {
     this.signalRService.hubConnection.on('msgSeen',(msgFrom:string)=>{
       this.removeMarkCount(msgFrom);
     });
+
+    this.signalRService.hubConnection.on('userStatusChanged',(userName:string,statusString:string)=>{
+      const index = this.recentChatList.findIndex(u => u.userName === userName);
+      if (index !== -1) {
+        this.recentChatList[index].status = statusString;
+      }
+    });
   }
 
   fetchRecentChat(){
     this.chatService.loadRecentChat().subscribe((data:RecentChatModel[])=>{
       this.recentChatList = data;
+      console.log(this.recentChatList);
     });
   }
 

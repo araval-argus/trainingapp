@@ -33,11 +33,13 @@ namespace ChatApp.Business.ServiceInterfaces
 
         public UserStatus getUserStatus(string userName);
 
-        public List<ColleagueModel> getAllUsers(string userName);
+        public List<SelectedUserModel> getAllUsers(string userName);
 
         public bool CheckDeleted(string userName);
 
         public string GenerateJSONWebToken(Profile profileInfo);
+
+        public bool ChangePassword(string userName, ChangePasswordModel password);
 
 	}
 }

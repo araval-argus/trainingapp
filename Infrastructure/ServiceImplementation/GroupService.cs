@@ -277,7 +277,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			if (context.GroupMembers.FirstOrDefault(u => u.GrpId == grpId && u.ProfileId == userId).Admin==1){
 				Groups existingGroup = context.Groups.FirstOrDefault(u => u.Id == grpId);
 				existingGroup.GroupName = grp.GroupName;
-				existingGroup.Description = grp.Description;
+				if (grp.Description != null)
+				{ existingGroup.Description = grp.Description; }
 				if (grp.ImageFile != null)
 				{
 					var filename = Guid.NewGuid().ToString(); // new generated image file name
@@ -401,17 +402,17 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 			}
 		}
 
-		public IEnumerable<GMessageSendModel> GetAllMessage(int groupId) 
+		public IEnumerable<GMessageDTO> GetAllMessage(int groupId) 
 		{
-			var returnList = new List<GMessageSendModel>();
-			var response = new List<GMessageSendModel>();
+			var returnList = new List<GMessageDTO>();
+			var response = new List<GMessageDTO>();
 			var groupMessages = context.GroupMessages.Where(u=>u.GrpId== groupId).ToList();
 			if (groupMessages.Count > 0)
 			{
 				foreach (var groupMessage in groupMessages)
 				{
 					var profile = context.Profiles.FirstOrDefault(u => u.Id == groupMessage.MessageFrom);
-					var newObj = new GMessageSendModel
+					var newObj = new GMessageDTO
 					{
 						Id= groupMessage.Id,
 						Content= groupMessage.Content,
@@ -478,7 +479,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
 			var Profile = context.Profiles.FirstOrDefault(u=>u.UserName==msg.MessageFrom);
 
-			var response = new GMessageSendModel()
+			var response = new GMessageDTO()
 			{
 				Id = message.Id,
 				Content = message.Content,

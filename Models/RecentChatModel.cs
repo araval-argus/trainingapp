@@ -12,5 +12,6 @@ namespace ChatApp.Models
 		public string UserName { get; set; }
 		public int Seen { get; set; }
 		public string? Type { get; set; }
+		public string? Status { get; set; }
 	}
 }

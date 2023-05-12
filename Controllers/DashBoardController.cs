@@ -1,4 +1,5 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -7,6 +8,7 @@ namespace ChatApp.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class DashBoardController : ControllerBase
 	{
 		private readonly IDashBoardService _dashboardService;

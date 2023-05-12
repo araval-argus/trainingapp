@@ -64,7 +64,6 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
           this.isHimself = true;
         }
 
-        console.log(this.selUser);
         this.signalRService.hubConnection.on('userStatusChanged',(userName:string,statusString:string)=>{
           if(this.selUser.userName==userName){
            this.selUser.status = statusString;
@@ -72,6 +71,7 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
         });
 
         this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
+          console.log('I am Chat Load');
           this.selUser = data;
           this.selUserImage = environment.ImageUrl + data.imagePath;
 
@@ -90,15 +90,6 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
       }
     })
 
-    this.chatService.getUser(this.username).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:ColleagueModel)=>{
-      this.selUser = data;
-      this.selUserImage = environment.ImageUrl + data.imagePath;
-
-      this.chatService.fetchMessages(this.selUser.userName).pipe(takeUntil(this.ngUnsubscribe)).subscribe((data:MessageDisplayModel[])=>{
-        this.displayMsgList = data;
-      })
-    })
-
     this.signalRService.hubConnection.on('msgSeen',(msgFrom:string)=>{
       this.displayMsgList.forEach(element=>{
         if(element.messageFrom == this.loggedInUser.userName){
@@ -111,7 +102,6 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
   ngAfterViewChecked():void {
     this.scrollToBottom();
   }
-
 
   onMessage(message:HTMLInputElement){
     if(message.value.trim()==''){}
@@ -190,5 +180,5 @@ export class ChatLoadComponent implements OnInit , AfterViewChecked , OnDestroy{
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();
     this.ngUnsubscribe.complete();
-}
+  }
 }

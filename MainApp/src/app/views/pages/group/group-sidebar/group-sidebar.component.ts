@@ -56,7 +56,7 @@ export class GroupSidebarComponent implements OnInit {
     });
 
     this.signalRService.hubConnection.on('iAmAddedToGroup',(newGrp:RecentGroupModel)=>{
-      this.recentGroupList.push(newGrp);
+      this.recentGroupList.splice(0,0,newGrp);
     });
 
     this.signalRService.hubConnection.on('iAmRemovedFromGroup',(groupId:number)=>{
@@ -100,7 +100,7 @@ export class GroupSidebarComponent implements OnInit {
     formdata.append('Description',this.createGrpModel.description);
     formdata.append('ImageFile',this.imageFile);
     this.groupService.createGroup(formdata).subscribe((data:RecentGroupModel)=>{
-      this.recentGroupList.push(data);
+      this.recentGroupList.splice(0,0,data);
     })
   }
 

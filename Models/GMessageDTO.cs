@@ -2,7 +2,7 @@
 
 namespace ChatApp.Models
 {
-	public class GMessageSendModel
+	public class GMessageDTO
 	{
 		public int Id { get; set; }
 		public string? Content { get; set; }

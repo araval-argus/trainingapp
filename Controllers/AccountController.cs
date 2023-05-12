@@ -68,13 +68,14 @@ namespace ChatApp.Controllers
             return BadRequest(new { Message = " Cannot Update User " });
         }
 
-        [HttpGet("{userName}")]
+		[Authorize]
+		[HttpGet("{userName}")]
         public IActionResult GetUser(string userName)
         {
             Profile user = _profileService.GetUser(userName);
             if (user != null && user.IsDeleted == 0)
             {
-                ColleagueModel model = new ColleagueModel();
+                SelectedUserModel model = new SelectedUserModel();
                 model.UserName = user.UserName;
                 model.FirstName = user.FirstName;
                 model.LastName = user.LastName;
@@ -87,31 +88,58 @@ namespace ChatApp.Controllers
             return BadRequest();
         }
 
-        [HttpGet("GetStatusList")]
+		[Authorize]
+		[HttpGet("GetStatusList")]
         public IActionResult StatusList()
         {
             return Ok(_profileService.GetAllStatus());
         }
 
-        [HttpGet("Status/{userName}")]
+		[Authorize]
+		[HttpGet("Status/{userName}")]
         public IActionResult UserStatus(string userName)
         {
             var h = _profileService.getUserStatus(userName);
 			return Ok(h);
         }
 
-        [HttpPost("ChangeStatus/{userName}")]
-        public IActionResult ChangeStatus(string userName , [FromBody] int statusCode )
+		[Authorize]
+		[HttpPost("ChangeStatus/{userName}")]
+
+		[Authorize]
+		public IActionResult ChangeStatus(string userName , [FromBody] int statusCode )
         {
             _profileService.ChangeStatus(userName, statusCode);
             return Ok();
         }
 
-        [HttpGet("GetUsers")]
+		[Authorize]
+		[HttpGet("GetUsers")]
         public IActionResult GetUsers([FromHeader]string Authorization)
         {
 			string userName = GetUserNameFromToken(Authorization);
             return Ok(_profileService.getAllUsers(userName));
+		}
+
+        [Authorize]
+        [HttpPost("ChangePassword")]
+        public IActionResult ChangePassword([FromBody] ChangePasswordModel password, [FromHeader] string Authorization)
+        {
+			IActionResult response = Unauthorized(new { Message = "Invalid Credentials." });
+			var username = GetUserNameFromToken(Authorization);
+			if (username != null)
+			{
+				bool isCorrect = _profileService.ChangePassword(username, password);
+                if (isCorrect)
+                {
+                    response = Ok();
+                }
+                else
+                {
+                    return BadRequest(new { Message = "Invalid Credentials." });
+                }
+			}
+			return response;
 		}
 
         private string GetUserNameFromToken(string Authorization)

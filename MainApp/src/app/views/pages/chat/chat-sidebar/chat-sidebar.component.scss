@@ -19,3 +19,9 @@
   bottom: -4px !important;
   right: -2px !important;
 }
+
+.stat.mdi::before{
+  position: absolute !important;
+  background-color: white;
+  border-radius: 90%;
+}

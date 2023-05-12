@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
@@ -14,6 +15,7 @@ namespace ChatApp.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class ChatController : ControllerBase
 	{
 		
@@ -46,9 +48,10 @@ namespace ChatApp.Controllers
 		[HttpGet("MsgList{selUserUserName}")]
 		public IActionResult GetMessage(string selUserUserName , [FromHeader] string Authorization)
 		{
+			Console.WriteLine("1");
 			string userName = GetUsernameFromToken(Authorization);
 
-			IEnumerable<MessageSendModel> msgList = _chatService.GetMsg(userName, selUserUserName);
+			IEnumerable<MessageDTO> msgList = _chatService.GetMsg(userName, selUserUserName);
 			if(msgList!=null)
 			{
 				return Ok(msgList);

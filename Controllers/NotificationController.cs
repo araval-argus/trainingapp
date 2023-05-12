@@ -1,5 +1,6 @@
 ﻿using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
@@ -9,6 +10,7 @@ namespace ChatApp.Controllers
 {
 	[Route("api/[controller]")]
 	[ApiController]
+	[Authorize]
 	public class NotificationController : ControllerBase
 	{
 		private readonly INotificationServices _notificationService;
