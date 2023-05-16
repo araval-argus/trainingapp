@@ -15,6 +15,8 @@ using System.Runtime.CompilerServices;
 using DesignationEntity = ChatApp.Context.EntityClasses.DesignationEntity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using ChatApp.Hubs;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -22,17 +24,19 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly IHubContext<ChatHub> hubContext;
 
-        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment)
+        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext, IChatService chatService)
         {
             this.context = context;
             this._webHostEnvironment = webHostEnvironment;
+            this.hubContext = hubContext;
         }
 
         // this method checks (username and password) or (email and password)
         public Profile CheckPassword(LoginModel model)
         {
-            return this.context.Profiles.Include("Designation").FirstOrDefault(x => x.IsActive && (model.Password == x.Password
+            return this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(x => x.IsActive && (model.Password == x.Password
             && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim())));
         }
 
@@ -52,12 +56,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     ProfileType = ProfileType.User,
                     ImageUrl = SetDefaultImage(),
                     DesignationID = regModel.DesignationID,
+                    StatusID = 1,
                     IsActive = true
-                };
+                };                
                 context.Profiles.Add(newUser);
                 context.SaveChanges();
 
-                newUser = context.Profiles.Include("Designation").FirstOrDefault(p => p.IsActive && p.UserName == regModel.UserName);
+                newUser = context.Profiles.Include("Designation").Include("Status").FirstOrDefault(p => p.IsActive && p.UserName == regModel.UserName);
             }
             return newUser;
         }
@@ -88,7 +93,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             Profile user = null;
             if (!string.IsNullOrEmpty(userName))
             {
-                user = this.context.Profiles.Include("Designation").FirstOrDefault(u => u.IsActive && u.UserName.Trim() == userName.Trim());
+                user = this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(u => u.IsActive && u.UserName.Trim() == userName.Trim());
             }
             return user;
         }
@@ -154,7 +159,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             //for fetching the profiles
             foreach (int id in Ids)
             {
-                var profile = this.context.Profiles.Include("Designation").FirstOrDefault(p => p.IsActive && p.Id == id);
+                var profile = this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(p => p.IsActive && p.Id == id);
                 if (profile != null)
                 {
                     friendsProfiles.Add(profile);
@@ -179,7 +184,8 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                         ImageUrl = profile.ImageUrl,
                         LastMessage = lastMessage.Message,
                         LastMessageTimeStamp = lastMessage.CreatedAt,
-                        UnreadMessageCount = UnreadMessageCount(profile.Id, userId)
+                        UnreadMessageCount = UnreadMessageCount(profile.Id, userId),
+                        Status = profile.Status
                     };
                 })
                 .OrderByDescending(profile => profile.LastMessageTimeStamp);
@@ -214,7 +220,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public IEnumerable<Profile> FetchAllProfiles()
         {
-            var employees = this.context.Profiles.Include("Designation").Where(p => p.IsActive).AsNoTracking();
+            var employees = this.context.Profiles.Include("Designation").Include("Status").Where(p => p.IsActive);
             return employees;
         }
 
@@ -234,7 +240,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         //fetches all users except the user with given username
         public IEnumerable<UserModel> FetchAllUsers(string userName)
         {
-            var users = this.context.Profiles.Include("Designation")
+            var users = this.context.Profiles.Include("Designation").Include("Status")
                 .Where(profile => profile.UserName != userName)
                 .Select(profile => new UserModel
                 {
@@ -243,12 +249,32 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     LastName = profile.LastName,
                     Email = profile.Email,
                     ImageUrl = profile.ImageUrl,
-                    Designation = profile.Designation
+                    Designation = profile.Designation,
+                    Status = profile.Status,
                 });
             return users;
         }
 
-       
+       public void ChangeStatus(Profile user, int statusId)
+        {
+            user.StatusID = statusId;
+            this.context.Update(user);
+            this.context.SaveChanges();
+        }
+
+
+        public IList<Status> FetchAllStatus()
+        {
+            IList<Status> allStatus= new List<Status>();
+            allStatus = this.context.Status.ToList();
+            return allStatus;
+        }
+
+        public Status FetchStatus(int userId)
+        {
+            Status statusToBeReturned = this.context.Profiles.Include("Status").FirstOrDefault(p => p.Id == userId).Status;
+            return statusToBeReturned;
+        }
     }
 }
 

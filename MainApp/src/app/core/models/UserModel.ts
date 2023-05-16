@@ -10,4 +10,10 @@ export interface UserModel {
   lastMessage?: string;
   lastMessageTimeStamp?: Date;
   unreadMessageCount?: number;
+  status: {
+    id: number,
+    type: string,
+    tagClasses: string,
+    tagStyle: string
+  }
 }

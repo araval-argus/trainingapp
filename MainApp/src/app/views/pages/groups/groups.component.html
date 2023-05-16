@@ -4,11 +4,11 @@
       <div class="card-body">
         <div class="row position-relative">
           <div class="col-lg-4 chat-aside border-lg-right" style="max-height: calc(124vh - 385px); min-height: calc(124vh - 385px);">
-            <app-groups-sidebar [groups]="groups"></app-groups-sidebar>
+            <app-groups-sidebar></app-groups-sidebar>
           </div>
           <!-- contains selected group's chat content -->
           <div class="col-lg-8 chat-content">
-              <app-group-content [selectedGroup]="selectedGroup" [joinedUsers]="joinedUsers"></app-group-content>
+              <app-group-content [selectedGroup]="selectedGroup"></app-group-content>
           </div>
         </div>
       </div>

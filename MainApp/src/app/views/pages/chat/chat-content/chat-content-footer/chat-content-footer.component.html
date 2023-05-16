@@ -54,8 +54,8 @@
     <div class="input-group">
       <input type="file" id="fileInput" #fileInput accept="image/*, audio/*, video/*" (change)="onFileSelected()"
         hidden>
-      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" #messageInput
-        required>
+      <input type="text" class="form-control rounded-pill mr-2" id="chatForm" placeholder="Type a message" autocomplete="off" #messageInput
+        >
       <button type="submit" class="btn btn-primary btn-icon rounded-circle">
         <i class="feather icon-send"></i>
       </button>

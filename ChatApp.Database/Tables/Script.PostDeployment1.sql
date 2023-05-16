@@ -31,3 +31,14 @@ INSERT INTO [Notification_Types] ([Type]) values
 ('group member added'),
 ('new admin')
 END
+
+IF NOT EXISTS(SELECT * FROM [Status])
+BEGIN
+INSERT INTO [Status] ([Type],[TagClasses], [TagStyle]) values 
+('Available','mdi mdi-check-circle', 'color: green'),
+('Busy','mdi mdi-checkbox-blank-circle', 'color: red'),
+('Do not disturb','mdi mdi-minus-circle', 'color: red'), 
+('Be right back','mdi mdi-clock', 'color: yellow'),
+('Appear away','mdi mdi-clock', 'color: dark yellow'),
+('Appear offline','mdi mdi-close-circle-outline','color: grey')
+END

@@ -9,6 +9,7 @@ import { SignalRService } from 'src/app/core/service/signalR-service';
 import { NotificationService } from 'src/app/core/service/notification.service';
 import { NotificationModel } from 'src/app/core/models/Notification-model';
 import { Subscription } from 'rxjs';
+import { AccountService } from 'src/app/core/service/account-service';
 
 @Component({
   selector: "app-navbar",
@@ -18,9 +19,16 @@ import { Subscription } from 'rxjs';
 export class NavbarComponent implements OnInit, OnDestroy {
   today: Date = new Date();
   loggedInUser: LoggedInUserModel;
+  loggedInUserStatusId: number;
   apiUrl: string = environment.apiUrl;
   notifications: NotificationModel[];
   subscriptions: Subscription[] = [];
+  allStatus: {
+    id: number,
+    type: string,
+    tagClasses: string,
+    tagStyle: string
+  }[] = [];
 
   constructor(
     @Inject(DOCUMENT) private document: Document,
@@ -28,15 +36,18 @@ export class NavbarComponent implements OnInit, OnDestroy {
     private router: Router,
     private authService: AuthService,
     private signalRService: SignalRService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private accountService: AccountService
   ) {}
 
   ngOnInit(): void {
     this.loggedInUser = this.authService.getLoggedInUserInfo();
+    this.fetchLoggedInUserStatus();
     this.removeNotificationsSubscription();
     this.subscibeToFetchNotifications();
     this.subscribeToAddNotification();
     this.subscribeToChangedLoggedInUser();
+    this.fetchAllStatus();
   }
 
   /**
@@ -121,6 +132,30 @@ export class NavbarComponent implements OnInit, OnDestroy {
       this.loggedInUser = this.authService.getLoggedInUserInfo();
     });
     this.subscriptions.push(sub);
+  }
+
+  fetchAllStatus(){
+    this.accountService.fetchAllStatus().subscribe( (allStatus: any) => {
+      this.allStatus = allStatus;
+      console.log(this.allStatus);
+    });
+  }
+
+  fetchLoggedInUserStatus(){
+    this.accountService.fetchLoggedInUserStatus().subscribe( (status: any) => {
+      this.loggedInUserStatusId = status;
+      console.log(this.loggedInUser)
+    })
+  }
+
+  compareFn(item, selected){
+    return item == selected;
+  }
+
+  changeStatus(){
+    console.log(this.loggedInUserStatusId)
+    this.accountService.changeStatus(this.loggedInUserStatusId).subscribe( () => {
+    });
   }
 
   setMessage(notificationModel: NotificationModel) {

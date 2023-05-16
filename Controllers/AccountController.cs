@@ -72,7 +72,7 @@ namespace ChatApp.Controllers
             if (user != null)
             {
                 var tokenString = GenerateJSONWebToken(user);
-                return Ok(new { token = tokenString, user = user });
+                return Ok(new { token = tokenString, user });
             }
             return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
         }
@@ -167,7 +167,7 @@ namespace ChatApp.Controllers
 
             var messages = this.chatService.FetchMessages(sender.Id, user.Id);
 
-            if(messages.Count() >= 0)
+            if(messages.Count() > 0)
             {
                 var lastMessage = messages.ToList()[messages.Count() - 1];
                 userModel.LastMessage = lastMessage.Message;
@@ -175,6 +175,43 @@ namespace ChatApp.Controllers
             }
            
             return Ok(userModel);
+        }
+
+        [HttpPatch("ChangeStatus")]
+        [Authorize]
+        public IActionResult ChangeStatus(int statusId, [FromHeader] string Authorization)
+        {
+
+            string username = CustomAuthorization.GetUsernameFromToken(Authorization);
+            var user = this._profileService.FetchProfileFromUserName(username);
+            if(user == null)
+            {
+                return BadRequest("user not found");
+            }
+            this._profileService.ChangeStatus(user, statusId);
+            return Ok();
+        }
+
+        [HttpGet("FetchAllStatus")]
+        [Authorize]
+        public IActionResult FetchAllStatus()
+        {
+            var allStatus = this._profileService.FetchAllStatus();
+            return Ok(allStatus);
+        }
+
+        [HttpGet("FetchStatus")]
+        [Authorize]
+        public IActionResult FetchStatus([FromHeader] string Authorization)
+        {
+            var userName = CustomAuthorization.GetUsernameFromToken(Authorization);
+            var user = this._profileService.FetchProfileFromUserName(userName);
+            if(user == null)
+            {
+                return Unauthorized("Unknown User");
+            }
+            var status = this._profileService.FetchStatus(user.Id);
+            return Ok(status);
         }
 
         #region HelperMethods

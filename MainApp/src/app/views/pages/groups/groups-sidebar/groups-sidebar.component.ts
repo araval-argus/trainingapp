@@ -1,5 +1,6 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Subscription } from 'rxjs';
 import { GroupModel } from 'src/app/core/models/group-model';
 import { LoggedInUserModel } from 'src/app/core/models/loggedin-user';
 import { AuthService } from 'src/app/core/service/auth-service';
@@ -14,9 +15,10 @@ import { environment } from 'src/environments/environment';
 })
 export class GroupsSidebarComponent implements OnInit {
 
-  @Input() groups: GroupModel[];
-  loggedInUser: LoggedInUserModel;
+  groups: GroupModel[] = [];
+  loggedInUser: LoggedInUserModel = this.authService.getLoggedInUserInfo();
   today = new Date();
+
 
 
   constructor(private authService: AuthService,
@@ -25,7 +27,7 @@ export class GroupsSidebarComponent implements OnInit {
     private signalRService: SignalRService) { }
 
   ngOnInit(): void {
-    this.loggedInUser = this.authService.getLoggedInUserInfo();
+    this.fetchGroups();
   }
 
   onClickGroup(group){
@@ -65,5 +67,25 @@ export class GroupsSidebarComponent implements OnInit {
       console.log(err)
     })
   }
+
+  fetchGroups(){
+    if(this.loggedInUser.sub){
+      this.groupService.fetchGroups(this.loggedInUser.sub).subscribe( (data: any) => {
+        this.groups = data;
+        this.groups.forEach((group) => {
+          if (group.groupIconUrl) {
+            group.groupIconUrl =
+              environment.apiUrl + "/../GroupIcons/" + group.groupIconUrl;
+          }
+          else{
+            group.groupIconUrl =
+            environment.apiUrl + "/../Default/default_group_icon.jpg";
+          }
+          group.lastMessageTimeStamp = new Date(group.lastMessageTimeStamp + 'Z');
+        });
+      });
+    }
+  }
+
 
 }

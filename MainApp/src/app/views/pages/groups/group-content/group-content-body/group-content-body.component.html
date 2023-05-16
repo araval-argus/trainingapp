@@ -1,4 +1,4 @@
-<div class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 49; position: 'relative'; min-height: calc(105vh - 385px);">
+<div *ngIf="selectedGroup" class="chat-body" [perfectScrollbar] #scrollbar style="z-index: 49; position: 'relative'; min-height: calc(105vh - 385px);">
   <ul class="messages">
     <!-- message of sender -->
     <div *ngFor="let message of messages">

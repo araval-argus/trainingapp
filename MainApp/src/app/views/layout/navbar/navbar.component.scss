@@ -1,2 +1,18 @@
 .notification-list { max-height: 280px; overflow-y: auto; min-width: 100% !important}
 
+.ng-select.no-border ::ng-deep .ng-select-container {
+  border: none !important;
+}
+
+.ng-select.small-font {
+  height:5px;
+  font-size: 0.8em;
+}
+
+.ng-select.small-font .ng-select-container  {
+  height:5px;
+}
+
+.ng-select>.ng-input{
+  font-size: 0.8rem;
+}

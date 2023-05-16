@@ -54,4 +54,19 @@ export class AccountService {
         params: new HttpParams().append("userName", loggedInUsername)
       });
     }
+
+    fetchAllStatus(){
+      return this.http.get(environment.apiUrl + "/account/FetchAllStatus");
+    }
+
+    fetchLoggedInUserStatus(){
+      return this.http.get(environment.apiUrl + "/account/fetchStatus");
+    }
+
+    changeStatus(statusId: number){
+      console.log(statusId)
+      return this.http.patch(environment.apiUrl + '/account/changeStatus',null,  {
+        params: new HttpParams().append("statusId", statusId+"")
+      });
+    }
 }

@@ -29,8 +29,8 @@
       <td><img [src]="employee.imageUrl" alt="" class="rounded-circle" width="32"></td>
       <td *ngIf="isAdmin">
         <button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success p-mr-2"
-         (click)="selectEmployee(employee); openScrollableModal(scrollableModal)" ngbTooltip="Edit"></button>
-        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning ml-2" (click)="deleteEmployee(employee)" ngbTooltip="Delete"></button>
+         (click)="selectEmployee(employee); openScrollableModal(scrollableModal)" container="body" ngbTooltip="Edit"></button>
+        <button pButton pRipple icon="pi pi-trash" class="p-button-rounded p-button-warning ml-2" (click)="deleteEmployee(employee)" container="body" ngbTooltip="Delete"></button>
       </td>
     </tr>
   </ng-template>

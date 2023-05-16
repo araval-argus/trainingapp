@@ -21,5 +21,7 @@ namespace ChatApp.Models
         public DateTime? LastMessageTimeStamp { get; set; } = null;
 
         public int? UnreadMessageCount { get; set; }
+
+        public Status Status { get; set; }
     }
 }

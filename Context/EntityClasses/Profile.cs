@@ -29,6 +29,11 @@ namespace ChatApp.Context.EntityClasses
         [ForeignKey("DesignationID")]
         public virtual DesignationEntity Designation { get; set; }
 
+        public int StatusID { get; set; }
+
+        [ForeignKey("StatusID")]
+        public virtual Status Status { get; set; }
+
         public bool IsActive { get; set; }
 
     }

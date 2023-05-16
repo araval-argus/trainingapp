@@ -9,7 +9,6 @@ import { GroupMemberModel } from 'src/app/core/models/group-member-model';
 })
 export class GroupContentComponent implements OnInit {
   @Input() selectedGroup: GroupModel;
-  @Input() joinedUsers: GroupMemberModel[];
 
 
   constructor() {}

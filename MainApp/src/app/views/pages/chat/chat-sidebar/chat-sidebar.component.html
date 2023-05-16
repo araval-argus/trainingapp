@@ -50,7 +50,7 @@
                       <div class="d-flex flex-column align-items-end">
                         <p class="text-muted tx-13 mb-1" *ngIf="today - friend.lastMessageTimeStamp.getDate() === 0">{{friend.lastMessageTimeStamp | date: "shortTime"}} </p>
                         <p class="text-muted tx-13 mb-1" *ngIf="today - friend.lastMessageTimeStamp.getDate() === 1">Yesterday </p>
-                        <p class="text-muted tx-13 mb-1" *ngIf="today - friend.lastMessageTimeStamp.getDate() !== 0 && today - friend.lastMessageTimeStamp.getDate() !== 1">{{friend.lastMessageTimeStamp | date: "medidumDate"}} </p>
+                        <p class="text-muted tx-13 mb-1" *ngIf="today - friend.lastMessageTimeStamp.getDate() !== 0 && today - friend.lastMessageTimeStamp.getDate() !== 1">{{friend.lastMessageTimeStamp | date: "mediumDate"}} </p>
                         <div *ngIf="friend.unreadMessageCount>0" class="unread-count-parent">
                           <div class="badge badge-pill badge-primary ml-auto">
                             {{ friend.unreadMessageCount }}

@@ -18,7 +18,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
-
+using ChatApp.Context.EntityClasses;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp
 {
@@ -68,8 +69,10 @@ namespace ChatApp
                  };
              });
 
+            
             services.AddAuthorization( options =>
             {
+                
                 options.AddPolicy("Employee", policy =>
                 {
                     string[] employees = new string[]

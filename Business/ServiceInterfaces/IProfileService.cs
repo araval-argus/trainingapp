@@ -37,5 +37,11 @@ namespace ChatApp.Business.ServiceInterfaces
         void UpdateEmployeeProfile(Profile employee);
 
         IEnumerable<UserModel> FetchAllUsers(string userName);
+
+        void ChangeStatus(Profile user, int statusId);
+
+        IList<Status> FetchAllStatus();
+
+        Status FetchStatus(int userId);
     }
 }

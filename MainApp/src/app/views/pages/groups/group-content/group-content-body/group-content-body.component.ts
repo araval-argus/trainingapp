@@ -9,7 +9,6 @@ import { SignalRService } from 'src/app/core/service/signalR-service';
 import { environment } from 'src/environments/environment';
 import { GroupMemberModel } from 'src/app/core/models/group-member-model';
 import { Subscription } from 'rxjs';
-import { take } from 'rxjs/operators';
 
 @Component({
   selector: 'app-group-content-body',
@@ -18,8 +17,8 @@ import { take } from 'rxjs/operators';
 })
 export class GroupContentBodyComponent implements OnInit, AfterViewChecked, OnDestroy {
 
-  @Input() selectedGroup: GroupModel;
-  @Input() joinedUsers: GroupMemberModel[];
+  selectedGroup: GroupModel;
+  joinedUsers: GroupMemberModel[] = [];
 
   subscriptions: Subscription[] = [];
   messages: GroupMessageModel[] = [];
@@ -40,11 +39,9 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked, OnDe
     ) { }
 
   ngOnInit(): void {
-
-    this.subscribeToGroupMessageAdded();
     this.subscribeToGroupSelected();
+    this.subscribeToGroupMessageAdded();
     this.subscribeToNotificationRaised();
-    this.fetchMessages();
   }
 
   subscribeToNotificationRaised(){
@@ -69,11 +66,24 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked, OnDe
   }
 
   subscribeToGroupSelected(){
-    const sub = this.groupService.groupSelected.subscribe( group => {
+    const sub = this.groupService.groupSelected.subscribe( (group: GroupModel) => {
       this.selectedGroup = group;
-      this.fetchMessages();
+      this.fetchJoinedUsers(group.id);
+      if(this.loggedInUser.sub && group){
+        this.fetchMessages(this.loggedInUser.sub, group.id);
+      }
     });
     this.subscriptions.push(sub);
+  }
+
+  fetchJoinedUsers(groupId){
+    this.groupService.fetchJoinedUsers(groupId).subscribe( (users: GroupMemberModel[]) => {
+      this.joinedUsers = users;
+        this.joinedUsers.forEach((user) => {
+          user.imageUrl =
+            environment.apiUrl + "/../Images/Users/" + user.imageUrl;
+        });
+    })
   }
 
   ngAfterViewChecked(){
@@ -132,21 +142,20 @@ export class GroupContentBodyComponent implements OnInit, AfterViewChecked, OnDe
     element.scrollTop = element.scrollHeight;
   }
 
-  fetchMessages(){
-    const sub = this.groupService.fetchMessages(this.loggedInUser.sub, this.selectedGroup.id).subscribe( (messages:GroupMessageModel[]) => {
-
-      setTimeout( () => {
-        messages.forEach( message => {
-          message.senderImage = this.joinedUsers.find( user => user.userName === message.senderUserName).imageUrl;
+  fetchMessages(userName: string, groupId: number){
+    console.log("messages fetched");
+    this.groupService
+      .fetchMessages(userName, groupId)
+      .subscribe((messages: GroupMessageModel[]) => {
+        messages.forEach((message) => {
+          message.senderImage = this.joinedUsers.find(
+            (user) => user.userName === message.senderUserName
+          ).imageUrl;
           message.message = this.setPath(message.messageType) + message.message;
-          message.createdAt = new Date(message.createdAt + 'Z')
-        })
+          message.createdAt = new Date(message.createdAt + "Z");
+        });
         this.messages = messages;
-      }, 500);
-
-
-    })
-    this.subscriptions.push(sub);
+      });
   }
 
   replyTothisMessage(message: GroupMessageModel){

@@ -65,6 +65,22 @@
               <p class="name font-weight-bold mb-0">{{loggedInUser.firstName}} {{loggedInUser.lastName}}</p>
               <p class="email text-muted mb-3">{{loggedInUser.email}}</p>
             </div>
+            <div>
+              <ng-select
+              class="no-border small-font mb-5"
+                dropdownPosition="bottom"
+                [items]="allStatus"
+                [clearable]="false"
+                [searchable]="false"
+                appearance="none"
+                bindLabel="type"
+                bindValue="id"
+                [(ngModel)]="loggedInUserStatusId"
+                [compareWith]="compareFn"
+                style="width: 120px"
+                (change)="changeStatus()"
+              ></ng-select>
+            </div>
           </div>
           <div class="dropdown-body">
             <ul class="profile-nav p-0 pt-3">
@@ -89,3 +105,4 @@
     </ul>
   </div>
 </nav>
+

@@ -1,6 +1,7 @@
 import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { FormsModule } from '@angular/forms';
 
 import { BaseComponent } from './base/base.component';
@@ -9,11 +10,8 @@ import { SidebarComponent } from './sidebar/sidebar.component';
 import { FooterComponent } from './footer/footer.component';
 
 import { ContentAnimateDirective } from '../../core/content-animate/content-animate.directive';
-
 import { NgbDropdownModule, NgbCollapseModule } from '@ng-bootstrap/ng-bootstrap';
-
 import { FeahterIconModule } from '../../core/feather-icon/feather-icon.module';
-
 import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
@@ -32,7 +30,8 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
     NgbDropdownModule,
     NgbCollapseModule,
     PerfectScrollbarModule,
-    FeahterIconModule
+    FeahterIconModule,
+    NgSelectModule
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   providers: [

@@ -27,6 +27,11 @@ namespace ChatApp.Controllers
             string userName = CustomAuthorization.GetUsernameFromToken(Authorization);
             var sender = this.profileService.FetchProfileFromUserName(userName);
 
+            if(sender == null) 
+            {
+                return BadRequest("user not found");
+            }
+
             var notifications = this.notificationService.GetAllNotifications(sender.Id);
 
             return Ok(notifications);

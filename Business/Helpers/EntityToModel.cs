@@ -34,6 +34,7 @@ namespace ChatApp.Business.Helpers
                 Designation = profile.Designation,
                 Email = profile.Email,
                 ImageUrl = profile.ImageUrl,
+                Status = profile.Status
             };
         }
 

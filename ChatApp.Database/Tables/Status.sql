@@ -1,0 +1,7 @@
+﻿CREATE TABLE [dbo].[Status]
+(
+	[Id] INT IDENTITY(1,1) PRIMARY KEY,
+	[Type] VARCHAR(100) NOT NULL, 
+    [TagClasses] VARCHAR(5000) NULL, 
+    [TagStyle] VARCHAR(5000) NULL 
+)

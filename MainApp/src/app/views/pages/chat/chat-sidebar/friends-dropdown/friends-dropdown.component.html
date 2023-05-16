@@ -9,14 +9,14 @@
     <input type="text"
     class="form-control  border-0 rounded-sm"
     id="searchForm" placeholder="Search here..."
-    (input)="onInputChange($event)">
+    (input)="onInputChange($event)" autocomplete="off">
   </div>
 </form>
  <!-- dropdown to show friends list -->
  <div class="dropdown appDropdown" style="position: absolute;z-index: 100; background-color: white; width: 92%"
  appDropdown (hideDropdown)="emptyList()">
 
-  <div class="dropdown-item pl-0" *ngFor="let friend of friendsProfiles" (click)="friendSelected(friend)">
+  <div class="dropdown-item pl-0 border-bottom" *ngFor="let friend of friendsProfiles" (click)="friendSelected(friend)">
     <div class="d-inline-flex">
       <div>
         <img [src]="friend.imageUrl" alt="" class="img-xs rounded-circle mr-3" />

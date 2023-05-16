@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 import { environment } from 'src/environments/environment';
 import { UserModel } from '../models/UserModel';
 import { GroupMessageModel } from '../models/group-message-model';
@@ -16,7 +16,7 @@ export class GroupService {
   constructor(private http: HttpClient,
     private authService: AuthService) { }
 
-  groupSelected = new Subject<GroupModel>();
+  groupSelected = new BehaviorSubject<GroupModel>(null);
   groupLeft = new Subject<GroupModel>();
   selectedGroupDetailsUpdated = new Subject<GroupModel>();
 

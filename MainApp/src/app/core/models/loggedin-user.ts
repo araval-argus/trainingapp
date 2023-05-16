@@ -7,5 +7,9 @@ export interface LoggedInUserModel
     // userName is stored as sub in token
     sub?: string,
     imageUrl?:string,
-    designation?: string
+    designation?: string,
+    status: {
+      id: number,
+      type: string
+    }
 }

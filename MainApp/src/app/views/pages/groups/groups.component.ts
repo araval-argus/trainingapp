@@ -68,7 +68,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
 
   subscribeToGroupSelected(){
     const sub = this.groupService.groupSelected.subscribe( (group: GroupModel) => {
-      this.selectedGroup = group;
+      if(group){
+        this.selectedGroup = group;
       const sub = this.groupService.fetchJoinedUsers(this.selectedGroup.id).subscribe( (users: GroupMemberModel[]) => {
         this.joinedUsers = users;
         this.joinedUsers.forEach((user) => {
@@ -78,6 +79,8 @@ export class GroupsComponent implements OnInit, OnDestroy {
         this.subscriptions.push(sub);
       });
       this.signalRService.notificationRemoved.next(group.name);
+      }
+
     });
     this.subscriptions.push(sub);
   }

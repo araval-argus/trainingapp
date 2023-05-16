@@ -22,5 +22,4 @@ export class ChatContentHeaderComponent implements OnInit {
   replyButtonClicked(event: any){
     console.log(event);
   }
-
 }

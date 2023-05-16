@@ -12,7 +12,9 @@
     [LastUpdatedAt] DATETIME NULL, 
     [LastUpdatedBy] INT NULL, 
     [ImageUrl] NVARCHAR(1000) NULL,
-    [DesignationID] INT,
+    [DesignationID] INT,    
+    [StatusID] INT DEFAULT 1 NOT NULL,
     [IsActive] BIT NOT NULL DEFAULT 1, 
     FOREIGN KEY ([DesignationID]) REFERENCES [Designations]([id])
+    --FOREIGN KEY ([StatusID]) REFERENCES [Status]([id])
 )

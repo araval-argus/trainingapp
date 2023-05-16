@@ -22,7 +22,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
 
         public IEnumerable<UserModel> FetchFriendsProfiles(string searchTerm)
         {
-            return context.Profiles.Include("Designation")
+            return context.Profiles.Include("Designation").Include("Status")
                 .Where(profile => profile.IsActive && profile.FirstName.ToLower().StartsWith(searchTerm))
                 .Select(profile => new UserModel()
                 {
@@ -32,6 +32,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                     UserName = profile.UserName,
                     Designation = profile.Designation,
                     ImageUrl = profile.ImageUrl,
+                    Status = profile.Status
                 }); ;
         }
 
