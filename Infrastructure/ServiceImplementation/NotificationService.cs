@@ -35,7 +35,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context.SaveChanges();
         }
 
-        public IList<NotificationModel> GetAllNotifications(int userId)
+        public IList<NotificationModel> GetAllNotifications(string userId)
         {
             IList<NotificationModel> notificationModels = new List<NotificationModel>();
             var notifications = this.context.Notifications.Include("NotificationType").
@@ -54,7 +54,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return notificationModels;
         }
 
-        public IList<NotificationModel> GetMessagesNotifications(int raisedFor, int raisedBy)
+        public IList<NotificationModel> GetMessagesNotifications(string raisedFor, string raisedBy)
         {
             IList<NotificationModel> notificationModels = new List<NotificationModel>();
             var notifications = this.context.Notifications.Include("NotificationType").
@@ -68,7 +68,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return notificationModels;
         }
 
-        public IList<NotificationModel> GetGroupMessagesNotifications(int raisedFor, int raisedInGroup)
+        public IList<NotificationModel> GetGroupMessagesNotifications(string raisedFor, int raisedInGroup)
         {
             IList<NotificationModel> notificationModels = new List<NotificationModel>();
             var notifications = this.context.Notifications.Include("NotificationType").

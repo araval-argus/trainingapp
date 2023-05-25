@@ -54,7 +54,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return messageEntity;
         }
 
-        public IEnumerable<MessageEntity> FetchMessages(int senderID, int recieverID)
+        public IEnumerable<MessageEntity> FetchMessages(string senderID, string recieverID)
         {
             return this.context.Messages.Where(
                 message => (message.SenderID == senderID && message.RecieverID == recieverID)
@@ -78,7 +78,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context.SaveChanges();
         }
 
-        int FetchProfileIdFromUserName(string userName)
+        string FetchProfileIdFromUserName(string userName)
         {
             return this.context.Profiles.FirstOrDefault(
                profile => profile.IsActive && profile.UserName.Equals(userName)).Id;
@@ -95,7 +95,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             }
         }
 
-        public IList<MessageEntity> FetchAllMessages(int userID)
+        public IList<MessageEntity> FetchAllMessages(string userID)
         {
             IList<MessageEntity> messageEntities = new List<MessageEntity>();
             messageEntities = this.context.Messages

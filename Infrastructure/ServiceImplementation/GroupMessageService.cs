@@ -82,7 +82,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context.SaveChanges();
         }
 
-        public void RemoveAllGroupMessagesSentByMember(int memberId, int groupId)
+        public void RemoveAllGroupMessagesSentByMember(string memberId, int groupId)
         {
             var messages = this.context.GroupMessages.Where(messages => messages.GroupID == groupId && messages.SenderID == memberId);
             if(messages.Count() > 0 )
@@ -97,7 +97,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return this.context.GroupMessages.OrderBy(message => message.Id).LastOrDefault(message => message.GroupID == groupId);
         }
 
-        public IList<GroupMessage> FetchAllGroupMessages(int userId)
+        public IList<GroupMessage> FetchAllGroupMessages(string userId)
         {
             IList<GroupMessage> groupMessages = new List<GroupMessage>();
 

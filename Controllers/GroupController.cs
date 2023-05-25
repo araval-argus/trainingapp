@@ -75,7 +75,7 @@ namespace ChatApp.Controllers
             {
                 return BadRequest("username is missing");
             }
-            int userId = this.profileService.FetchIdFromUserName(UserName);
+            string userId = this.profileService.FetchIdFromUserName(UserName);
             IEnumerable<GroupModel> groups = this.groupService.FetchGroups(userId);
             return Ok(groups);
         }
@@ -89,7 +89,7 @@ namespace ChatApp.Controllers
             }
 
             var userName = CustomAuthorization.GetUsernameFromToken(Authorization);
-            int userId = this.profileService.FetchIdFromUserName(userName);
+            string userId = this.profileService.FetchIdFromUserName(userName);
 
             if (!this.groupMemberService.IsAdmin(userId, GroupId))
             {
@@ -109,9 +109,9 @@ namespace ChatApp.Controllers
         public IActionResult AddMember([FromBody] GroupMemberModel User, [FromQuery] int GroupId, [FromHeader] string Authorization)
         {
             string senderUsername = CustomAuthorization.GetUsernameFromToken(Authorization);
-            int senderId = this.profileService.FetchIdFromUserName(senderUsername);
+            string senderId = this.profileService.FetchIdFromUserName(senderUsername);
 
-            if(senderId <= 0)
+            if(String.IsNullOrEmpty(senderId))
             {
                 return NotFound("User Does Not Exist");
             }
@@ -128,7 +128,7 @@ namespace ChatApp.Controllers
                 return Unauthorized("Only Admin Can Add New Member");
             }
 
-            int memberId = this.profileService.FetchIdFromUserName(User.UserName);
+            string memberId = this.profileService.FetchIdFromUserName(User.UserName);
             this.groupMemberService.AddGroupMember(memberId, group.Id, false);
 
             Notification notification = new()
@@ -181,7 +181,7 @@ namespace ChatApp.Controllers
         public IActionResult RemoveMember([FromQuery] string MemberUserName, [FromQuery] int GroupId, [FromHeader] string Authorization)
         {
             string senderUserName = CustomAuthorization.GetUsernameFromToken(Authorization);
-            int senderId = this.profileService.FetchProfileFromUserName(senderUserName).Id;            
+            string senderId = this.profileService.FetchProfileFromUserName(senderUserName).Id;            
 
             if(senderUserName != MemberUserName && !this.groupMemberService.IsAdmin(senderId, GroupId))
             {
@@ -202,7 +202,7 @@ namespace ChatApp.Controllers
                 return NotFound("Group not found");
             }
 
-            int userId = user.Id;
+            string userId = user.Id;
 
             this.groupMessageService.RemoveAllGroupMessagesSentByMember(userId, GroupId);
 
@@ -290,7 +290,7 @@ namespace ChatApp.Controllers
         [HttpGet("FetchJoinedMembers")]
         public IActionResult FetchJoinedMembers([FromQuery] int GroupId, [FromHeader] string Authorization)
         {
-            if(GroupId == null)
+            if(GroupId == 0)
             {
                 return BadRequest("Group is not provided");
             }
@@ -490,7 +490,7 @@ namespace ChatApp.Controllers
                 return Unauthorized("Unauthorized User");
             }
 
-            int senderId = sender.Id;
+            string senderId = sender.Id;
 
             if(!this.groupMemberService.IsAdmin(senderId, groupMemberModel.groupId))
             {
@@ -570,8 +570,7 @@ namespace ChatApp.Controllers
             }
 
             return Ok(groupModel);
-        }
-    
+        }    
 
     }
 }

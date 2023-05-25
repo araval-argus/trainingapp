@@ -13,11 +13,11 @@ export class NotificationService {
   constructor(private http: HttpClient) { }
 
   fetchNotifications(){
-    return this.http.get<NotificationModel[]>(environment.apiUrl + "/notification/fetchNotifications");
+    return this.http.get<NotificationModel[]>(environment.apiUrl + "/notification/FetchNotifications");
   }
 
   clearAllNotification(){
-    return this.http.delete(environment.apiUrl+ "/notification/clearAllNotifications")
+    return this.http.delete(environment.apiUrl+ "/notification/ClearAllNotifications")
   }
 
 }

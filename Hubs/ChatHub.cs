@@ -22,7 +22,6 @@ namespace ChatApp.Hubs
         private readonly IOnlineUserService onlineUserService;
         private readonly IProfileService profileService;
         private readonly IChatService chatService;
-        private readonly IWebHostEnvironment webHostEnvironment;
         private readonly IGroupMessageService groupMessageService;
         private readonly IGroupMemberService groupMemberService;
         private readonly INotificationService notificationService;
@@ -31,7 +30,6 @@ namespace ChatApp.Hubs
         public ChatHub(IOnlineUserService onlineUserService,
             IProfileService profileService,
             IChatService chatService,
-            IWebHostEnvironment webHostEnvironment,
             IGroupMessageService groupMessageService,
             IGroupMemberService groupMemberService,
             INotificationService notificationService,
@@ -41,7 +39,6 @@ namespace ChatApp.Hubs
             this.onlineUserService = onlineUserService;
             this.profileService = profileService;
             this.chatService = chatService;
-            this.webHostEnvironment = webHostEnvironment;
             this.groupMessageService = groupMessageService;
             this.groupMemberService = groupMemberService;
             this.notificationService = notificationService;
@@ -69,16 +66,15 @@ namespace ChatApp.Hubs
             return base.OnDisconnectedAsync(exception);
         }
 
-        public async Task RegisterUser(string userName)
+        public void RegisterUser(string userName)
         {
-            OnlineUserEntity onlineUserEntity = new OnlineUserEntity()
+            OnlineUserEntity onlineUserEntity = new()
             {
                 UserName = userName,
                 ConnectionId = Context.ConnectionId
             };
 
             this.onlineUserService.RegisterOnlineUser(onlineUserEntity);
-
         }
 
         public async Task AddMessage(MessageModel messageModel)
@@ -185,7 +181,7 @@ namespace ChatApp.Hubs
 
         MessageModel ConvertToMessageModel(MessageEntity messageEntity)
         {
-            MessageModel messageModel = new MessageModel()
+            MessageModel messageModel = new()
             {
                 Id = messageEntity.Id,
                 MessageType = messageEntity.MessageType,
@@ -201,7 +197,7 @@ namespace ChatApp.Hubs
         }
 
 
-        string FetchUserNameFromId(int id)
+        string FetchUserNameFromId(string id)
         {
             return this.profileService.FetchUserNameFromId(id);
         }

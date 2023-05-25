@@ -36,10 +36,7 @@ namespace ChatApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ChatAppContext>(options => {
-
                 options.UseSqlServer(this.Configuration.GetConnectionString("Default"));
-                options.UseLoggerFactory(LoggerFactory.Create(builder => builder.AddConsole()));
-                options.EnableSensitiveDataLogging();
             });
             // Default Policy
             services.AddCors(options =>
@@ -52,6 +49,19 @@ namespace ChatApp
                                             .AllowAnyMethod();
                     });
             });
+
+            services.AddIdentityCore<Profile>( options =>
+            {
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequiredLength = 6;
+            })
+                .AddRoles<IdentityRole>()
+                .AddTokenProvider<DataProtectorTokenProvider<Profile>>("ChatApp")
+                .AddEntityFrameworkStores<ChatAppContext>()
+            .AddDefaultTokenProviders();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
              .AddJwtBearer(options =>
@@ -137,7 +147,6 @@ namespace ChatApp
             services.AddScoped<IGroupMemberService, GroupMemberService>();
             services.AddScoped<IGroupMessageService, GroupMessageService>();
             services.AddScoped<INotificationService, NotificationService>();
-            //services.AddScoped<IGroupService, GroupService>();
             services.AddSignalR();
 
             // In production, the Angular files will be served from this directory
@@ -157,8 +166,9 @@ namespace ChatApp
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, UserManager<Profile> userManager, RoleManager<IdentityRole> roleManager)
         {
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -204,7 +214,7 @@ namespace ChatApp
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
             });
 
-            
+
 
             //app.UseSpa(spa =>
             //{
@@ -230,6 +240,10 @@ namespace ChatApp
             //        spa.UseAngularCliServer(npmScript: "start");
             //    }
             //});
+
+
         }
+
+        
     }
 }

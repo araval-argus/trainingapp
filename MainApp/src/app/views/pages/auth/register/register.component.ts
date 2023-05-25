@@ -47,7 +47,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onRegister(e) {
     e.preventDefault();
-    console.log("regModel inside onRegister method :- ",this.regModel);
     if(this.userNameExists){
       Swal.fire({
         icon: 'error',

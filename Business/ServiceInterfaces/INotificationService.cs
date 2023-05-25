@@ -8,8 +8,8 @@ namespace ChatApp.Business.ServiceInterfaces
     {
         Notification AddNotification(Notification notification);
         void DeleteNotifications(IList<NotificationModel> notificationModelList);
-        IList<NotificationModel> GetAllNotifications(int userId);
-        IList<NotificationModel> GetMessagesNotifications(int raisedFor, int raisedBy);
-        IList<NotificationModel> GetGroupMessagesNotifications(int raisedFor, int raisedInGroup);
+        IList<NotificationModel> GetAllNotifications(string userId);
+        IList<NotificationModel> GetMessagesNotifications(string raisedFor, string raisedBy);
+        IList<NotificationModel> GetGroupMessagesNotifications(string raisedFor, int raisedInGroup);
     }
 }

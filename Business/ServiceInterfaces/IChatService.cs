@@ -10,7 +10,7 @@ namespace ChatApp.Business.ServiceInterfaces
 
         MessageEntity AddMessage(MessageModel messageModel);
 
-        IEnumerable<MessageEntity> FetchMessages(int senderID, int recieverID);
+        IEnumerable<MessageEntity> FetchMessages(string senderID, string recieverID);
 
         string FetchMessageFromId(int id);
 
@@ -19,6 +19,6 @@ namespace ChatApp.Business.ServiceInterfaces
         void MarkMsgAsSeen(int messageId);
 
         //fetches all messages of all interacted users
-        IList<MessageEntity> FetchAllMessages(int userID);
+        IList<MessageEntity> FetchAllMessages(string userID);
     }
 }

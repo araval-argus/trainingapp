@@ -21,7 +21,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             this.context = context;
             this.webHostEnvironment = webHostEnvironment;
         }
-        public GroupModel CreateGroup(GroupModel groupModel, int creatorId)
+        public GroupModel CreateGroup(GroupModel groupModel, string creatorId)
         {
             Group newGroup = new()
             {
@@ -47,10 +47,10 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return groupModel;
         }
 
-        public IEnumerable<GroupModel> FetchGroups(int userId)
+        public IEnumerable<GroupModel> FetchGroups(string userId)
         {
             IList<GroupModel> Groups = new List<GroupModel>();
-            if(userId == 0)
+            if(String.IsNullOrEmpty(userId))
             {
                 return Groups;
             }

@@ -61,8 +61,8 @@ namespace ChatApp.Controllers
         [HttpGet("fetchMessages")]
         public IActionResult FetchMessages(string loggedInUserName, string friendUserName)
         {
-            int loggedInUserId = FetchIdFromUserName(loggedInUserName);
-            int friendId = FetchIdFromUserName(friendUserName);
+            string loggedInUserId = FetchIdFromUserName(loggedInUserName);
+            string friendId = FetchIdFromUserName(friendUserName);
             IEnumerable<MessageEntity> messages = this.chatService.FetchMessages(loggedInUserId, friendId).OrderBy(m => m.CreatedAt);
             
             // for marking each message as seen
@@ -96,17 +96,17 @@ namespace ChatApp.Controllers
             return Ok(new { messages = messagesToBeSent });
         }
 
-        [HttpGet("fetchAll")]
+        [HttpGet("fetchAllInteractedUsers")]
         public IActionResult FetchAllUsers(string loggedInUsername)
         {
             if (string.IsNullOrEmpty(loggedInUsername))
             {
-                return BadRequest("ënter username");
+                return BadRequest("enter username");
             }
-            int id = FetchIdFromUserName(loggedInUsername);
+            string id = FetchIdFromUserName(loggedInUsername);
 
             //list of friends that have interacted with logged in user before
-            IEnumerable<UserModel> friends = this.profileService.FetchAllUsers(id);
+            IEnumerable<UserModel> friends = this.profileService.FetchAllInteractedUsers(id);
             return Ok(friends);
         }
 
@@ -180,8 +180,8 @@ namespace ChatApp.Controllers
         [HttpGet("markAsRead")]
         public IActionResult MarkMsgs(string loggedInUserName, string friendUserName)
         {
-            int loggedInUserId = FetchIdFromUserName(loggedInUserName);
-            int friendId = FetchIdFromUserName(friendUserName);
+            string loggedInUserId = FetchIdFromUserName(loggedInUserName);
+            string friendId = FetchIdFromUserName(friendUserName);
             IEnumerable<MessageEntity> messages = this.chatService.FetchMessages(loggedInUserId, friendId).OrderBy(m => m.CreatedAt);
 
             // for marking each message as seen
@@ -208,12 +208,12 @@ namespace ChatApp.Controllers
         #endregion
 
         #region helpermethods
-        int FetchIdFromUserName(string userName)
+        string FetchIdFromUserName(string userName)
         {
             return this.profileService.FetchIdFromUserName(userName);
         }
 
-        string FetchUserNameFromId(int id)
+        string FetchUserNameFromId(string id)
         {
             return this.profileService.FetchUserNameFromId(id);
         }

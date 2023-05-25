@@ -18,7 +18,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             this.context = context;
         }
-        public void AddGroupMember(int userId, int groupId, bool isAdmin)
+        public void AddGroupMember(string userId, int groupId, bool isAdmin)
         {
             GroupMember member = new()
             {
@@ -63,16 +63,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
 
-        public bool IsAdmin(int userId, int groupId)
+        public bool IsAdmin(string userId, int groupId)
         {
-            if(userId <= 0)
-            {
-                return false;
-            }
             return this.context.GroupMembers.Any(m => m.ProfileID == userId && m.GroupID == groupId && m.IsAdmin);
         }
 
-        public GroupMember RemoveMember(int memberId, int groupId)
+        public GroupMember RemoveMember(string memberId, int groupId)
         {
             GroupMember member = this.context.GroupMembers.FirstOrDefault(m => m.ProfileID == memberId && m.GroupID == groupId);
             if(member == null)
@@ -123,12 +119,12 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return joinedUsers.ToList();
         }
 
-        public bool IsMember(int userId, int groupId)
+        public bool IsMember(string userId, int groupId)
         {
             return this.context.GroupMembers.Any(member => member.ProfileID == userId && member.GroupID == groupId);
         }
 
-        public GroupMember FetchMember(int profileId, int groupId)
+        public GroupMember FetchMember(string profileId, int groupId)
         {
             return this.context.GroupMembers.FirstOrDefault(m => m.ProfileID == profileId && m.GroupID == groupId);
         }

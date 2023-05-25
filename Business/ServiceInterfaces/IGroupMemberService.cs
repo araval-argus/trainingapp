@@ -7,15 +7,15 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IGroupMemberService
     {
-        void AddGroupMember(int userId, int groupId, bool isAdmin);
-        bool IsAdmin(int userId, int groupId);
+        void AddGroupMember(string userId, int groupId, bool isAdmin);
+        bool IsAdmin(string userId, int groupId);
         void MakeAdmin(GroupMember member);
-        bool IsMember(int userId, int groupId);
-        GroupMember RemoveMember(int memberId, int groupId);
+        bool IsMember(string userId, int groupId);
+        GroupMember RemoveMember(string memberId, int groupId);
         bool IsThereAnyAdminLeftInTheGroup(int groupId);
         IList<GroupMember> ListOfJoinedMembers(int groupID);
         IList<GroupMemberModel> ListOfJoinedGroupMemberModels(int groupId);
         IList<GroupMemberModel> ListOfNotJoinedMembers(int groupID);
-        GroupMember FetchMember(int profileId, int groupId);
+        GroupMember FetchMember(string profileId, int groupId);
     }
 }

@@ -8,7 +8,6 @@ namespace ChatApp.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class NotificationController : ControllerBase
     {
         private readonly IProfileService profileService;

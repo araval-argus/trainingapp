@@ -1,4 +1,5 @@
 ﻿using ChatApp.Business.Helpers;
+using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -8,14 +9,10 @@ using System.Threading.Tasks;
 
 namespace ChatApp.Context.EntityClasses
 {
-    public class Profile
+    public class Profile: IdentityUser
     {
-        public int Id { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public string UserName { get; set; }
-        public string Email { get; set; }
-        public string Password { get; set; }
         public ProfileType ProfileType { get; set; }
         public DateTime? CreatedAt { get; set; }
         public int? CreatedBy { get; set; }
@@ -35,6 +32,15 @@ namespace ChatApp.Context.EntityClasses
         public virtual Status Status { get; set; }
 
         public bool IsActive { get; set; }
+
+        public IEnumerable<Group> CreatedGroups { get; set; }
+        public IEnumerable<Group> ModifiedGroups { get; set; }
+        public IEnumerable<Notification> NotificationsRaisedBy { get; set; }
+        public IEnumerable<Notification> NotificationsRaisedFor { get; set; }
+        public IEnumerable<GroupMember> GroupMembers { get; set; }
+        public IEnumerable<GroupMessage> SentGroupMessages { get; set; }
+        public IEnumerable<GroupMessage> RecievedGroupMessages { get; set; }
+
 
     }
 }

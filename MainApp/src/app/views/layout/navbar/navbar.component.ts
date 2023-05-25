@@ -103,7 +103,7 @@ export class NavbarComponent implements OnInit, OnDestroy {
   }
 
   subscibeToFetchNotifications() {
-    const sub = this.notificationService
+    this.notificationService
       .fetchNotifications()
       .subscribe((notifications: NotificationModel[]) => {
         notifications.forEach((n) => {
@@ -112,7 +112,6 @@ export class NavbarComponent implements OnInit, OnDestroy {
         });
         this.notifications = notifications;
       });
-    this.subscriptions.push(sub);
   }
 
   subscribeToAddNotification() {
@@ -137,14 +136,12 @@ export class NavbarComponent implements OnInit, OnDestroy {
   fetchAllStatus(){
     this.accountService.fetchAllStatus().subscribe( (allStatus: any) => {
       this.allStatus = allStatus;
-      console.log(this.allStatus);
     });
   }
 
   fetchLoggedInUserStatus(){
     this.accountService.fetchLoggedInUserStatus().subscribe( (status: any) => {
       this.loggedInUserStatusId = status;
-      console.log(this.loggedInUser)
     })
   }
 

@@ -12,11 +12,10 @@ import Swal from 'sweetalert2'
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit {
 
   returnUrl: any;
   loginModel: LoginModel;
-  subscriptions: Subscription[] = [];
 
   constructor(private router: Router,
     private route: ActivatedRoute,
@@ -39,7 +38,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    // console.log(this.loginModel);
 
     // Implementation of API.
-    const sub = this.accountService.login(this.loginModel).subscribe((result: any) => {
+    this.accountService.login(this.loginModel).subscribe((result: any) => {
       this.authService.login(result.token, () => {
 
         Swal.fire({
@@ -54,7 +53,9 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.router.navigate(["/"]);
         }, (500));
 
-        this.router.navigate([this.returnUrl]);
+        console.log(this.returnUrl)
+
+        //this.router.navigate([this.returnUrl]);
 
       });
       this.signalRService.makeConnection();
@@ -66,11 +67,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       });
     });
 
-    this.subscriptions.push(sub);
   }
 
-  ngOnDestroy(){
-    this.subscriptions.forEach( sub => sub.unsubscribe());
-  }
 
 }

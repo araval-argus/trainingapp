@@ -10,8 +10,8 @@ namespace ChatApp.Business.ServiceInterfaces
         GroupMessage AddGroupMessage(GroupMessageModel groupMessage);
         GroupMessage FetchGroupMessageFromId(int groupMessageId);
         void DeleteAllGroupMessages(int groupId);
-        void RemoveAllGroupMessagesSentByMember(int memberId, int groupId);
+        void RemoveAllGroupMessagesSentByMember(string memberId, int groupId);
         GroupMessage FetchLastMessage(int groupId);
-        IList<GroupMessage> FetchAllGroupMessages(int userId);
+        IList<GroupMessage> FetchAllGroupMessages(string userId);
     }
 }

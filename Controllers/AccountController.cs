@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Security.Claims;
 using System.Text;
+using System.Threading.Tasks;
 using ChatApp.Business.Helpers;
 using ChatApp.Business.ServiceInterfaces;
 using ChatApp.Context.EntityClasses;
@@ -13,6 +14,7 @@ using ChatApp.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -31,29 +33,42 @@ namespace ChatApp.Controllers
         private Validations _validations;
         private IWebHostEnvironment _webHostEnvironment;
         private IChatService chatService;
+        private UserManager<Profile> userManager;
 
         public AccountController(IConfiguration config,
             IProfileService profileService,
             IWebHostEnvironment webHostEnvironment,
-            IChatService chatService)
+            IChatService chatService,
+            UserManager<Profile> userManager)
         {
             _config = config;
             _profileService = profileService;
             _validations = new Validations();
             _webHostEnvironment = webHostEnvironment;
             this.chatService = chatService;
+            this.userManager = userManager;
         }
 
         [HttpPost("Login")]
         public IActionResult Login([FromBody] LoginModel loginModel)
         {
             IActionResult response = Unauthorized(new { Message = "Invalid Credentials."});
-            
-            var user = _profileService.CheckPassword(loginModel);
 
-            if (user != null)
+            var user = userManager.FindByNameAsync(loginModel.Username);
+
+            if (user.Result == null)
             {
-                var tokenString = GenerateJSONWebToken(user);
+                user = userManager.FindByEmailAsync(loginModel.EmailAddress);
+                if(user.Result == null)
+                {
+                    return BadRequest("User does not exist");
+                }
+            }
+
+            if(userManager.CheckPasswordAsync(user.Result, loginModel.Password).Result)
+            {
+                var userToGenerateToken = this._profileService.FetchProfileFromUserName(user.Result.UserName);
+                var tokenString = GenerateJSONWebToken(userToGenerateToken);
                 response = Ok(new { token = tokenString });
             }
 
@@ -61,25 +76,50 @@ namespace ChatApp.Controllers
         }
 
         [HttpPost("Register")]
-        public IActionResult Register([FromBody] RegisterModel registerModel)
+        public async Task<IActionResult> Register([FromBody] RegisterModel registerModel)
         {
             if (!_validations.ValidateRegistrationField(registerModel))
             {
                 return BadRequest(new { Message = "fields cant be validated" });
             }
-            var user = _profileService.RegisterUser(registerModel);
-
-            if (user != null)
+            var user = new Profile
             {
-                var tokenString = GenerateJSONWebToken(user);
-                return Ok(new { token = tokenString, user });
+                FirstName = registerModel.FirstName,
+                LastName = registerModel.LastName,
+                //Password = regModel.Password,
+                UserName = registerModel.UserName,
+                Email = registerModel.Email,
+                CreatedAt = DateTime.UtcNow,
+                ProfileType = ProfileType.User,
+                ImageUrl = SetDefaultImage(),
+                DesignationID = registerModel.DesignationID,                
+                StatusID = 1,
+                IsActive = true
+            };
+
+            var result = await this.userManager.CreateAsync(user, registerModel.Password);
+
+
+            if (result.Succeeded)
+            {
+                //check whether the role inserted is correct or not
+                result = await userManager.AddToRoleAsync(user, "User");
+
+                if(result.Succeeded)
+                {
+                    user = this._profileService.FetchProfileFromUserName(registerModel.UserName);
+                    var tokenString = GenerateJSONWebToken(user);
+                    return Ok(new { token = tokenString });
+                }
+
+                
             }
-            return BadRequest(new { Message = "User Already Exists. Please use different email and UserName." });
+            return BadRequest(new { Message = "Something Went Wrong" });
         }
 
         [HttpPost("Update")]
         [Authorize]
-        public IActionResult UpdateUserDetails([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
+        public async Task<IActionResult> UpdateUserDetails([FromForm] UpdateModel updateModel, [FromHeader] string Authorization)
         {
 
             var usernameFromToken = CustomAuthorization.GetUsernameFromToken(Authorization);
@@ -91,22 +131,31 @@ namespace ChatApp.Controllers
                 {
                     DeleteOlderImage(user.ImageUrl);
                     user.ImageUrl = createUniqueImgFile(updateModel.ImageFile);
-                    user = _profileService.UpdateProfile(updateModel, usernameFromToken, true);
                 }
-                else
+
+                user.FirstName = updateModel.FirstName;
+                user.LastName = updateModel.LastName;
+                user.Email = updateModel.Email;
+                user.UserName = updateModel.UserName;
+
+                var result = await userManager.UpdateAsync(user);
+                if(result.Succeeded)
                 {
-                    user = _profileService.UpdateProfile(updateModel, usernameFromToken);
+                    var tokenString = GenerateJSONWebToken(user);
+                    return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
                 }
-                var tokenString = GenerateJSONWebToken(user);
-                return Ok(new { token = tokenString, Message = "Your details has been updated successfully" });
+
+                return BadRequest("Something went wrong");
+
             }
             return BadRequest(new { Message = "User does not exists" });
         }
 
         [HttpGet("checkUsername")]
-        public IActionResult CheckUsername([FromQuery] string username)
+        public async Task<IActionResult> CheckUsername([FromQuery] string username)
         {
-            return Ok(new { usernameExists = _profileService.CheckUserNameExists(username) });
+            var profile = await userManager.FindByNameAsync(username);
+            return Ok(new { usernameExists = profile != null});
         }
 
 
@@ -114,29 +163,44 @@ namespace ChatApp.Controllers
         public IActionResult FetchDesignations()
         {
             IEnumerable<DesignationEntity> designations = this._profileService.FetchAllDesignations();
-            return Ok(new { designations = designations });
+            return Ok(new { designations });
         }
 
         [HttpPost("checkPassword")]
         [Authorize]
-        public IActionResult CheckPassword([FromBody] LoginModel loginModel)
+        public async Task<IActionResult> CheckPassword([FromBody] LoginModel loginModel)
         {
-            if (this._profileService.CheckPassword(loginModel) != null)
+            //loginModel is used to check the password as it contains all the necessary fields like username, email and password.
+            var profile = await userManager.FindByNameAsync(loginModel.Username);
+            if(profile == null)
             {
-                return Ok(new {passwordMatched = true});
+                profile = await userManager.FindByEmailAsync(loginModel.EmailAddress);
+                if(profile == null)
+                {
+                    return BadRequest("Something went wrong");
+                }
             }
+            var result = await userManager.CheckPasswordAsync(profile,loginModel.Password);           
 
-            return Ok(new { passwordMatched = false });
+            return Ok(new { passwordMatched = result });
         }
 
         [HttpPost("changePassword")]
         [Authorize]
-        public IActionResult ChangePassword(PasswordModel passwordModel)
+        public async Task<IActionResult> ChangePassword(PasswordModel passwordModel)
         {
-            if(this._profileService.ChangePassword(passwordModel))
-                return Ok(new { message = "password changed"});
+            var profile = _profileService.FetchProfileFromUserName(passwordModel.UserName);
 
-            return BadRequest(new { message = "password incorrect" });
+            if (profile != null)
+            {
+                var result = await userManager.ChangePasswordAsync(profile, passwordModel.OldPassword, passwordModel.NewPassword);
+                if(result.Succeeded)
+                {
+                    return Ok(new {message = "Password Changed" });
+                }
+                return BadRequest("Something went wrong");
+            }
+            return BadRequest("User not found");
         }
 
         [HttpGet("FetchAllUsers")]
@@ -256,6 +320,18 @@ namespace ChatApp.Controllers
             }
 
             return fileName + extension;
+        }
+
+        private string SetDefaultImage()
+        {
+            string fileName = Guid.NewGuid().ToString() + ".jpg";
+
+            var DefaultFileLoc = Path.Combine(_webHostEnvironment.WebRootPath, @"Default/default_profile.jpg");
+            var FileLoc = Path.Combine(DefaultFileLoc, @"../../Images/Users", fileName);
+
+            System.IO.File.Copy(DefaultFileLoc, FileLoc);
+
+            return fileName;
         }
 
         void DeleteOlderImage(string path)

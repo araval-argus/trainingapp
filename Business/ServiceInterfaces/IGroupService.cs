@@ -7,12 +7,10 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IGroupService
     {
-        GroupModel CreateGroup(GroupModel groupModel, int creatorId);
-        IEnumerable<GroupModel> FetchGroups(int userId);
+        GroupModel CreateGroup(GroupModel groupModel, string creatorId);
+        IEnumerable<GroupModel> FetchGroups(string userId);
         Group FetchGroupFromId(int groupId);
-
         void DeleteGroup(int groupId);
-
         void UpdateGroup(GroupModel groupModel, Profile user);
     }
 }

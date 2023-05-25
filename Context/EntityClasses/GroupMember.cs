@@ -5,8 +5,9 @@ namespace ChatApp.Context.EntityClasses
 {
     public class GroupMember
     {
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int Id { get; set; }
-        public int ProfileID { get; set; }
+        public string ProfileID { get; set; }
 
         [ForeignKey("ProfileID")]
         public virtual Profile Member { get; set; }

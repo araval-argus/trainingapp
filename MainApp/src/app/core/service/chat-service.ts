@@ -29,8 +29,8 @@ export class ChatService {
     });
   }
 
-  fetchAll(loggedInUsername: string){
-    return this.http.get(environment.apiUrl+ "/chat/fetchAll",{
+  fetchAllInteractedUsers(loggedInUsername: string){
+    return this.http.get(environment.apiUrl+ "/chat/fetchAllInteractedUsers",{
       params: new HttpParams().append("loggedInUsername", loggedInUsername)
     });
   }

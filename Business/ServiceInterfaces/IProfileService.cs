@@ -11,24 +11,14 @@ namespace ChatApp.Business.ServiceInterfaces
 {
     public interface IProfileService
     {
-        Profile CheckPassword(LoginModel loginModel);
-
-        Profile RegisterUser(RegisterModel regModel);
-
         Profile FetchProfileFromUserName(string UserName);
 
-        Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false);
+        string FetchIdFromUserName(string userName);
+        string FetchUserNameFromId(string id);
 
-        bool CheckUserNameExists(string? userName);
-
-        int FetchIdFromUserName(string userName);
-        string FetchUserNameFromId(int id);
-
-        IEnumerable<UserModel> FetchAllUsers(int id);
+        IEnumerable<UserModel> FetchAllInteractedUsers(string id);
 
         IEnumerable<DesignationEntity> FetchAllDesignations();
-
-        bool ChangePassword(PasswordModel passwordModel);
 
         IEnumerable<Profile> FetchAllProfiles();
 
@@ -42,6 +32,6 @@ namespace ChatApp.Business.ServiceInterfaces
 
         IList<Status> FetchAllStatus();
 
-        Status FetchStatus(int userId);
+        Status FetchStatus(string userId);
     }
 }

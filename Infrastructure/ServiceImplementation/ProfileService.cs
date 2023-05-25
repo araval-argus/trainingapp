@@ -17,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using ChatApp.Hubs;
+using Microsoft.AspNetCore.Identity;
 
 namespace ChatApp.Infrastructure.ServiceImplementation
 {
@@ -24,69 +25,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
     {
         private readonly ChatAppContext context;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        private readonly IHubContext<ChatHub> hubContext;
 
-        public ProfileService(ChatAppContext context, IWebHostEnvironment webHostEnvironment, IHubContext<ChatHub> hubContext, IChatService chatService)
+        public ProfileService(ChatAppContext context, 
+            IWebHostEnvironment webHostEnvironment )
         {
             this.context = context;
             this._webHostEnvironment = webHostEnvironment;
-            this.hubContext = hubContext;
-        }
-
-        // this method checks (username and password) or (email and password)
-        public Profile CheckPassword(LoginModel model)
-        {
-            return this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(x => x.IsActive && (model.Password == x.Password
-            && (x.Email.ToLower().Trim() == model.EmailAddress.ToLower().Trim() || x.UserName.ToLower().Trim() == model.Username.ToLower().Trim())));
-        }
-
-        public Profile RegisterUser(RegisterModel regModel)
-        {
-            Profile newUser = null;
-            if (!CheckEmailOrUserNameExists(regModel.UserName, regModel.Email))
-            {
-                newUser = new Profile
-                {
-                    FirstName = regModel.FirstName,
-                    LastName = regModel.LastName,
-                    Password = regModel.Password,
-                    UserName = regModel.UserName,
-                    Email = regModel.Email,
-                    CreatedAt = DateTime.UtcNow,
-                    ProfileType = ProfileType.User,
-                    ImageUrl = SetDefaultImage(),
-                    DesignationID = regModel.DesignationID,
-                    StatusID = 1,
-                    IsActive = true
-                };                
-                context.Profiles.Add(newUser);
-                context.SaveChanges();
-
-                newUser = context.Profiles.Include("Designation").Include("Status").FirstOrDefault(p => p.IsActive && p.UserName == regModel.UserName);
-            }
-            return newUser;
-        }
-
-        public Profile UpdateProfile(UpdateModel updateModel, string username, bool updateImage = false)
-        {
-            Profile user = FetchProfileFromUserName(username);
-            if (user != null)
-            {
-                user.UserName = updateModel.UserName;
-                user.FirstName = updateModel.FirstName;
-                user.LastName = updateModel.LastName;
-                user.Email = updateModel.Email;
-
-                context.Profiles.Update(user);
-                context.SaveChanges();
-            }
-            return user;
-        }
-
-        private bool CheckEmailOrUserNameExists(string userName, string email)
-        {
-            return context.Profiles.Any(x => x.IsActive && (x.Email.ToLower().Trim() == email.ToLower().Trim() || x.UserName.ToLower().Trim() == userName.ToLower().Trim()));
-        }
+        }  
 
         public Profile FetchProfileFromUserName(string userName)
         {
@@ -96,46 +41,24 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 user = this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(u => u.IsActive && u.UserName.Trim() == userName.Trim());
             }
             return user;
-        }
+        }        
 
-        public bool CheckUserNameExists(string? userName = null)
-        {
-            if (userName == null)
-            {
-                return false;
-            }
-            return context.Profiles.Any(p => p.IsActive && p.UserName.Trim() == userName.Trim());
-        }
-
-        private string SetDefaultImage()
-        {
-            string fileName = Guid.NewGuid().ToString() + ".jpg";
-
-            var DefaultFileLoc = Path.Combine(_webHostEnvironment.WebRootPath, @"Default/default_profile.jpg");
-            var FileLoc = Path.Combine(DefaultFileLoc, @"../../Images/Users", fileName);
-
-            File.Copy(DefaultFileLoc, FileLoc);
-
-            return fileName;
-        }
-
-
-        public int FetchIdFromUserName(string userName)
+        public string FetchIdFromUserName(string userName)
         {
             if (string.IsNullOrEmpty(userName))
             {
-                return 0;
+                return null;
             }
             Profile profile =  this.context.Profiles.FirstOrDefault(
                 profile => profile.IsActive && profile.UserName.Equals(userName));
             if(profile == null)
             {
-                return 0;
+                return null;
             }
             return profile.Id;
         }
 
-        public string FetchUserNameFromId(int id)
+        public string FetchUserNameFromId(string id)
         {
             return this.context.Profiles.FirstOrDefault(
                 profile => profile.IsActive && profile.Id == id
@@ -143,11 +66,11 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         }
 
         //This method will return a list of users who have interacted with the logged in user
-        public IEnumerable<UserModel> FetchAllUsers(int userId)
+        public IEnumerable<UserModel> FetchAllInteractedUsers(string userId)
         {
 
             // Fetch distinct user ids with whome the user with 'userId' had interacted
-            IEnumerable<int> Ids = this.context.Messages.Where(
+            IEnumerable<string> Ids = this.context.Messages.Where(
                 m => m.SenderID == userId || m.RecieverID == userId
                 )
                 .Select(
@@ -157,7 +80,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             IList<Profile> friendsProfiles = new List<Profile>();
 
             //for fetching the profiles
-            foreach (int id in Ids)
+            foreach (string id in Ids)
             {
                 var profile = this.context.Profiles.Include("Designation").Include("Status").FirstOrDefault(p => p.IsActive && p.Id == id);
                 if (profile != null)
@@ -191,7 +114,7 @@ namespace ChatApp.Infrastructure.ServiceImplementation
                 .OrderByDescending(profile => profile.LastMessageTimeStamp);
         }
 
-        public int UnreadMessageCount(int senderID, int recieverID)
+        public int UnreadMessageCount(string senderID, string recieverID)
         {
             return this.context.Messages.Where(message =>
                         (message.SenderID == senderID && message.RecieverID == recieverID && !message.IsSeen)
@@ -202,21 +125,6 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         {
             return this.context.Designations.AsEnumerable<DesignationEntity>();
         }
-
-
-        public bool ChangePassword(PasswordModel passwordModel)
-        {
-            Profile profile = this.context.Profiles.FirstOrDefault(p => p.IsActive && p.UserName == passwordModel.UserName && p.Password == passwordModel.OldPassword);
-            if (profile != null)
-            {
-                profile.Password = passwordModel.NewPassword;
-                this.context.Profiles.Update(profile);
-                this.context.SaveChanges();
-                return true;
-            }
-            return false;
-        }
-
 
         public IEnumerable<Profile> FetchAllProfiles()
         {
@@ -270,11 +178,13 @@ namespace ChatApp.Infrastructure.ServiceImplementation
             return allStatus;
         }
 
-        public Status FetchStatus(int userId)
+        public Status FetchStatus(string userId)
         {
             Status statusToBeReturned = this.context.Profiles.Include("Status").FirstOrDefault(p => p.Id == userId).Status;
             return statusToBeReturned;
         }
+
+        
     }
 }
 
