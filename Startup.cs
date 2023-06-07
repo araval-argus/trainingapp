@@ -31,7 +31,6 @@ namespace ChatApp
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ChatAppContext>(options => options.UseSqlServer(this.Configuration.GetConnectionString("Default")));
-
             //This service is added for allowing local host to send request
             services.AddCors(options =>
             {

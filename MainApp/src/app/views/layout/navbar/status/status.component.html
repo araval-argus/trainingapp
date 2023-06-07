@@ -1,4 +1,4 @@
-<ng-select [items]="status" [(ngModel)]="selectedStatus" bindValue="id" [clearable]="false" [hideSelected]="true" [searchable]="false" [markFirst]="false" (change)="statusChanged()">
+<ng-select class="custom" [items]="status" [(ngModel)]="selectedStatus" bindValue="id" [clearable]="false" [hideSelected]="true" [searchable]="false" [markFirst]="false" (change)="statusChanged()">
     <ng-template ng-label-tmp let-item="item" class="d-flex align-items-center py-2">
         <i class="mdi px-1" [ngClass]="item.class"></i>
         <span>{{item.status}}</span>

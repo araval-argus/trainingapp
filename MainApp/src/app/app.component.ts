@@ -27,7 +27,7 @@ export class AppComponent implements OnInit {
         this.accountService.setStatus(6).subscribe(data => { });
         this.authService.logout(() => {
           Swal.fire({
-            title: 'Success!',
+            title: 'Deleted!',
             text: 'You are removed from Organization.',
             icon: 'error',
             timer: 3000,

@@ -53,7 +53,16 @@ namespace ChatApp.Infrastructure.ServiceImplementation
         public Profile RegisterUser(RegisterModel regModel)
         {
             Profile newUser = null;
-            if (!CheckEmailOrUserNameExists(regModel.UserName, regModel.Email))
+            bool isPresent = false;
+            if (regModel.Type < 4)
+            {
+                Profile temp = context.Profiles.AsNoTracking().FirstOrDefault(e => e.ProfileType == regModel.Type);
+                if(temp != null)
+                {
+                    isPresent = true;
+                }
+            }
+            if (!CheckEmailOrUserNameExists(regModel.UserName, regModel.Email) && !isPresent)
             {
                 //generating salt
                 byte[] bArray;

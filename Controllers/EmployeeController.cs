@@ -29,6 +29,7 @@ namespace ChatApp.Controllers
         }
 
         [Authorize(Policy = "EmployeePolicy")]
+        //[Authorize(Roles = "Admin")]
         [HttpGet("getAll")]
         public IActionResult getAll()
         {

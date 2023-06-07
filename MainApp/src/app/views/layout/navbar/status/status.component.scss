@@ -1,6 +1,4 @@
-.ng-select{
-    min-width: 9rem;
-}
+
 .active{
     color: green !important;
 }
@@ -12,3 +10,9 @@
 .hold{
     color: #ffb51a !important;
 }
+
+.ng-select.custom {
+    .ng-select-container {
+      border: 0px;
+    }
+  }
