@@ -40,6 +40,8 @@ export class ChatComponent {
 
   userId : string ;
   imageFile: File;
+    fileType: string;
+imageSrc: any;
   constructor(private chatService :ChatService, private authService : AuthService,private modalService : NgbModal) {
     
   }
@@ -104,7 +106,32 @@ toggleEmoji(message :any){
   onFileSelected(event){
     if (event.target.files.length > 0) {
       this.imageFile = (event.target as HTMLInputElement).files[0];
+      this.previewImage(this.imageFile);
     }
+  }
+  
+  previewImage(file: File): void {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      this.imageSrc = e.target.result;
+    };
+    // Read the file as a data URL, triggering the onload event above
+    reader.readAsDataURL(file);
+    this.fileType = file.type;
+  }
+  isImage(type: string): boolean {
+    return type.startsWith('image/');
+  }
+
+  isAudio(type: string): boolean {
+    return type.startsWith('audio/');
+  }
+
+  isVideo(type: string): boolean {
+    return type.startsWith('video/');
+  }
+  removePreview(){
+    this.imageSrc = null;
   }
 
   uploadFile(){
@@ -121,6 +148,7 @@ toggleEmoji(message :any){
     })
     
   }
+  
 
   // Implement the logic for replying to a message.
   ToggleReplyMsg(msg:any){

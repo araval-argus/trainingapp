@@ -245,3 +245,31 @@
 #messageListHolder {
     overflow-y: scroll;
 }
+
+/* Style for the "Mark all as read" icon */
+.conversationHeader p {
+  margin: 0;
+  cursor: pointer;
+}
+/* Style for the "Media File" message */
+.content div {
+  color: #555;
+}
+
+/* Hover effect for the conversation item */
+.conversation:hover {
+  background-color: #f0f0f0;
+}
+
+/* Styling for the check-circle icon */
+.conversationHeader img {
+  vertical-align: middle;
+  margin-right: 5px;
+}
+
+/* Styling for the ellipsis (...) in truncated content */
+.content div:first-child {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
