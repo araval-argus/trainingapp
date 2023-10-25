@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient ,HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
@@ -12,12 +12,20 @@ export class ChatService {
   private baseUrl:string ="http://localhost:5050/api/Chat";
   public Username = new Subject<string>();
   public Message = new Subject<string>();
+  MarkAsSeenChanged = new Subject<string>();
   // public Conversations = new Subject<any[]>();
   constructor(private http : HttpClient, private router:Router) { }
 
   // Get All Messages 
   viewMessages(userObj : string, otherObj:string):Observable<any>{
     return this.http.get<any>(`${this.baseUrl}/GetMessages?username=${userObj}&selusername=${otherObj}`);
+  }
+  //Mark all as Read Function
+  MarkAsRead(username: string, seluserusername: string) {
+    const params = new HttpParams()
+      .set('username', username)
+      .set('selusername', seluserusername);
+    return this.http.post<any>(`${this.baseUrl}/markAsRead`, params);
   }
   
   // Send Messages 

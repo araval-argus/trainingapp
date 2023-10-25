@@ -79,5 +79,18 @@ export class SidebarComponent {
     this.authService.logout();
 
   }
+  MarkAllAsRead(){
+    this.chatService.MarkAsRead(this.username,'All').subscribe();
+    this.chatService.MarkAsSeenChanged.next("Changed");
+  }
+  
+  MarkAsRead(e:Event , selusername:string){
+    e.preventDefault();
+    e.stopPropagation();
+    this.chatService.MarkAsRead(this.username,selusername).subscribe((data)=>{
+      console.log(data);
+    });
+    this.chatService.MarkAsSeenChanged.next("Changed.");
+   }
 
 }

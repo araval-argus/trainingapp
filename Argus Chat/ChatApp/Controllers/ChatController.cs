@@ -155,11 +155,24 @@ namespace ChatApp.Controllers
 
         [HttpGet("GetUserId")]
 
-        public IActionResult GetUserId(string userName) {
+        public IActionResult GetUserId(string userName)
+        {
             if (ModelState.IsValid)
             {
                 var id = chatService.FetchUserIdByUsername(userName);
                 return Ok(id);
+            }
+            return BadRequest(new { Message = "Model State is not valid." });
+        }
+
+        // Messages as read or unread 
+        [HttpPost("markAsRead")]
+        public IActionResult markAsRead([FromForm] string username, [FromForm] string selusername)
+        {
+            if (ModelState.IsValid)
+            {
+                chatService.MarkAsRead(username, selusername);
+                return Ok(new { Message = "Marked as Read." });
             }
             return BadRequest(new { Message = "Model State is not valid." });
         }

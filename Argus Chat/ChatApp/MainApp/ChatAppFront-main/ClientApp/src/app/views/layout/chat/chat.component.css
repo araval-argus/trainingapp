@@ -58,7 +58,7 @@
     flex-direction: column;
 }
 #container #body .message .messageContent {
-    background-color: #000000;
+    background-color: whitesmoke;
     border-radius: 5px;
     padding: 10px;
     max-width: 300px;
@@ -145,3 +145,81 @@
 .overflowrap{
     overflow-wrap: anywhere;
 }
+/* Preview Css */
+.modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+  
+  .file-upload {
+    margin-bottom: 15px;
+  }
+  
+  img, audio, video {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+  }
+  
+  .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+  }
+  
+  .btn {
+    cursor: pointer;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+  }
+  
+  .btn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+  }
+  
+  .btn-primary {
+    background-color: #007bff;
+    color: #fff;
+  }
+
+  /* Reply Message Css */
+  .replymsg {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 100%;
+  }
+  
+  .overflowrap {
+    overflow: hidden;
+  }
+  
+  .messageContent {
+    padding: 10px;
+    border: 3px solid #ddd;
+    margin-bottom: 10px;
+  }
+  
+  .time {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+  }
+  
+  .reply button {
+    font-size: 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+  
+  /* Optional: Style for the reply icon */
+  .reply button i {
+    color: #007bff;
+  }
+  
+  

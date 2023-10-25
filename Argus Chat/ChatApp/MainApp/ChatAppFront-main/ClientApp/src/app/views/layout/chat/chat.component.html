@@ -95,15 +95,29 @@
       </div>
       <div class="modal-body">
         <input type="file" class="file-upload" (change)="onFileSelected($event)" #File accept="audio/*,video/*,image/*">
+        <div *ngIf="isImage(fileType)">
+          <img [src]="imageSrc"  width="300" />
+        </div>
+        
+        <!-- Audio Preview -->
+        <div *ngIf="isAudio(fileType)">
+          <audio controls [src]="imageSrc"></audio>
+        </div>
+        
+        <!-- Video Preview -->
+        <div *ngIf="isVideo(fileType)">
+          <video controls [src]="imageSrc" width="300"></video>
+        </div>
       </div>
+      
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
-        <button type="button" class="btn btn-primary" (click)="uploadFile();modal.close()">Send</button>
+        <button type="button" class="btn btn-secondary" (click)="modal.close();removePreview()">Close</button>
+        <button type="button" class="btn btn-primary" (click)="uploadFile();modal.close();removePreview()">Send</button>
       </div>
     </ng-template>
     
-    <div id="micIcon">
+    <!-- <div id="micIcon">
       <img src="../../assets/images/voiceIcon.svg" />
-    </div>
+    </div> -->
   </div>
 </div>
