@@ -18,6 +18,7 @@ export class SidebarComponent {
   constructor(private modalService: NgbModal, private chatService: ChatService, private authService : AuthService) { }
   // @ViewChild('basicModal') basicModal: any;
   username = localStorage.getItem('username');
+  x=205;
   profileImageUrl = '../../assets/images/noPic.svg';
   private searchTerms = new Subject<string>();
   results : any[] ;

@@ -28,6 +28,12 @@
       </ul>
     </div>
   </div>
+  <div class="mark-as-read-container">
+    <button class="mark-as-read-btn" title="Mark All as Read" (click)="MarkAllAsRead()">
+      <img class="checkbox-icon" src="../../../../assets/images/Markallasread.svg" alt="Checkbox icon" />
+    </button>
+    <div class="description">Mark All as Read</div>
+  </div>
   <div id="messageListHolder">
     <div class="conversation" *ngFor="let conversation of conversations" (click)="onClick(conversation.userName)">
       <div class="picture">
@@ -36,9 +42,13 @@
       <div class="content">
         <div class="conversationHeader">
           <div class="name"> {{ conversation.firstName }} </div>
-          <div class="time">{{ recentChatDate(conversation.dateTime) }} <p class="" title="Mark all as read" (click)="MarkAsRead($event,conversation.userName)">
+          <div class="time">{{ recentChatDate(conversation.dateTime) }}</div>
+          <div class="unread-messages" *ngIf="x> 0"> 
+            {{ x }}
+          </div>
+          <p class="" title="Mark all as read" (click)="MarkAsRead($event,conversation.userName)">
             <img width="19" src="../../assets/images/check-circle.svg" />
-          </p></div>
+          </p>
         </div>
         <div *ngIf="!conversation.content.includes('/chat/')">{{ conversation.content | slice:0:20 }}{{ conversation.content.length > 40 ? '...' : '' }}</div>
               <div *ngIf="conversation.content.includes('/chat/')" >Media File</div>

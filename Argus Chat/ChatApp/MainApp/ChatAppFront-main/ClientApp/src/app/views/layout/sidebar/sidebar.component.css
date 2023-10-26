@@ -273,3 +273,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+/* Styling for the unread messages icon */
+.unread-messages {
+  background-color: white; 
+  border-style: groove;
+  color: black;
+  border-radius: 50%; 
+  padding: 5px 10px; 
+  font-size: 12px; 
+}
+/* MArk all as read  */
+.mark-as-read-container {
+  display: flex;
+  align-items: center;
+}
+
+.mark-as-read-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.checkbox-icon {
+  width: 20px; /* Adjust width as needed */
+  height: 20px; /* Adjust height as needed */
+}
+
+.description {
+  margin-left: 10px; /* Adjust margin as needed to separate from the button */
+  font-size: 14px; /* Adjust font size as needed */
+}

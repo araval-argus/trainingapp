@@ -17,28 +17,45 @@
       [ngClass]="{ me: message.senderId == userId ? false : true }"
       *ngFor="let message of conversations"
     > 
-    
-      <img *ngIf="message.type == 'image'" [src]="localPath + message.content" alt="Image" width="350px" height="200px">
+      <div class ="file" *ngIf="message.type == 'image'">
+        
+        <div class="time">{{recentChatDate(message.dateTime) }}</div>
+        <img  [src]="localPath + message.content" alt="Image" width="350px" height="200px">
+      </div>
+      
       <video controls *ngIf="message.type === 'video'" width="350px" height="200px" >
+        <div class="time">{{recentChatDate(message.dateTime) }}</div>
         <source [src]="localPath + message.content" type="video/mp4">
         Your browser does not support the video tag.
       </video>
       <audio controls *ngIf="message.type === 'audio'" width="350px" height="200px" >
+        <div class="time">{{recentChatDate(message.dateTime) }}</div>
         <source [src]="localPath + message.content" type="audio/mp3">
         Your browser does not support the html audio tag.
       </audio>
       
+      
     <!---- Since there are many types of data so depending on type of message we will implement this accordingly. -->
+   
     <div class = "replymsg overflowrap" *ngIf="message.replyedToId != 0 ">{{(message.replyedToId)}} </div>
+    <div *ngIf="message.type === 'Null'" class="time">{{recentChatDate(message.dateTime) }}</div>
     <div *ngIf="message.type === 'Null'" class="messageContent" (dblclick)="ToggleReplyMsg(message)">
         {{ message.content }}
-        <div class="time">{{recentChatDate(message.dateTime) }}</div>
-        <div class="reply">
-          <button style="font-size:20px ; background: transparent; border: none; position:left;"> <i
-              class="fa fa-mail-reply" (click)="ToggleReplyMsg(message)"></i></button>
-        </div>
+       
+      
       </div>
     </div>
+
+    <!-- <div class="message" *ngFor="let message of conversations" [ngClass]="{ 'me': message.senderId === userId }">
+      <div class="profile-pic">
+        <img src="../../assets/images/profile-pic.jpg" alt="Profile Picture" />
+      </div>
+      <div class="message-content">
+        Your message content goes here -->
+        <!-- {{ message.content }}
+      </div>
+    </div> -->
+
     
   </div>
   <!-- To show the replymessage details if we have selected a message. -->
