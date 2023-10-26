@@ -1,16 +1,17 @@
-#background_header {
+/* #background_header {
     width: 100%;
     height: 20vh;
     background-image: url(../../../../assets/images/background.jpg);
-}
+} */
 #background_body {
-    height: 80vh;
+    height: 100vh;
     background: #2b1a8a;
 }
+
 #chatContainer {
     position: fixed;
-    top: 0%;
-    bottom: 0%;
+    top: 8%;
+    bottom: 8%;
     margin: auto;
     width: 70%;
     height: 90%;
