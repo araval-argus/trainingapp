@@ -12,6 +12,8 @@ import { ViewProfileComponent } from './views/pages/view-profile/view-profile.co
 import { ReactiveFormsModule } from '@angular/forms';
 import { EditProfileComponent } from './views/pages/edit-profile/edit-profile.component';
 import { ChatpageComponent } from './views/pages/chatpage/chatpage.component';
+import { SidebarGroupComponent } from './views/layout/sidebar-group/sidebar-group.component';
+
 
 export const routes: Routes = [
     {path:'home',component:HomeComponent},
@@ -23,6 +25,8 @@ export const routes: Routes = [
     {path:'view-profile', component:ViewProfileComponent},
     {path:"edit-profile" , component:EditProfileComponent},
     {path:"chat-page",component:ChatpageComponent},
+    {path:"group",component:SidebarGroupComponent},
+    
     { path: '',   redirectTo: '/home', pathMatch: 'full' },
 ];
 

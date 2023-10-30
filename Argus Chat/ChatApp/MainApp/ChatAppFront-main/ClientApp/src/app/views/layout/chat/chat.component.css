@@ -48,7 +48,7 @@
     flex-direction: column-reverse;
     padding: 10px 20px;
     overflow-y: auto;
-    background-image: url(/src/assets/images/Back.jpg) image-set(width 20px);
+    /* background-image: url(/src/assets/images/Back.jpg) image-set(width 20px); */
 }
 #container #body .message {
     margin-top: 10px;
