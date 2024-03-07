@@ -1,0 +1,182 @@
+<div *ngIf="user" [style]="{height : '100%'}">
+    
+    <div class="chat-header border-bottom pb-2">
+        <div class="d-flex justify-content-between">
+            <div class="d-flex align-items-center">
+                
+                <i class="feather icon-corner-up-left icon-md mr-2 ml-n2 text-muted d-lg-none"></i>
+                <div>
+                    <p># General</p>
+                    <!-- <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'available'">
+                        <i class="mdi mdi-brightness-1 active"></i>
+                        <span class="ml-1">Available</span>
+                    </p>
+                    <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'dnd'">
+                        <i class="mdi mdi-minus-circle dnd"></i>
+                        <span class="ml-1">Do not disturb</span>
+                    </p>
+                    <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'busy'">
+                        <i class="mdi mdi-brightness-1 busy"></i>
+                        <span class="ml-1">Busy</span>
+                    </p>
+                    <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'rightback'">
+                        <i class="mdi mdi-clock-fast beBack"></i>
+                        <span class="ml-1">Be right back</span>
+                    </p>
+                    <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'away'">
+                        <i class="mdi mdi-clock beBack"></i>
+                        <span class="ml-1">Away</span>
+                    </p>
+                    <p class="text-muted tx-13" *ngIf="selectedUser.profileStatus.toLowerCase() === 'offline'">
+                        <i class="mdi mdi-close-circle-outline"></i>
+                        <span class="ml-1">Offline</span>
+                    </p> -->
+    
+                </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <ng-select [items]="areas"
+                style="width:200px; margin-right: 5px;"
+                bindLabel="name"
+                bindValue="id"
+                [searchable]="true"
+                [(ngModel)]="areaId"
+                (ngModelChange)="requestForMessage()"
+                >
+              </ng-select>
+                <!-- <a href="" (click)="false">
+                    <i class="feather icon-video icon-md text-muted mr-3" (click)="openModal(openComment)" ngbTooltip="Start video call"></i>
+                </a> -->
+                <div class="d-flex flex-grow align-items-center px-2 addPost mr-1" (click)="openModal(openComment)">
+                  <i class="mdi mdi-plus icon-lg"></i>
+                  <span class="mr-2">New</span>
+                </div>
+                 <!-- <i class="feather icon-video icon-md text-muted mr-3"  ngbTooltip="Start video call"></i>     -->
+                 <!-- HEELLLO<i class="bi bi-plus-square"></i> -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Rendering message list -->
+    <div class="chat-body row justify-content-center" style="width: 100%;" id="chat-body" [perfectScrollbar] #scrollContainer>
+        <div class="messages d-lg-flex d-md-flex col-lg-4 col-md-6 mb-3" *ngFor="let message of messageList; let i = index">
+    
+            <!-- for date -->
+            <!-- <div class="text-center" *ngIf="i == 0 || (message.createdAt | date : 'mediumDate') !== (messageList[i-1].createdAt | date : 'mediumDate')"
+                [style]="{'margin-bottom':'0.5rem !important'}">
+                <p class="p-1 d-inline-block text-muted rounded" style="font-size: 0.7rem; background-color: rgba(194, 202, 209, 0.897);">{{message.createdAt | date : 'mediumDate'}}</p>
+            </div> -->
+
+            <div style="width: 100%;">
+              <div class="card text-dark bg-light">
+                <div class="card-header">{{message.areaName}}</div>
+                <div class="card-body">
+                  <h5 class="card-title">{{message.role}} - ${{message.payPerHour}} Per Hour</h5>
+                  <p class="card-text">{{message.desc}}</p>
+                </div>
+                <div class="d-flex ml-2 mb-2">
+                  <img [src]="getProfile(message.imageUrl)" class="img-xs rounded-circle" alt="avatar">
+                  <div class="d-flex flex-column bubble pl-2">
+                      <p class="text-success font-weight-bold">
+                          ~{{message.messageFromUsername}}
+                      </p>
+                      <p class="text-right">{{ message.createdAt | date : 'medium' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+    
+            <!-- msgs -->
+            <!-- <li class="message-item" [ngClass]="message.messageFromUsername === user.userName ? 'me' : 'friend'">
+    
+                <img [src]="getProfile(message.imageUrl)" class="img-xs rounded-circle" alt="avatar">
+    
+                <div class="content">
+                    <div class="message">
+    
+                        <div class="bubble" [ngClass]="message.messageFrom == user.userName ? 'mymsg' : ''">
+    
+                            <p class="text-success font-weight-bold" *ngIf="message.messageFrom !== user.userName">
+                                ~{{message.messageFromUsername}}
+                            </p>
+    
+                            <p class="d-inline-block">{{message.desc}}</p>
+                            <p style="font-size: 0.5rem;" class="text-right">{{ message.createdAt | date : 'shortTime' }}</p>
+                        </div>
+    
+                        render file -->
+                        <!-- <div *ngIf="message.type !== 'text'">
+                            
+                            <img *ngIf="message.type === 'image'" [src]="getMsgUrl(message.filePath)" class="img-md" height="200px" width="200px" alt="avatar">
+    
+                            <video width="320" height="240" controls *ngIf="message.type === 'video'">
+                                <source [src]="getMsgUrl(message.filePath)" type="video/mp4">
+                                <source [src]="getMsgUrl(message.filePath)" type="video/ogg">
+                              Your browser does not support the video tag.
+                            </video>
+    
+                            <audio controls *ngIf="message.type === 'audio'">
+                                <source [src]="getMsgUrl(message.filePath)" type="audio/ogg">
+                                <source [src]="getMsgUrl(message.filePath)" type="audio/mpeg">
+                              Your browser does not support the audio element.
+                            </audio>
+                            
+                        </div>
+                        
+                        <div class="mt-2">
+                            <span class="d-box">{{ message.createdAt | date : 'shortTime' }}</span>
+                        </div>
+                        
+                    </div>
+                </div>
+            </li> -->
+          </div>
+          <h3 class="text-primary d-flex justify-content-center mt-2" *ngIf="messageList.length==0">No Data Found</h3>
+    </div>
+    
+
+</div>
+
+
+<ng-template tabindex="-1" aria-hidden="true" let-modal let-d="dismiss" #openComment>
+
+    <div class="modal-content">
+
+        <!--Header-->
+        <div class="modal-header">
+          <h5 class="modal-title" >Create a post</h5>
+        </div>
+    
+            <div class="modal-body">
+                
+                <div class="form-group">
+                    <label for="name">Requirement For : </label>
+                    <input type="text" name="userName" class="form-control" [(ngModel)]="post.role" required>
+                </div>
+    
+                <div class="form-group">
+                <label for="name">Description : </label>
+                <input type="text" name="groupName" [(ngModel)]="post.desc" class="form-control" placeholder="Description" minlength="5" required maxlength="200">
+                </div>
+
+                <div class="form-group">
+                    <label for="name">Area : </label>
+                    <select class="form-select rounded-0 font-size-14" [(ngModel)]="post.areaCode">
+                        <option *ngFor="let area of areas" [value]="area.id">{{area.name}}
+                        </option>
+                    </select>
+                </div>
+    
+                <div class="form-group">
+                <label for="name">Pay Per Hour (in $) : </label>
+                <input class="form-control" name="description" [(ngModel)]="post.payPerHour" type="number" min="0" max="999">
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" (click)="modal.close()">Close</button>
+                <button type="submit" class="btn btn-primary" (click)="createPost();modal.close();" [disabled]="post.areaCode<=0 || post.desc=='' || post.role=='' || !post.payPerHour || post.payPerHour<0 || post.payPerHour>999">Make Post</button>
+            </div>
+    </div>
+
+</ng-template>

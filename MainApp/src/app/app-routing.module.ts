@@ -31,6 +31,10 @@ const routes: Routes = [
         path: 'admin',
         loadChildren: () => import('./views/admin/admin.module').then(m => m.AdminModule)
       },
+      {
+        path: 'general',
+        loadChildren: () => import('./views/pages/general/general.module').then(m => m.GeneralModule)
+      },
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' }, 
     ]
   },

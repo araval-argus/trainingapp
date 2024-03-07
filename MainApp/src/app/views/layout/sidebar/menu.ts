@@ -11,6 +11,11 @@ export const MENU: MenuItem[] = [
     link: '/dashboard'
   },
   {
+    label: 'General',
+    icon: 'inbox',
+    link: '/general'
+  },
+  {
     label: 'Chat',
     icon: 'inbox',
     link: '/chat'

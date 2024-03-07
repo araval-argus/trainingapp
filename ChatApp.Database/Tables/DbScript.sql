@@ -21,4 +21,9 @@ INSERT INTO Profiles (FirstName, LastName, UserName, Email, Password, CreatedBy,
 INSERT INTO Salts (UserId, UsedSalt) values (1, 'mQcB1ZgH5gSwI5olEKlmZA==');
 END
 
+IF NOT EXISTS(SELECT * FROM Areas)
+BEGIN
+INSERT INTO Areas (Name)
+	values ('Area 1'),('Area 2'),('Area 3'),('Area 4');
+END
 

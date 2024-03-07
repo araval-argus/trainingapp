@@ -23,5 +23,7 @@ namespace ChatApp.Context
         public virtual DbSet<Notification> Notifications { get; set; }
         public virtual DbSet<Status> Status { get; set; }
         public virtual DbSet<Designation> Designations { get; set; }
+        public virtual DbSet<Areas> Areas { get; set; }
+        public virtual DbSet<GeneralMessages> GeneralMessages { get; set; }
     }
 }
